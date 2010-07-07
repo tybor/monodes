@@ -22,6 +22,8 @@
 #include "node.h"
 #include "beam.h"
 
+#include "QTransform"
+
 Canvas::Canvas()
 {
     /* Drawing this structure for now
@@ -59,4 +61,9 @@ Canvas::Canvas()
     //scale(qreal(0.8), qreal(0.8));
     setMinimumSize(150, 100);
     setWindowTitle(tr("Mobile nodes"));
+    // Trasformation to view the model as the engineers expects, i.e. y growing upwards.
+    setTransform(QTransform
+                (1.0,  0.0, 0.0,
+                 0.0, -1.0, 0.0,
+                 0.0,  0.0, 1.0), false);
 }

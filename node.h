@@ -32,12 +32,7 @@ class Node : public QGraphicsItem
 {
 public:
     Node(Canvas *a_canvas,double an_x, double an_y);
-    // Create a new node on a_canvas
 
-    // Coordinates
-    qreal x,y;
-
-    inline QPointF to_point() {return QPointF(x,y); };
     void add_beam (Beam *a_beam);
     QList<Beam *> beams() const;
 

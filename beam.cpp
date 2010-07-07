@@ -38,7 +38,7 @@ Beam::Beam(Node *a_node, Node *another_node)
 QRectF Beam::boundingRect() const
 {
     qreal extra = 2.0;
-    QRectF result = QRectF(first->to_point(),  second->to_point()).normalized();
+    QRectF result = QRectF(first->pos(),  second->pos()).normalized();
     result.adjust(-extra, -extra, extra, extra);
     return result;
 }

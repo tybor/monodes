@@ -30,8 +30,7 @@ Node::Node(Canvas *a_canvas,double an_x, double an_y)
 {
         assert(a_canvas!=NULL);
         canvas=a_canvas;
-        x = an_x;
-        y = an_y;
+        setPos(an_x,an_y);
  }
 
     void Node::add_beam(Beam *a_beam) {
