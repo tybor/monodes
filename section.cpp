@@ -18,24 +18,21 @@
 */
 
 
-#include "linearsystem.h"
-#include "matrix.h"
-#include "assert.h"
+#include "section.h"
 
-LinearSystem::LinearSystem (Matrix a_stiffness, Matrix some_loads) {
-    assert(a_stiffness.rows() == some_loads.rows());
-
-    stiffness = a_stiffness;
-    loads = some_loads;
+Section::Section(qreal a_width, qreal an_height)
+{
+    b=a_width;
+    h=an_height;
 }
 
-void LinearSystem::run()
-{
-    //qreal sol[][] = new qreal[stiffness.size()][loads.size()]
-    // currently empty
+qreal Section::area() const {return b*h;}
+qreal Section::moment_of_inertia() const {
+    // Avoiding pow to be faster
+    return b*h*h*h/12.0;
 }
-
-Matrix LinearSystem::solutions()
-{
-    return displacements;
+qreal Section::height() const {return h;};
+qreal Section::shear_factor() const {
+    // Rectangular sections have a shear factor of 6/5
+    return 1.2;
 }

@@ -18,24 +18,28 @@
 */
 
 
-#include "linearsystem.h"
-#include "matrix.h"
-#include "assert.h"
+#ifndef MATERIAL_H
+#define MATERIAL_H
 
-LinearSystem::LinearSystem (Matrix a_stiffness, Matrix some_loads) {
-    assert(a_stiffness.rows() == some_loads.rows());
+#include <QtCore>
 
-    stiffness = a_stiffness;
-    loads = some_loads;
-}
-
-void LinearSystem::run()
+class Material
+        // An indefinite elastic material
 {
-    //qreal sol[][] = new qreal[stiffness.size()][loads.size()]
-    // currently empty
-}
+public:
+    Material(); // Default material
+    Material(qreal an_E, qreal a_nu, qreal an_alfa);
 
-Matrix LinearSystem::solutions()
-{
-    return displacements;
-}
+    // TODO: turn into a QObject heir with slots for changed values.
+    qreal young_modulus() const;
+    qreal poisson_ratio() const;
+    qreal thermal_expansion_coefficient() const;
+    qreal weight() const;
+private:
+    qreal E; // Young modulus
+    qreal nu; // Poisson ratio
+    qreal alfa; // coefficient of thermal expansion
+    qreal density; // density
+};
+
+#endif // MATERIAL_H

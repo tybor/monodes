@@ -22,15 +22,28 @@
 #define LINEARSYSTEM_H
 
 #include <QThread>
+#include "matrix.h"
 
 class LinearSystem : public QThread
-        // A linear system running as a separate thread
+        // A linear system running as a separate thread, specialized in solving the systems resulting from the
+        // stiffness method of structural analysis.
 {
 public:
-    //set_degrees_of_freedom (unsigned int an_n);
-    //set_load_cases_count (unsigned int an_n);
+        LinearSystem (Matrix stiffness, Matrix loads);
+        // a new solving linear system for a structure with `a_dofs' degrees of freedom with `a_lcc' load cases
+        //add_stiffness (unsigned int i, unsigned int j, qreal stiffness); /// Add stiffness at index i,j
+        //add_load (unsigned int dof, unsigned int lc, qreal load);
+
+        Matrix solutions();
 protected:
      void run();
+ private:
+     unsigned int dof; /// Degrees of freedom
+     unsigned int lcc; /// Load cases count
+
+     Matrix stiffness;
+     Matrix displacements;
+     Matrix loads;
 
 signals:
 

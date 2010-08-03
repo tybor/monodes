@@ -17,25 +17,26 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-
 #include "canvas.h"
 #include "node.h"
 #include "beam.h"
+#include "matrix.h"
 
 #include "QTransform"
+#include <QDialog>
+#include <QPushButton>
+#include <QFormLayout>
+#include <QDoubleSpinBox>
+
+#include <assert.h>
+#include <stdio.h>
+#include <iostream>
 
 Canvas::Canvas()
 {
-    /* Drawing this structure for now
-     *
-     *  D--E--F--G  30
-     *  |  |  |
-     *  A  B  C     0
-     *  0 50 100 120
-     */
     QGraphicsScene *scene = new QGraphicsScene(this);
     scene->setItemIndexMethod(QGraphicsScene::NoIndex);
-    scene->setSceneRect(-50, -50, 150, 50);
+
     setScene(scene);
     setCacheMode(CacheBackground);
     setViewportUpdateMode(BoundingRectViewportUpdate);
@@ -43,27 +44,111 @@ Canvas::Canvas()
     setTransformationAnchor(AnchorUnderMouse);
     setResizeAnchor(AnchorViewCenter);
 
-    Node *a = new Node(this,   0.0,  0.0); scene->addItem(a);
-    Node *b = new Node(this,  50.0,  0.0); scene->addItem(b);
-    Node *c = new Node(this, 100.0,  0.0); scene->addItem(c);
-    Node *d = new Node(this,   0.0, 30.0); scene->addItem(d);
-    Node *e = new Node(this,  50.0, 30.0); scene->addItem(e);
-    Node *f = new Node(this, 100.0, 30.0); scene->addItem(f);
-    Node *g = new Node(this, 120.0, 30.0); scene->addItem(g);
+    // Add zoom buttons
+    // the following is clumsy; "-" overrides "+" button.
 
-    scene->addItem(new Beam(a,d));
-    scene->addItem(new Beam(d,e));
-    scene->addItem(new Beam(e,f));
-    scene->addItem(new Beam(f,g));
-    scene->addItem(new Beam(b,e));
-    scene->addItem(new Beam(c,f));
+//    QPushButton *zoomin_button = new QPushButton ("+");
+//    QPushButton *zoomout_button = new QPushButton ("-");
+//    QGraphicsProxyWidget *proxy2 = scene->addWidget (zoomout_button);
 
-    //scale(qreal(0.8), qreal(0.8));
     setMinimumSize(150, 100);
     setWindowTitle(tr("Mobile nodes"));
+    setBackgroundBrush
+	    (QBrush(QImage(":/images/paper3.png")));
     // Trasformation to view the model as the engineers expects, i.e. y growing upwards.
     setTransform(QTransform
                 (1.0,  0.0, 0.0,
                  0.0, -1.0, 0.0,
                  0.0,  0.0, 1.0), false);
+
+    // Makes a continous beam with 1 extra_bearing, in addition to the left and the right. Left and right are hinges. The beam is rectangular and made of concrete. A uniform load is added to the right span.
+    // a--b--c
+    // ^  ^  ^
+    // Left bearing
+    Node *a = new Node(0.0, 300.0,uncostrained); add_node(*a);
+    // Middle bearing
+    Node *b = new Node(300.0,0.0,horizontal_trailer); add_node(*b);
+    // Right bearing
+    Node *c = new Node(800.0,0.0, hinge); add_node(*c);
+
+    a->setToolTip("A");
+    b->setToolTip("B");
+    c->setToolTip("C");
+
+    // Adding load on bc, the right span.
+    // Testing rendering of nodes
+    add_node(*(new Node(0.0,-100.0, uncostrained)));
+    add_node(*(new Node(50.0,-100.0, vertical_trailer)));
+    add_node(*(new Node(100.0,-100.0, horizontal_trailer)));
+    add_node(*(new Node(150.0,-100.0, hinge)));
+    add_node(*(new Node(200.0,-100.0, vertical_shoe)));
+    add_node(*(new Node(250.0,-100.0, horizontal_shoe)));
+    add_node(*(new Node(300.0,-100.0, restrained)));
+
+    //QGraphicsSvgItem foo("")
+    Beam *left = new Beam(a,b); add_beam(*left);
+    Beam *right = new Beam(b,c); add_beam(*right);
+
+    Material *steel = new Material(210000.0,0.9,1.4e-6);
+    Section *section = new Section(8.0, 15.0);
+    left->set_material(*steel); left->set_section(*section);
+    right->set_material(*steel); right; right->set_section(*section);
+
+    zoom_to_fit(); // instead of  scene->setSceneRect(-50, -50, 150, 50);
+}
+
+void Canvas::add_node(Node &a_node) {
+    scene()->addItem(&a_node);
+    nodes_list.append(&a_node);
+}
+
+void Canvas::add_beam(Beam &a_beam) {
+    scene()->addItem(&a_beam);
+    beams_list.append(&a_beam);
+}
+
+QList<Node*> Canvas::nodes() const {
+    return nodes_list;
+}
+
+QList<Beam*> Canvas::beams() const {
+    return beams_list;
+}
+
+void Canvas::zoom_to_fit() {
+    qreal x1=0.0,x2=0.0,y1=0.0,y2=0.0;
+    QList<Node*>::iterator i;
+    // Find the smallest and biggest coordinate.
+    for (i=nodes_list.begin(); i!=nodes_list.end(); ++i) {
+        Node &n=**i;
+        if (n.x()<x1) x1=n.x();
+        if (n.x()>x2) x2=n.x();
+        if (n.y()<y1) y1=n.y();
+        if (n.y()>y2) y2=n.y();
+    }
+    qreal dx = x2-x1; qreal dy = y2-y1;
+    qreal border = ( (dx>dy) ? dx : dy ) / 20;
+    scene()->setSceneRect(x1-border,y1-border,dx+2*border,dy+2*border);
+}
+void Canvas::zoom_in(){
+
+}
+void Canvas::zoom_out(){
+
+}
+
+unsigned int Canvas::support_conditions_count() const {
+    assert(/*not implemented*/ NULL);
+    unsigned int i, size=nodes().size(), result=0;
+    for (i=size; i>=0; i--) result+=nodes().at(i)->support_conditions_count();
+    return result;
+}
+
+void Canvas::solve() {
+    unsigned int dofs=nodes().size()*3 -support_conditions_count() ; // degrees of freedom
+    unsigned int lcc=1; // load cases count
+
+    // TODO: this shall be a SymmetricSquareMatrix
+    Matrix m(dofs,dofs);
+    // Sum all the stiffness
 }

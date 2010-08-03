@@ -3,12 +3,12 @@
 
     This file is part of Monodes.
 
-    0MQ is free software; you can redistribute it and/or modify it under
+    Monodes is free software; you can redistribute it and/or modify it under
     the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.
 
-    0MQ is distributed in the hope that it will be useful,
+    Monodes is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     Lesser GNU General Public License for more details.
@@ -18,24 +18,27 @@
 */
 
 
-#include "linearsystem.h"
-#include "matrix.h"
-#include "assert.h"
+#ifndef NODEDIALOG_H
+#define NODEDIALOG_H
 
-LinearSystem::LinearSystem (Matrix a_stiffness, Matrix some_loads) {
-    assert(a_stiffness.rows() == some_loads.rows());
+#include <QtGui>
+//#include <QDialogButtonBox>
 
-    stiffness = a_stiffness;
-    loads = some_loads;
-}
+// Forward declarations
+class Node;
 
-void LinearSystem::run()
+class NodeDialog : public QDialog
 {
-    //qreal sol[][] = new qreal[stiffness.size()][loads.size()]
-    // currently empty
-}
+    Q_OBJECT
+public:
+    //explicit NodeDialog(QWidget *parent = 0);
+    NodeDialog (Node &a_node);
+private:
+    Node &node;
+signals:
 
-Matrix LinearSystem::solutions()
-{
-    return displacements;
-}
+public slots:
+
+};
+
+#endif // NODEDIALOG_H

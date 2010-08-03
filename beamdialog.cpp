@@ -3,12 +3,12 @@
 
     This file is part of Monodes.
 
-    0MQ is free software; you can redistribute it and/or modify it under
+    Monodes is free software; you can redistribute it and/or modify it under
     the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.
 
-    0MQ is distributed in the hope that it will be useful,
+    Monodes is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     Lesser GNU General Public License for more details.
@@ -18,17 +18,20 @@
 */
 
 
-#include "mainmenu.h"
-#include "ui_mainmenu.h"
+#include "beamdialog.h"
+#include "beam.h"
+#include <QtGui>
 
-MainMenu::MainMenu(QWidget *parent) :
+BeamDialog::BeamDialog(Beam &a_beam,QWidget *parent) :
     QDialog(parent),
-    ui(new Ui::MainMenu)
+    beam(a_beam)
 {
-    ui->setupUi(this);
-}
-
-MainMenu::~MainMenu()
-{
-    delete ui;
+    QFormLayout *layout = new QFormLayout;
+    setLayout(layout);
+    QDoubleSpinBox *x_spin = new QDoubleSpinBox;
+    QDoubleSpinBox *y_spin = new QDoubleSpinBox;
+    x_spin->setValue(beam.x());
+    y_spin->setValue(beam.y());
+    layout->addRow("x:", x_spin);
+    layout->addRow("y:", y_spin);
 }

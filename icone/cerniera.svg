@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="38pt" height="26pt" viewBox="0 0 38 26" version="1.1">
+<g id="surface0">
+<rect x="0" y="0" width="38" height="26" style="fill:rgb(100%,100%,100%);fill-opacity:1;stroke:none;"/>
+<path style="fill:none;stroke-width:0.1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%,0%,0%);stroke-opacity:1;stroke-miterlimit:10;" d="M 11.599992 7.799992 L 12.399992 7.799992 " transform="matrix(20,0,0,20,-210.585786,-142.585786)"/>
+<path style="fill:none;stroke-width:0.1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%,0%,0%);stroke-opacity:1;stroke-miterlimit:10;" d="M 11.199992 7.199992 L 11.199992 8.399992 " transform="matrix(20,0,0,20,-210.585786,-142.585786)"/>
+<path style="fill:none;stroke-width:0.1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%,0%,0%);stroke-opacity:1;stroke-miterlimit:10;" d="M 11.199992 7.199992 L 10.599992 7.799992 " transform="matrix(20,0,0,20,-210.585786,-142.585786)"/>
+<path style="fill:none;stroke-width:0.1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%,0%,0%);stroke-opacity:1;stroke-miterlimit:10;" d="M 11.199992 7.799992 L 10.599992 8.399992 " transform="matrix(20,0,0,20,-210.585786,-142.585786)"/>
+<path style="fill:none;stroke-width:0.1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%,0%,0%);stroke-opacity:1;stroke-miterlimit:10;" d="M 11.199992 8.099992 L 10.899992 8.399992 " transform="matrix(20,0,0,20,-210.585786,-142.585786)"/>
+<path style="fill:none;stroke-width:0.1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%,0%,0%);stroke-opacity:1;stroke-miterlimit:10;" d="M 10.599992 8.099992 L 11.199992 7.499992 " transform="matrix(20,0,0,20,-210.585786,-142.585786)"/>
+<path style="fill:none;stroke-width:0.1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%,0%,0%);stroke-opacity:1;stroke-miterlimit:10;" d="M 10.599992 7.499992 L 10.899992 7.199992 " transform="matrix(20,0,0,20,-210.585786,-142.585786)"/>
+<path style="fill-rule:evenodd;fill:rgb(100%,100%,100%);fill-opacity:1;stroke-width:0.1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%,0%,0%);stroke-opacity:1;stroke-miterlimit:10;" d="M 11.599992 7.799992 C 11.599992 8.020891 11.420891 8.199992 11.199992 8.199992 C 10.979094 8.199992 10.799992 8.020891 10.799992 7.799992 C 10.799992 7.579094 10.979094 7.399992 11.199992 7.399992 C 11.420891 7.399992 11.599992 7.579094 11.599992 7.799992 " transform="matrix(20,0,0,20,-210.585786,-142.585786)"/>
+</g>
+</svg>

@@ -3,12 +3,12 @@
 
     This file is part of Monodes.
 
-    0MQ is free software; you can redistribute it and/or modify it under
+    Monodes is free software; you can redistribute it and/or modify it under
     the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.
 
-    0MQ is distributed in the hope that it will be useful,
+    Monodes is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     Lesser GNU General Public License for more details.
@@ -18,24 +18,17 @@
 */
 
 
-#include "linearsystem.h"
-#include "matrix.h"
-#include "assert.h"
+#include "trussdialog.h"
+#include "ui_trussdialog.h"
 
-LinearSystem::LinearSystem (Matrix a_stiffness, Matrix some_loads) {
-    assert(a_stiffness.rows() == some_loads.rows());
-
-    stiffness = a_stiffness;
-    loads = some_loads;
+TrussDialog::TrussDialog(QWidget *parent) :
+    QDialog(parent),
+    ui(new Ui::TrussDialog)
+{
+    ui->setupUi(this);
 }
 
-void LinearSystem::run()
+TrussDialog::~TrussDialog()
 {
-    //qreal sol[][] = new qreal[stiffness.size()][loads.size()]
-    // currently empty
-}
-
-Matrix LinearSystem::solutions()
-{
-    return displacements;
+    delete ui;
 }

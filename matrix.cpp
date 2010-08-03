@@ -20,10 +20,13 @@
 
 #include "matrix.h"
 #include <iostream>
+#include <string.h> // to get memcpy
 #include "assert.h"
 
 Matrix::Matrix () {
-    // Nothing at all; let's make the compiler happy.
+    rows_count = 0;
+    cols_count = 0;
+    coefficients = NULL;
 }
 
 Matrix::Matrix(unsigned int a_rows_n, unsigned int a_cols_n)
@@ -33,18 +36,38 @@ Matrix::Matrix(unsigned int a_rows_n, unsigned int a_cols_n)
     coefficients = new qreal[rows()*cols()];
 }
 
-Matrix::Matrix (Matrix &another) {
+Matrix::Matrix(unsigned int a_rows_n, unsigned int a_cols_n, qreal some_coefficients[]) {
+	// I would have liked to write 
+	// unsigned int count =  sizeof some_coefficients / sizeof *some_coefficients;
+	// assert (count== a_rows_n*a_cols_n);
+	// to check if some_coefficients has the correct size but for C++ this is a pointer to a black hole and the size of the array it points to is lost. Shame on you!
+    rows_count = a_rows_n;
+    cols_count = a_cols_n;
+
+    coefficients = new qreal[rows()*cols()];
+    memcpy(coefficients, some_coefficients, sizeof some_coefficients);
+//    for(unsigned int i=1; i<=rows();i++)
+//        for(unsigned int j=1; i<=cols();j++)
+//            set(some_coefficients[(i-1)*cols()+j-1],i,j);
+}
+
+Matrix::Matrix (const Matrix &another) {
     rows_count = another.rows();
     cols_count = another.cols();
     // We may provide something better than that:
     coefficients = new qreal[rows()*cols()];
     for(unsigned int i=1; i<=rows();i++)
-        for(unsigned int j=1; i<=cols();j++)
+	for(unsigned int j=1; j<=cols();j++)
             set(another.at(i,j),i,j);
+    // perhaps something like coeffients = memcpy(another.coefficients,
 }
 
 Matrix::~Matrix() {
+    std::cout<<"Deleting a "<<
+	    rows_count<<"x"<<cols_count<<
+	    " matrix..."<<std::flush;
     delete coefficients;
+    std::cout<<"deleted.\n"<<std::flush;
 }
 
 qreal Matrix::at(unsigned int a_row, unsigned int a_col) const {
@@ -63,6 +86,31 @@ void Matrix::add(qreal a_value,unsigned int a_row, unsigned int a_col) {
     assert(is_valid_row(a_row));
     assert(is_valid_col(a_col));
     coefficients[(a_row-1)*cols() + (a_col-1)]+=a_value;
+}
+
+Matrix Matrix::transposed() {
+    // Copy current matrix
+    Matrix result(cols(),rows());
+    for (unsigned int r=1; r<=rows();r++) {
+        // Copy the diagonal element
+        result.set(at(r,r), r,r);
+        // Copy non-diagonal elements
+        for (unsigned int c=r+1; c<=cols();c++)
+            result.set(at(r,c),c,r);
+    }
+    return result;
+}
+
+Matrix Matrix::operator* (Matrix another) {
+    assert(cols()==another.rows());
+    Matrix result(rows(),another.cols());
+    for (unsigned int i=1; i<=result.rows();i++)
+	for (unsigned int j=1; j<=result.cols();j++) {
+	    result.set(0.0,i,j);
+	    for (unsigned int k=1; k<=cols();k++)
+		result.add(at(i,k)*another.at(k,j),i,j);
+        };
+       return result;
 }
 
 bool Matrix::is_valid_col(unsigned int a_col) const {

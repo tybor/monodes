@@ -18,25 +18,23 @@
 */
 
 
-#ifndef MAINMENU_H
-#define MAINMENU_H
+#ifndef SECTION_H
+#define SECTION_H
 
-#include <QDialog>
+#include <QtCore>
 
-namespace Ui {
-    class MainMenu;
-}
-
-class MainMenu : public QDialog
+class Section
+        // A simple rectangular section
 {
-    Q_OBJECT
-
 public:
-    explicit MainMenu(QWidget *parent = 0);
-    ~MainMenu();
+    Section(qreal a_width, qreal an_height);
+    qreal area() const;
+    qreal moment_of_inertia() const;
+    qreal height() const;
+    qreal shear_factor() const;
 
 private:
-    Ui::MainMenu *ui;
+    qreal b,h;
 };
 
-#endif // MAINMENU_H
+#endif // SECTION_H

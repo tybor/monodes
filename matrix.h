@@ -26,15 +26,23 @@
 class Matrix
         /// A two dimensional array dynamically
 {
+
+    // TODO: implement a copy-on-write design!
 public:
     Matrix(); // Undefined matrix
     Matrix(unsigned int a_rows_n, unsigned int a_cols_c);
-    Matrix(Matrix &another); // Copy constructor
+    Matrix(unsigned int a_rows_n, unsigned int a_cols_c, qreal coefficients[]);
+    Matrix(const Matrix &another); // Copy constructor
     ~Matrix();
 
+    // Element access and modifying
     qreal at(unsigned int rows_n, unsigned int cols_c) const;
     void set(qreal a_value,unsigned int rows_n, unsigned int cols_c);
     void add(qreal a_value,unsigned int rows_n, unsigned int cols_c);
+
+    // Operation
+    Matrix transposed();
+    Matrix operator* (Matrix another);
 
     // Queries; all leaves matrix constant
     unsigned int rows() const {return rows_count;};
@@ -48,7 +56,7 @@ private:
     unsigned int rows_count;
     unsigned int cols_count;
 
-    qreal *coefficients;
+    qreal    *coefficients;
 };
 
 #endif // MATRIX_H

@@ -18,24 +18,20 @@
 */
 
 
-#include "linearsystem.h"
-#include "matrix.h"
-#include "assert.h"
+#include "material.h"
 
-LinearSystem::LinearSystem (Matrix a_stiffness, Matrix some_loads) {
-    assert(a_stiffness.rows() == some_loads.rows());
-
-    stiffness = a_stiffness;
-    loads = some_loads;
-}
-
-void LinearSystem::run()
+Material::Material()
 {
-    //qreal sol[][] = new qreal[stiffness.size()][loads.size()]
-    // currently empty
+    Material(1.0,1.0,1.0);
 }
 
-Matrix LinearSystem::solutions()
-{
-    return displacements;
+Material::Material(qreal an_E, qreal a_nu, qreal an_alfa) {
+    E=an_E;
+    nu=a_nu;
+    alfa=an_alfa;
 }
+
+qreal Material::young_modulus() const {return E;}
+qreal Material::poisson_ratio() const {return nu; }
+qreal Material::thermal_expansion_coefficient() const {return alfa;}
+qreal Material::weight() const { return density; }

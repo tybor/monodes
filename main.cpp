@@ -1,16 +1,21 @@
 #include <QtGui/QApplication>
-#include "mainwindow.h"
 #include "canvas.h"
+#include "matrix.h"
+#include <stdio.h>
+#include <iostream>
+#include <assert.h>
 
 int main(int argc, char *argv[])
 {
-    QApplication a(argc, argv);
-    Canvas w; //MainWindow w;
+    QApplication application(argc, argv);
+    Canvas continous_beam;
+
+
 #if defined(Q_WS_S60)
-    w.showMaximized();
+    continous_beam.showMaximized();
 #else
-    w.show();
+    continous_beam.show();
 #endif
 
-    return a.exec();
+    return application.exec();
 }

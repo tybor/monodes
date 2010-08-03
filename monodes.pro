@@ -11,19 +11,33 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        mainwindow.cpp \
     node.cpp \
     canvas.cpp \
     beam.cpp \
-    linearsystem.cpp
+    linearsystem.cpp \
+    matrix.cpp \
+    material.cpp \
+    section.cpp \
+    nodedialog.cpp \
+    beamdialog.cpp \
+    materialdialog.cpp \
+    trussdialog.cpp
 
-HEADERS  += mainwindow.h \
+HEADERS  += \
     node.h \
     canvas.h \
     beam.h \
-    linearsystem.h
+    linearsystem.h \
+    matrix.h \
+    material.h \
+    section.h \
+    nodedialog.h \
+    beamdialog.h \
+    materialdialog.h \
+    trussdialog.h
 
-FORMS    += mainwindow.ui
+FORMS    += \
+    trussdialog.ui
 
 CONFIG += mobility
 MOBILITY = 
@@ -34,3 +48,9 @@ symbian {
     TARGET.EPOCSTACKSIZE = 0x14000
     TARGET.EPOCHEAPSIZE = 0x020000 0x800000
 }
+
+RESOURCES += \
+    images.qrc
+
+OTHER_FILES += \
+    README
