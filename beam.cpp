@@ -213,9 +213,9 @@ Beam::Beam(Node *a_node, Node *another_node)
 }
 
 // How difficoult to get read-only fields, that in Eiffel are for free!!!
-inline Node &Beam::first() const { return *first_node; }
-inline Node &Beam::second() const { return *second_node; }
-inline qreal Beam::length() const { return beam_length;}
+Node &Beam::first() const { return *first_node; }
+Node &Beam::second() const { return *second_node; }
+qreal Beam::length() const { return beam_length;}
 
 void Beam::set_section(Section &a_section) {
     s = &a_section;

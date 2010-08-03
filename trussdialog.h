@@ -21,7 +21,7 @@
 #ifndef TRUSSDIALOG_H
 #define TRUSSDIALOG_H
 
-#include <QDialog>
+#include <QtGui>
 
 namespace Ui {
     class TrussDialog;
@@ -35,6 +35,13 @@ public:
     explicit TrussDialog(QWidget *parent = 0);
     ~TrussDialog();
 
+    //see http://wiki.forum.nokia.com/index.php/Handle_change_in_screen_orientation_in_Qt_for_Symbian
+    //resizeEvent() method get called when user change screen mode.
+    void resizeEvent (QResizeEvent* event);
+signals:
+
+public slots:
+    void update_spans(int new_spans);
 private:
     Ui::TrussDialog *ui;
 };

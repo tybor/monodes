@@ -2,18 +2,19 @@
 <ui version="4.0">
  <class>TrussDialog</class>
  <widget class="QDialog" name="TrussDialog">
-  <property name="geometry">
-   <rect>
-    <x>0</x>
-    <y>0</y>
-    <width>383</width>
-    <height>386</height>
-   </rect>
+  <property name="enabled">
+   <bool>true</bool>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Continous beam</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="sizeConstraint">
+    <enum>QLayout::SetMaximumSize</enum>
+   </property>
+   <property name="margin">
+    <number>1</number>
+   </property>
    <item>
     <widget class="QComboBox" name="left_bearing">
      <item>
@@ -35,38 +36,84 @@
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
+     <property name="sizeConstraint">
+      <enum>QLayout::SetDefaultConstraint</enum>
+     </property>
      <item>
-      <widget class="QSlider" name="verticalSlider">
-       <property name="maximum">
-        <number>10</number>
+      <widget class="QLabel" name="label_spans">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
        </property>
-       <property name="pageStep">
-        <number>3</number>
+       <property name="text">
+        <string>Spans</string>
        </property>
-       <property name="value">
-        <number>2</number>
-       </property>
-       <property name="orientation">
-        <enum>Qt::Vertical</enum>
+       <property name="buddy">
+        <cstring>spans_count</cstring>
        </property>
       </widget>
      </item>
      <item>
-      <layout class="QGridLayout" name="gridLayout">
-       <item row="1" column="2">
-        <widget class="QDoubleSpinBox" name="doubleSpinBox_2">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-        </widget>
-       </item>
+      <widget class="QSpinBox" name="spans_count">
+       <property name="minimum">
+        <number>1</number>
+       </property>
+       <property name="maximum">
+        <number>5</number>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="material_button">
+       <property name="font">
+        <font>
+         <pointsize>8</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>Material</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="section_button">
+       <property name="font">
+        <font>
+         <pointsize>8</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>Section</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QScrollArea" name="scrollArea">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="widgetResizable">
+      <bool>true</bool>
+     </property>
+     <widget class="QWidget" name="scrollAreaWidgetContents">
+      <layout class="QGridLayout" name="gridLayout" columnstretch="0,1,1">
+       <property name="margin">
+        <number>0</number>
+       </property>
+       <property name="spacing">
+        <number>1</number>
+       </property>
        <item row="0" column="1">
-        <widget class="QLabel" name="label">
+        <widget class="QLabel" name="label_span_length">
          <property name="sizePolicy">
-          <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+          <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
@@ -82,9 +129,9 @@ p, li { white-space: pre-wrap; }
         </widget>
        </item>
        <item row="0" column="2">
-        <widget class="QLabel" name="label_2">
+        <widget class="QLabel" name="label_load">
          <property name="sizePolicy">
-          <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+          <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
@@ -100,38 +147,91 @@ p, li { white-space: pre-wrap; }
         </widget>
        </item>
        <item row="1" column="0">
-        <widget class="QLabel" name="label_3">
+        <widget class="QLabel" name="label_1">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
          <property name="text">
           <string>1</string>
+         </property>
+         <property name="buddy">
+          <cstring>span1</cstring>
          </property>
         </widget>
        </item>
        <item row="1" column="1">
-        <widget class="QDoubleSpinBox" name="doubleSpinBox">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-        </widget>
+        <widget class="QDoubleSpinBox" name="span1"/>
+       </item>
+       <item row="1" column="2">
+        <widget class="QDoubleSpinBox" name="load1"/>
        </item>
        <item row="2" column="0">
-        <widget class="QLabel" name="label_4">
+        <widget class="QLabel" name="label_2">
          <property name="text">
           <string>2</string>
+         </property>
+         <property name="buddy">
+          <cstring>span2</cstring>
          </property>
         </widget>
        </item>
        <item row="2" column="1">
-        <widget class="QDoubleSpinBox" name="doubleSpinBox_3"/>
+        <widget class="QDoubleSpinBox" name="span2"/>
        </item>
        <item row="2" column="2">
-        <widget class="QDoubleSpinBox" name="doubleSpinBox_4"/>
+        <widget class="QDoubleSpinBox" name="load2"/>
+       </item>
+       <item row="3" column="0">
+        <widget class="QLabel" name="label_3">
+         <property name="text">
+          <string>3</string>
+         </property>
+         <property name="buddy">
+          <cstring>span3</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="1">
+        <widget class="QDoubleSpinBox" name="span3"/>
+       </item>
+       <item row="3" column="2">
+        <widget class="QDoubleSpinBox" name="load3"/>
+       </item>
+       <item row="4" column="0">
+        <widget class="QLabel" name="label_4">
+         <property name="text">
+          <string>4</string>
+         </property>
+         <property name="buddy">
+          <cstring>span4</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="1">
+        <widget class="QDoubleSpinBox" name="span4"/>
+       </item>
+       <item row="4" column="2">
+        <widget class="QDoubleSpinBox" name="load4"/>
+       </item>
+       <item row="5" column="0">
+        <widget class="QLabel" name="label_5">
+         <property name="text">
+          <string>5</string>
+         </property>
+         <property name="buddy">
+          <cstring>span5</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="1">
+        <widget class="QDoubleSpinBox" name="span5"/>
+       </item>
+       <item row="5" column="2">
+        <widget class="QDoubleSpinBox" name="load5"/>
        </item>
       </layout>
-     </item>
-    </layout>
+     </widget>
+    </widget>
    </item>
    <item>
     <widget class="QComboBox" name="right_bearing">
@@ -164,6 +264,25 @@ p, li { white-space: pre-wrap; }
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>spans_count</tabstop>
+  <tabstop>left_bearing</tabstop>
+  <tabstop>right_bearing</tabstop>
+  <tabstop>material_button</tabstop>
+  <tabstop>section_button</tabstop>
+  <tabstop>span1</tabstop>
+  <tabstop>load1</tabstop>
+  <tabstop>span2</tabstop>
+  <tabstop>load2</tabstop>
+  <tabstop>span3</tabstop>
+  <tabstop>load3</tabstop>
+  <tabstop>span4</tabstop>
+  <tabstop>load4</tabstop>
+  <tabstop>span5</tabstop>
+  <tabstop>load5</tabstop>
+  <tabstop>scrollArea</tabstop>
+  <tabstop>buttonBox</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>
@@ -173,8 +292,8 @@ p, li { white-space: pre-wrap; }
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>248</x>
-     <y>254</y>
+     <x>201</x>
+     <y>506</y>
     </hint>
     <hint type="destinationlabel">
      <x>157</x>
@@ -189,8 +308,8 @@ p, li { white-space: pre-wrap; }
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>316</x>
-     <y>260</y>
+     <x>201</x>
+     <y>506</y>
     </hint>
     <hint type="destinationlabel">
      <x>286</x>

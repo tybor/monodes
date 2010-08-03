@@ -20,15 +20,43 @@
 
 #include "trussdialog.h"
 #include "ui_trussdialog.h"
+#include <assert.h>
+
+static int maximum_spans = 5;
 
 TrussDialog::TrussDialog(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::TrussDialog)
 {
     ui->setupUi(this);
+    // Show/hide
+    connect(ui->spans_count, SIGNAL(valueChanged(int)),
+			 this, SLOT(update_spans(int)));
 }
 
 TrussDialog::~TrussDialog()
 {
     delete ui;
+}
+
+//resizeEvent() method get called when user change screen mode.
+void TrussDialog::resizeEvent (QResizeEvent* event)
+{
+    QSize widgetSize = event->size();
+	//Resize your custom control according to new size.
+    //QMainWindow::
+    //resizeEvent(event);
+}
+
+void TrussDialog::update_spans(int spans) {
+    int span; int col;
+    // Shows all span length and load for rows from 2 to spans
+    for (span=2; span<=spans;++span)
+	for (col=0; col<=2; ++col)
+	    ui->gridLayout->itemAtPosition(span,col)->widget()->show();
+    //assert(span==spans);
+    // Hides all span length and load for rows from 2 to spans
+    for (/*unnecessary ?*/span=spans+1 ; span<=maximum_spans;++span)
+	for (col=0; col<=2; ++col)
+	   ui->gridLayout->itemAtPosition(span,col)->widget()->hide();
 }
