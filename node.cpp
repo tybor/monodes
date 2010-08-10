@@ -1,7 +1,7 @@
 /*
     Copyright (c) 2010 Paolo Redaelli
 
-    This file is part of .
+    This file is part of Monodes.
 
     Monodes is free software; you can redistribute it and/or modify it under
     the terms of the GNU General Public License as published by
@@ -125,24 +125,26 @@ Node::Node (qreal an_x, qreal an_y, enum Constrain a_constrain)
     {
         QPainterPath path;
     	switch (my_constrain) {
-	case uncostrained:
+        case uncostrained:
 	    path.addEllipse(-bigger, -bigger, 2*bigger, 2*bigger);
 	    break;
-	case vertical_trailer:
-	    path.addEllipse(-bigger, -bigger, 2*bigger, 2*bigger);
-	    break;
-	case horizontal_trailer:
-	    path.addEllipse(-bigger, -bigger, 2*bigger, 2*bigger);
-	    break;
+            //TODO:
+            //	case vertical_trailer:
+            //	    path.addEllipse(-bigger, -bigger, 2*bigger, 2*bigger);
+            //	    break;
+            //	case horizontal_trailer:
+            //	    path.addEllipse(-bigger, -bigger, 2*bigger, 2*bigger);
+            //	    break;
 	case hinge:
 	    path.addEllipse(-bigger, -bigger, 2*bigger, 2*bigger);
 	    break;
-	case vertical_shoe:
-	    path.addEllipse(-bigger, -bigger, 2*bigger, 2*bigger);
-	    break;
-	case horizontal_shoe:
-	    path.addEllipse(-bigger, -bigger, 2*bigger, 2*bigger);
-	    break;
+            //TODO
+            //	case vertical_shoe:
+            //	    path.addEllipse(-bigger, -bigger, 2*bigger, 2*bigger);
+            //	    break;
+            //	case horizontal_shoe:
+            //	    path.addEllipse(-bigger, -bigger, 2*bigger, 2*bigger);
+            //	    break;
 	case restrained:
 	    path.addEllipse(-bigger, -bigger, 2*bigger, 2*bigger);
 	    break;
@@ -162,17 +164,18 @@ Node::Node (qreal an_x, qreal an_y, enum Constrain a_constrain)
 	    painter->drawLine(-smaller,0, smaller,0);
 	    painter->drawLine(0,-smaller,0,smaller);
 	    break;
-	case vertical_trailer: // A triangle with a vertical line
-            painter->setPen(light);
-	    painter->drawConvexPolygon(vert_trail,3);
-	    painter->drawLine(bigger+smaller,-bigger,bigger+smaller,bigger);
-	    break;
-	case horizontal_trailer: // A triangle with an horizontal line
-            painter->setPen(light);
-	    // Maybe a drawChord look better
-	    painter->drawConvexPolygon(horiz_trail,3);
-	    painter->drawLine(-bigger,-bigger-smaller,bigger,-bigger-smaller);
-	    break;
+            // TODO:
+            //	case vertical_trailer: // A triangle with a vertical line
+            //            painter->setPen(light);
+            //	    painter->drawConvexPolygon(vert_trail,3);
+            //	    painter->drawLine(bigger+smaller,-bigger,bigger+smaller,bigger);
+            //	    break;
+            //	case horizontal_trailer: // A triangle with an horizontal line
+            //            painter->setPen(light);
+            //	    // Maybe a drawChord look better
+            //	    painter->drawConvexPolygon(horiz_trail,3);
+            //	    painter->drawLine(-bigger,-bigger-smaller,bigger,-bigger-smaller);
+            //	    break;
 	case hinge: // A circle with some diagonal lines
 	    painter->setPen(light);
 	    painter->drawLine(-smaller*3,0, smaller*3,0);
@@ -183,16 +186,17 @@ Node::Node (qreal an_x, qreal an_y, enum Constrain a_constrain)
 	    painter->setBrush(QBrush(Qt::white));
             painter->drawEllipse(origin, smaller,smaller);
 	    break;
-	case vertical_shoe:
-	    painter->setPen(heavy);
-	    painter->drawLine(-smaller,bigger,-smaller,-bigger);
-	    painter->drawLine(smaller,bigger,smaller,-bigger);
-	    break;
-	case horizontal_shoe:
-	    painter->setPen(heavy);
-	    painter->drawLine(-bigger,smaller,bigger,smaller);
-	    painter->drawLine(-bigger,-smaller,bigger,-smaller);
-	    break;
+            // TODO: support them
+            //	case vertical_shoe:
+            //	    painter->setPen(heavy);
+            //	    painter->drawLine(-smaller,bigger,-smaller,-bigger);
+            //	    painter->drawLine(smaller,bigger,smaller,-bigger);
+            //	    break;
+            //	case horizontal_shoe:
+            //	    painter->setPen(heavy);
+            //	    painter->drawLine(-bigger,smaller,bigger,smaller);
+            //	    painter->drawLine(-bigger,-smaller,bigger,-smaller);
+            //	    break;
         case restrained: // Incastro, no free degrees
 	    painter->setPen(heavy);
 	    painter->drawLine(0,-2*bigger,0,2*bigger);

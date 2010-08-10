@@ -21,7 +21,9 @@ SOURCES += main.cpp\
     nodedialog.cpp \
     beamdialog.cpp \
     materialdialog.cpp \
-    trussdialog.cpp
+    trussdialog.cpp \
+    licensedialog.cpp \
+    sectiondialog.cpp
 
 HEADERS  += \
     node.h \
@@ -34,10 +36,17 @@ HEADERS  += \
     nodedialog.h \
     beamdialog.h \
     materialdialog.h \
-    trussdialog.h
+    trussdialog.h \
+    licensedialog.h \
+    sectiondialog.h
 
 FORMS    += \
-    trussdialog.ui
+    trussdialog.ui \
+    nodedialog.ui \
+    beamdialog.ui \
+    materialdialog.ui \
+    licensedialog.ui \
+    sectiondialog.ui
 
 CONFIG += mobility
 MOBILITY = 
@@ -50,7 +59,8 @@ symbian {
 }
 
 RESOURCES += \
-    images.qrc
+    images.qrc \
+    texts.qrc
 
 OTHER_FILES += \
     README

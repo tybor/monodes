@@ -18,33 +18,20 @@
 */
 
 
-#ifndef TRUSSDIALOG_H
-#define TRUSSDIALOG_H
+#ifndef LICENSEDIALOG_H
+#define LICENSEDIALOG_H
 
-#include <QtGui>
-#include "node.h"
-#include "ui_trussdialog.h"
+#include "ui_licensedialog.h"
 
-
-class TrussDialog : public QDialog, public Ui::TrussDialog
+class LicenseDialog : public QDialog, private Ui::LicenseDialog
 {
     Q_OBJECT
 
 public:
-    explicit TrussDialog(QWidget *parent = 0);
+    explicit LicenseDialog(QWidget *parent = 0);
 
-    enum Constrain left_constrain();
-    enum Constrain right_constrain();
-
-    //see http://wiki.forum.nokia.com/index.php/Handle_change_in_screen_orientation_in_Qt_for_Symbian
-    //resizeEvent() method get called when user change screen mode.
-    void resizeEvent (QResizeEvent* event);
-signals:
-
-public slots:
-    void update_spans(int new_spans);
-private:
-
+protected:
+    void changeEvent(QEvent *e);
 };
 
-#endif // TRUSSDIALOG_H
+#endif // LICENSEDIALOG_H

@@ -31,9 +31,9 @@
 #include <assert.h>
 #include <stdio.h>
 #include <iostream>
+#include <stdio.h>
 
-Canvas::Canvas()
-{
+Canvas::Canvas() {
     QGraphicsScene *scene = new QGraphicsScene(this);
     scene->setItemIndexMethod(QGraphicsScene::NoIndex);
 
@@ -44,6 +44,9 @@ Canvas::Canvas()
     setTransformationAnchor(AnchorUnderMouse);
     setResizeAnchor(AnchorViewCenter);
 
+    // when the main dialog is closed update the canvas
+    connect(&dialog, SIGNAL(finished(int)), this, SLOT(dialog_closed(int)));
+
     // Add zoom buttons
     // the following is clumsy; "-" overrides "+" button.
 
@@ -53,48 +56,57 @@ Canvas::Canvas()
 
     setMinimumSize(150, 100);
     setWindowTitle(tr("Mobile nodes"));
-    setBackgroundBrush
-	    (QBrush(QImage(":/images/paper3.png")));
+    // Show a nice squared paper background
+    setBackgroundBrush(QBrush(QImage(":/images/paper4.jpg")));
     // Trasformation to view the model as the engineers expects, i.e. y growing upwards.
     setTransform(QTransform
                 (1.0,  0.0, 0.0,
                  0.0, -1.0, 0.0,
                  0.0,  0.0, 1.0), false);
 
-    // Makes a continous beam with 1 extra_bearing, in addition to the left and the right. Left and right are hinges. The beam is rectangular and made of concrete. A uniform load is added to the right span.
-    // a--b--c
-    // ^  ^  ^
-    // Left bearing
-    Node *a = new Node(0.0, 300.0,uncostrained); add_node(*a);
-    // Middle bearing
-    Node *b = new Node(300.0,0.0,horizontal_trailer); add_node(*b);
-    // Right bearing
-    Node *c = new Node(800.0,0.0, hinge); add_node(*c);
+//    // Makes a continous beam with 1 extra_bearing, in addition to the left and the right. Left and right are hinges. The beam is rectangular and made of concrete. A uniform load is added to the right span.
+//    // a--b--c
+//    // ^  ^  ^
+//    // Left bearing
+//    Node *a = new Node(0.0, 300.0,uncostrained); add_node(*a);
+//    // Middle bearing
+//    Node *b = new Node(300.0,0.0,horizontal_trailer); add_node(*b);
+//    // Right bearing
+//    Node *c = new Node(800.0,0.0, hinge); add_node(*c);
 
-    a->setToolTip("A");
-    b->setToolTip("B");
-    c->setToolTip("C");
+//    a->setToolTip("A");
+//    b->setToolTip("B");
+//    c->setToolTip("C");
 
-    // Adding load on bc, the right span.
-    // Testing rendering of nodes
-    add_node(*(new Node(0.0,-100.0, uncostrained)));
-    add_node(*(new Node(50.0,-100.0, vertical_trailer)));
-    add_node(*(new Node(100.0,-100.0, horizontal_trailer)));
-    add_node(*(new Node(150.0,-100.0, hinge)));
-    add_node(*(new Node(200.0,-100.0, vertical_shoe)));
-    add_node(*(new Node(250.0,-100.0, horizontal_shoe)));
-    add_node(*(new Node(300.0,-100.0, restrained)));
+//    // Adding load on bc, the right span.
+//    // Testing rendering of nodes
+//    add_node(*(new Node(0.0,-100.0, uncostrained)));
+//    add_node(*(new Node(50.0,-100.0, vertical_trailer)));
+//    add_node(*(new Node(100.0,-100.0, horizontal_trailer)));
+//    add_node(*(new Node(150.0,-100.0, hinge)));
+//    add_node(*(new Node(200.0,-100.0, vertical_shoe)));
+//    add_node(*(new Node(250.0,-100.0, horizontal_shoe)));
+//    add_node(*(new Node(300.0,-100.0, restrained)));
 
-    //QGraphicsSvgItem foo("")
-    Beam *left = new Beam(a,b); add_beam(*left);
-    Beam *right = new Beam(b,c); add_beam(*right);
+//    //QGraphicsSvgItem foo("")
+//    Beam *left = new Beam(a,b); add_beam(*left);
+//    Beam *right = new Beam(b,c); add_beam(*right);
 
-    Material *steel = new Material(210000.0,0.9,1.4e-6);
-    Section *section = new Section(8.0, 15.0);
-    left->set_material(*steel); left->set_section(*section);
-    right->set_material(*steel); right; right->set_section(*section);
+    material = new Material(210000.0,0.9,1.4e-6); // Steel
+    section = new Section(8.0, 15.0);
+//    left->set_material(*stee/l); left->set_section(*section);
+//    right->set_material(*steel); right; right->set_section(*section);
+    dialog.show();
 
     zoom_to_fit(); // instead of  scene->setSceneRect(-50, -50, 150, 50);
+}
+
+void Canvas::dialog_closed(int res) {
+    std::cout<<"Dialog closed\n";
+    // We assume that the indexes in the left and right bearing combo box has the same numbering of the constrain enumeration
+    Node *left = new Node(0.0,0.0, dialog.left_constrain());
+    add_node(*left);
+    //for (int span)
 }
 
 void Canvas::add_node(Node &a_node) {

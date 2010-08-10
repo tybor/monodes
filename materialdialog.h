@@ -21,23 +21,17 @@
 #ifndef MATERIALDIALOG_H
 #define MATERIALDIALOG_H
 
-#include <QtGui>
-#include "material.h"
-class MaterialDialog : public QDialog
+#include "ui_materialdialog.h"
+
+class MaterialDialog : public QDialog, private Ui::MaterialDialog
 {
     Q_OBJECT
+
 public:
-    explicit MaterialDialog(Material &a_material,QWidget *parent = 0);
-    // Destructor is not needed when correctly setting up subwidgets parent ~MaterialDialog();
+    explicit MaterialDialog(QWidget *parent = 0);
 
-private:
-    Material &material;
-    QFormLayout *layout;
-    QDoubleSpinBox *E_spin, *nu_spin, *alpha_spin, *density_spin;
-signals:
-
-public slots:
-
+protected:
+    void changeEvent(QEvent *e);
 };
 
 #endif // MATERIALDIALOG_H

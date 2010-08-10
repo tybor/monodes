@@ -22,19 +22,23 @@
 #define NODEDIALOG_H
 
 #include <QtGui>
-//#include <QDialogButtonBox>
+#include "ui_nodedialog.h"
+//#include "node.h"
 
-// Forward declarations
-class Node;
+class Node; // Forward declaration
 
-class NodeDialog : public QDialog
+class NodeDialog : public QDialog, public Ui::NodeDialog
 {
     Q_OBJECT
 public:
-    //explicit NodeDialog(QWidget *parent = 0);
-    NodeDialog (Node &a_node);
-private:
+    explicit NodeDialog(Node &a_node, QWidget *parent = 0);
+
+protected:
     Node &node;
+    void changeEvent(QEvent *e);
+
+private:
+
 signals:
 
 public slots:

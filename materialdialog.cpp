@@ -19,37 +19,20 @@
 
 
 #include "materialdialog.h"
-#include "material.h"
-#include <QtGui>
 
-MaterialDialog::MaterialDialog(Material &a_material, QWidget *parent) :
-    QDialog(parent),
-    material(a_material)
-{
-    layout = new QFormLayout(this);
-    setLayout(layout);
-    // E, Young modulus
-    E_spin = new QDoubleSpinBox(this);
-    E_spin->setValue(material.young_modulus());
-    layout->addRow("Young modulus",E_spin);
-    // nu, Poisson ratio
-    nu_spin = new QDoubleSpinBox(this);
-    nu_spin->setValue(material.poisson_ratio());
-    layout->addRow("Poisson ratio",nu_spin);
-     // alpha, coefficient of thermal expansion
-    alpha_spin = new QDoubleSpinBox(this);
-    alpha_spin->setValue(material.thermal_expansion_coefficient());
-    layout->addRow("Thermal expansion coefficient",alpha_spin);
-    // density
-    density_spin = new QDoubleSpinBox(this);
-    density_spin->setValue(material.young_modulus());
-    layout->addRow("Density",density_spin);
+MaterialDialog::MaterialDialog(QWidget *parent) :
+    QDialog(parent){
+    setupUi(this);
 }
 
-//This should not be necessary setting widget parents
-//MaterialDialog::~MaterialDialog() {
-//    delete E_spin;
-//    delete nu_spin;
-//    delete alpha_spin;
-//    delete density_spin;
-//}
+void MaterialDialog::changeEvent(QEvent *e)
+{
+    QDialog::changeEvent(e);
+    switch (e->type()) {
+    case QEvent::LanguageChange:
+        retranslateUi(this);
+        break;
+    default:
+        break;
+    }
+}

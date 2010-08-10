@@ -19,19 +19,26 @@
 
 
 #include "beamdialog.h"
-#include "beam.h"
-#include <QtGui>
 
 BeamDialog::BeamDialog(Beam &a_beam,QWidget *parent) :
     QDialog(parent),
     beam(a_beam)
 {
-    QFormLayout *layout = new QFormLayout;
-    setLayout(layout);
-    QDoubleSpinBox *x_spin = new QDoubleSpinBox;
-    QDoubleSpinBox *y_spin = new QDoubleSpinBox;
-    x_spin->setValue(beam.x());
-    y_spin->setValue(beam.y());
-    layout->addRow("x:", x_spin);
-    layout->addRow("y:", y_spin);
+    setupUi(this);
+#if defined(Q_WS_S60)
+    showMaximized();
+#endif
+    spanLength->setValue(beam.length());
+}
+
+void BeamDialog::changeEvent(QEvent *e)
+{
+    QDialog::changeEvent(e);
+    switch (e->type()) {
+    case QEvent::LanguageChange:
+        retranslateUi(this);
+        break;
+    default:
+        break;
+    }
 }

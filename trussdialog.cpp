@@ -24,20 +24,29 @@
 
 static int maximum_spans = 5;
 
+enum bearing {
+    unconstrained=0,
+    hinged,
+    fixed_joint
+};
+
 TrussDialog::TrussDialog(QWidget *parent) :
-    QDialog(parent),
-    ui(new Ui::TrussDialog)
+    QDialog(parent)
 {
-    ui->setupUi(this);
-    // Show/hide
-    connect(ui->spans_count, SIGNAL(valueChanged(int)),
-			 this, SLOT(update_spans(int)));
+    setupUi(this);
+#if defined(Q_WS_S60)
+    showMaximized();
+#endif
+
+   update_spans(spans_count->value());
+//   We currently allows only free, hinge
+//   and fixed bearing conditions; when we will support the others (trailers and
+//   shoes) we shall set the allowed one going throught the model of the combo
+//   then setting the flags of the items, and unset Qt::ItemIsSelectable
+    //   Show/hide
+   connect(spans_count, SIGNAL(valueChanged(int)), this,SLOT(update_spans(int)));
 }
 
-TrussDialog::~TrussDialog()
-{
-    delete ui;
-}
 
 //resizeEvent() method get called when user change screen mode.
 void TrussDialog::resizeEvent (QResizeEvent* event)
@@ -48,15 +57,58 @@ void TrussDialog::resizeEvent (QResizeEvent* event)
     //resizeEvent(event);
 }
 
+enum Constrain contrain(int index){
+    switch (index) {
+    case 0: return uncostrained ; break;
+    case 1: return hinge; break;
+    case 2: return restrained; break;
+    default:
+        assert(0 /* never reached */);
+        return uncostrained;
+    }
+}
+
+enum Constrain TrussDialog::left_constrain() {
+    return contrain(left_bearing->currentIndex());
+}
+
+enum Constrain TrussDialog::right_constrain() {
+    return contrain(right_bearing->currentIndex());
+}
+
 void TrussDialog::update_spans(int spans) {
+    QComboBox *left=left_bearing, *right=right_bearing;
+    switch (spans) {
+    case 1: // A free extreme node require a fixed bearing on the other side
+	switch (right->currentIndex()) {
+	case unconstrained: // right must be fixed
+	    right->setCurrentIndex(fixed_joint);
+	    break;
+	case hinged: // right cannot be uncostrained
+	    if (right->currentIndex()==unconstrained) {
+		// Change it to something more sensible
+		right->setCurrentIndex(hinged);
+	    }
+	    break;
+	case fixed_joint: // Any right bearing is allowed
+	    break;
+	};
+	break;
+    case 2: // A free extreme node require the other not to be free either
+	break;
+    default: // Everything else is allowed.
+	break;
+    };
+
     int span; int col;
     // Shows all span length and load for rows from 2 to spans
     for (span=2; span<=spans;++span)
 	for (col=0; col<=2; ++col)
-	    ui->gridLayout->itemAtPosition(span,col)->widget()->show();
+            gridLayout->itemAtPosition(span,col)->widget()->show();
     //assert(span==spans);
     // Hides all span length and load for rows from 2 to spans
     for (/*unnecessary ?*/span=spans+1 ; span<=maximum_spans;++span)
 	for (col=0; col<=2; ++col)
-	   ui->gridLayout->itemAtPosition(span,col)->widget()->hide();
+           gridLayout->itemAtPosition(span,col)->widget()->hide();
+
 }

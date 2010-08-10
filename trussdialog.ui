@@ -5,6 +5,14 @@
   <property name="enabled">
    <bool>true</bool>
   </property>
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>350</width>
+    <height>485</height>
+   </rect>
+  </property>
   <property name="windowTitle">
    <string>Continous beam</string>
   </property>
@@ -24,12 +32,12 @@
      </item>
      <item>
       <property name="text">
-       <string>Fixed</string>
+       <string>Hinge</string>
       </property>
      </item>
      <item>
       <property name="text">
-       <string>Hinge</string>
+       <string>Fully restrained</string>
       </property>
      </item>
     </widget>
@@ -57,11 +65,17 @@
      </item>
      <item>
       <widget class="QSpinBox" name="spans_count">
+       <property name="buttonSymbols">
+        <enum>QAbstractSpinBox::PlusMinus</enum>
+       </property>
        <property name="minimum">
         <number>1</number>
        </property>
        <property name="maximum">
         <number>5</number>
+       </property>
+       <property name="value">
+        <number>3</number>
        </property>
       </widget>
      </item>
@@ -103,6 +117,14 @@
       <bool>true</bool>
      </property>
      <widget class="QWidget" name="scrollAreaWidgetContents">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>346</width>
+        <height>347</height>
+       </rect>
+      </property>
       <layout class="QGridLayout" name="gridLayout" columnstretch="0,1,1">
        <property name="margin">
         <number>0</number>
@@ -142,7 +164,7 @@ p, li { white-space: pre-wrap; }
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Droid Sans'; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Load&lt;/p&gt;
-&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;[kg/m]&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;[kN/m ≃ kg/cm]&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
         </widget>
        </item>
@@ -160,10 +182,18 @@ p, li { white-space: pre-wrap; }
         </widget>
        </item>
        <item row="1" column="1">
-        <widget class="QDoubleSpinBox" name="span1"/>
+        <widget class="QDoubleSpinBox" name="span1">
+         <property name="buttonSymbols">
+          <enum>QAbstractSpinBox::PlusMinus</enum>
+         </property>
+        </widget>
        </item>
        <item row="1" column="2">
-        <widget class="QDoubleSpinBox" name="load1"/>
+        <widget class="QDoubleSpinBox" name="load1">
+         <property name="buttonSymbols">
+          <enum>QAbstractSpinBox::PlusMinus</enum>
+         </property>
+        </widget>
        </item>
        <item row="2" column="0">
         <widget class="QLabel" name="label_2">
@@ -176,10 +206,18 @@ p, li { white-space: pre-wrap; }
         </widget>
        </item>
        <item row="2" column="1">
-        <widget class="QDoubleSpinBox" name="span2"/>
+        <widget class="QDoubleSpinBox" name="span2">
+         <property name="buttonSymbols">
+          <enum>QAbstractSpinBox::PlusMinus</enum>
+         </property>
+        </widget>
        </item>
        <item row="2" column="2">
-        <widget class="QDoubleSpinBox" name="load2"/>
+        <widget class="QDoubleSpinBox" name="load2">
+         <property name="buttonSymbols">
+          <enum>QAbstractSpinBox::PlusMinus</enum>
+         </property>
+        </widget>
        </item>
        <item row="3" column="0">
         <widget class="QLabel" name="label_3">
@@ -192,10 +230,18 @@ p, li { white-space: pre-wrap; }
         </widget>
        </item>
        <item row="3" column="1">
-        <widget class="QDoubleSpinBox" name="span3"/>
+        <widget class="QDoubleSpinBox" name="span3">
+         <property name="buttonSymbols">
+          <enum>QAbstractSpinBox::PlusMinus</enum>
+         </property>
+        </widget>
        </item>
        <item row="3" column="2">
-        <widget class="QDoubleSpinBox" name="load3"/>
+        <widget class="QDoubleSpinBox" name="load3">
+         <property name="buttonSymbols">
+          <enum>QAbstractSpinBox::PlusMinus</enum>
+         </property>
+        </widget>
        </item>
        <item row="4" column="0">
         <widget class="QLabel" name="label_4">
@@ -208,10 +254,18 @@ p, li { white-space: pre-wrap; }
         </widget>
        </item>
        <item row="4" column="1">
-        <widget class="QDoubleSpinBox" name="span4"/>
+        <widget class="QDoubleSpinBox" name="span4">
+         <property name="buttonSymbols">
+          <enum>QAbstractSpinBox::PlusMinus</enum>
+         </property>
+        </widget>
        </item>
        <item row="4" column="2">
-        <widget class="QDoubleSpinBox" name="load4"/>
+        <widget class="QDoubleSpinBox" name="load4">
+         <property name="buttonSymbols">
+          <enum>QAbstractSpinBox::PlusMinus</enum>
+         </property>
+        </widget>
        </item>
        <item row="5" column="0">
         <widget class="QLabel" name="label_5">
@@ -224,10 +278,18 @@ p, li { white-space: pre-wrap; }
         </widget>
        </item>
        <item row="5" column="1">
-        <widget class="QDoubleSpinBox" name="span5"/>
+        <widget class="QDoubleSpinBox" name="span5">
+         <property name="buttonSymbols">
+          <enum>QAbstractSpinBox::PlusMinus</enum>
+         </property>
+        </widget>
        </item>
        <item row="5" column="2">
-        <widget class="QDoubleSpinBox" name="load5"/>
+        <widget class="QDoubleSpinBox" name="load5">
+         <property name="buttonSymbols">
+          <enum>QAbstractSpinBox::PlusMinus</enum>
+         </property>
+        </widget>
        </item>
       </layout>
      </widget>
@@ -242,12 +304,12 @@ p, li { white-space: pre-wrap; }
      </item>
      <item>
       <property name="text">
-       <string>Fixed</string>
+       <string>Hinged</string>
       </property>
      </item>
      <item>
       <property name="text">
-       <string>Hinge</string>
+       <string>Fully restrained</string>
       </property>
      </item>
     </widget>

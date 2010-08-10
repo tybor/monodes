@@ -24,6 +24,7 @@
 #include <QGraphicsView>
 #include "node.h"
 #include "beam.h"
+#include "trussdialog.h"
 
 class Canvas : public QGraphicsView
         /// A representation of a structural model. Currently supporting only continous beams.
@@ -32,7 +33,7 @@ class Canvas : public QGraphicsView
 public:
     Canvas();
     /// Makes a continous beam with 1 extra_bearing, in addition to the left and the right. Left and right are hinges. The beam is rectangular (b=8cm, h=15cm) and made of steel. A uniform load is added to the right span. Left span is 3m long, middle is 5m.
-
+//
     void solve();
 
     QList<Node*> nodes() const;
@@ -49,10 +50,14 @@ public:
 private:
     QList<Node *> nodes_list;
     QList<Beam *> beams_list;
+    Material *material; ///< The one material currently supported
+    Section *section; ///< The one section currently supported
+    TrussDialog dialog; ///< The entry dialog to set spans, lengths, loads, material and section
 
 signals:
 
 public slots:
+    void dialog_closed(int res); ///< The feature called when the main dialog is closed.
 
 };
 

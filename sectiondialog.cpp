@@ -18,33 +18,21 @@
 */
 
 
-#ifndef TRUSSDIALOG_H
-#define TRUSSDIALOG_H
+#include "sectiondialog.h"
 
-#include <QtGui>
-#include "node.h"
-#include "ui_trussdialog.h"
+SectionDialog::SectionDialog(QWidget *parent) :
+    QDialog(parent){
+    setupUi(this);
+}
 
-
-class TrussDialog : public QDialog, public Ui::TrussDialog
+void SectionDialog::changeEvent(QEvent *e)
 {
-    Q_OBJECT
-
-public:
-    explicit TrussDialog(QWidget *parent = 0);
-
-    enum Constrain left_constrain();
-    enum Constrain right_constrain();
-
-    //see http://wiki.forum.nokia.com/index.php/Handle_change_in_screen_orientation_in_Qt_for_Symbian
-    //resizeEvent() method get called when user change screen mode.
-    void resizeEvent (QResizeEvent* event);
-signals:
-
-public slots:
-    void update_spans(int new_spans);
-private:
-
-};
-
-#endif // TRUSSDIALOG_H
+    QDialog::changeEvent(e);
+    switch (e->type()) {
+    case QEvent::LanguageChange:
+        retranslateUi(this);
+        break;
+    default:
+        break;
+    }
+}

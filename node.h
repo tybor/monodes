@@ -30,11 +30,11 @@ class Canvas;
 
 enum Constrain {
     uncostrained, // Free no degrees of freedom bounded
-    vertical_trailer, // Carrello verticale, horizontal displacement locked, free vertical displacement and rotation
-    horizontal_trailer, // Carrello orizzontale, vertical displacement locker, free horizontal displacement and rotation.
+    //vertical_trailer, // Carrello verticale, horizontal displacement locked, free vertical displacement and rotation
+    //horizontal_trailer, // Carrello orizzontale, vertical displacement locker, free horizontal displacement and rotation.
     hinge, // Cerniera, displacements fixed, rotation free.
-    vertical_shoe, // Pattino verticale, free vertical displacement, fixed horizontal displacement and rotation
-    horizontal_shoe, // Pattino orizzontale, free horizontal displacement, fixed vertical displacement and rotation
+    //vertical_shoe, // Pattino verticale, free vertical displacement, fixed horizontal displacement and rotation
+    //horizontal_shoe, // Pattino orizzontale, free horizontal displacement, fixed vertical displacement and rotation
     restrained // Incastro, no free degrees
 };
 
@@ -64,15 +64,6 @@ public:
     QRectF boundingRect() const;
     QPainterPath shape() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
-
-
-//    void set_free(); // Free no degrees of freedom bounded
-//    void set_vertical_trailer(); // Carrello verticale, horizontal displacement locked, free vertical displacement and rotation
-//    void set_horizontal_trailer(); // Carrello orizzontale, vertical displacement locker, free horizontal displacement and rotation.
-//    void set_hinge(); // Cerniera, displacements fixed, rotation free.
-//    void set_vertical_show(); // Pattino verticale, free vertical displacement, fixed horizontal displacement and rotation
-//    void set_horizontal_shoe(); // Pattino orizzontale, free horizontal displacement, fixed vertical displacement and rotation
-//    void set_fixed_joint(); // Incastro, no free degrees
 
 protected:
     // QVariant itemChange(GraphicsItemChange change, const QVariant &value);

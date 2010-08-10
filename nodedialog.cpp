@@ -19,36 +19,34 @@
 
 
 #include "nodedialog.h"
+#include "node.h"
+#include "beam.h"
 
-#include <QFormLayout>
-#include <QPushButton>
-#include <QFormLayout>
-
-//NodeDialog::NodeDialog(QWidget *parent) :
-//    QDialogButtonBox(parent)
-//{
-//}
-
-NodeDialog::NodeDialog(Node &a_node) :
-        QDialog(),
+NodeDialog::NodeDialog(Node &a_node, QWidget *parent) :
+	QDialog(parent),
         node(a_node)
     /// Present the user the precise location of the node which may be edited and a way to change its support conditions
 {
-	//connect(this, SIGNAL(accepted()), this, SLOT(accept()));
-    //connect(this, SIGNAL(rejected()), this, SLOT(reject()));
+    setupUi(this);
+#if defined(Q_WS_S60)
+    showMaximized();
+#endif
+    if (node.beams().count()==1) {
+	// This node is an extreme, it may be free, hinged or fixed.
+	Beam *ab=node.beams().first();
+    } else { // We are in the middle of the beam. Hinged assumed
 
-//    std::cout<<"premuto ("<<x()<<","<<y()<<")"
-//	    <<std::endl<<std::flush;
-//    QDialog dialog; //= new QDialog;
-    QPushButton *support = new QPushButton(QIcon(":/icone/carrello.png"),"trailer");
-    QPushButton *hinge= new QPushButton(QIcon(":/icone/cerniera.png"),"hinge");
-    QDialogButtonBox *buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+    }
+}
 
-    QVBoxLayout *vertical = new QVBoxLayout();
-    vertical->addWidget(support);
-    vertical->addWidget(hinge);
-    vertical->addWidget(buttons);
-    setLayout(vertical);
-    //    int res = dialog.exec();
-    //    //QGraphicsProxyWidget *dialog_item = scene()->addWidget(dialog);
+void NodeDialog::changeEvent(QEvent *e)
+{
+    QDialog::changeEvent(e);
+    switch (e->type()) {
+    case QEvent::LanguageChange:
+	retranslateUi(this);
+	break;
+    default:
+	break;
+    }
 }

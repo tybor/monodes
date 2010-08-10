@@ -17,23 +17,23 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <QtGui>
+
 #ifndef BEAMDIALOG_H
 #define BEAMDIALOG_H
 
-class Beam;
-class BeamDialog : public QDialog
+#include "ui_beamdialog.h"
+#include "beam.h"
+
+class BeamDialog : public QDialog, private Ui::BeamDialog
 {
     Q_OBJECT
+
 public:
-    BeamDialog (Beam &a_beam, QWidget *parent=0);
+    explicit BeamDialog(Beam &a_beam,QWidget *parent = 0);
 
-private:
+protected:
     Beam &beam;
-signals:
-
-public slots:
-
+    void changeEvent(QEvent *e);
 };
 
 #endif // BEAMDIALOG_H
