@@ -34,6 +34,9 @@ TrussDialog::TrussDialog(QWidget *parent) :
     QDialog(parent)
 {
     setupUi(this);
+    // Lenghts e spans devono essere liste di QDoubleSpinBox!
+    lengths(maximum_spans);
+    loads(maximum_spans);
 #if defined(Q_WS_S60)
     showMaximized();
 #endif

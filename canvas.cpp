@@ -103,10 +103,14 @@ Canvas::Canvas() {
 
 void Canvas::dialog_closed(int res) {
     std::cout<<"Dialog closed\n";
-    // We assume that the indexes in the left and right bearing combo box has the same numbering of the constrain enumeration
-    Node *left = new Node(0.0,0.0, dialog.left_constrain());
+    qreal x = 0.0;
+    Node *left = new Node(x,0.0, dialog.left_constrain());
     add_node(*left);
-    //for (int span)
+    for (int span=1, int spans=dialog.spans_count->value(); span<=spans; ++span){
+        x += dialog.lengths[span];
+        Node *middle(x,0.0, hinge);
+        add_node(*middle);
+    }
 }
 
 void Canvas::add_node(Node &a_node) {

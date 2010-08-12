@@ -36,6 +36,9 @@ public:
     enum Constrain left_constrain();
     enum Constrain right_constrain();
 
+    QList<qreal> lengths;
+    QList<qreal> loads;
+
     //see http://wiki.forum.nokia.com/index.php/Handle_change_in_screen_orientation_in_Qt_for_Symbian
     //resizeEvent() method get called when user change screen mode.
     void resizeEvent (QResizeEvent* event);
