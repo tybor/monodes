@@ -24,7 +24,8 @@
 #include <QtGui>
 #include "node.h"
 #include "ui_trussdialog.h"
-
+#include "sectiondialog.h"
+#include "materialdialog.h"
 
 class TrussDialog : public QDialog, public Ui::TrussDialog
 {
@@ -36,8 +37,12 @@ public:
     enum Constrain left_constrain();
     enum Constrain right_constrain();
 
-    QList<qreal> lengths;
-    QList<qreal> loads;
+    QVector<QDoubleSpinBox*> lengths;
+    QVector<QDoubleSpinBox*> loads;
+
+    /// Sub-dialogs
+    MaterialDialog material_dialog;
+    SectionDialog section_dialog;
 
     //see http://wiki.forum.nokia.com/index.php/Handle_change_in_screen_orientation_in_Qt_for_Symbian
     //resizeEvent() method get called when user change screen mode.

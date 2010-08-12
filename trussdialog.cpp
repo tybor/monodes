@@ -31,12 +31,31 @@ enum bearing {
 };
 
 TrussDialog::TrussDialog(QWidget *parent) :
-    QDialog(parent)
+    QDialog(parent),
+    // The following constructors and their "expanded" objects may be converted into references and created in the body of this constructor. Oh, my  how foolish is C++
+    lengths(),
+    loads(),
+    // Initialization of sub-dialogs
+    material_dialog(this),
+    section_dialog(this)
+
 {
     setupUi(this);
-    // Lenghts e spans devono essere liste di QDoubleSpinBox!
-    lengths(maximum_spans);
-    loads(maximum_spans);
+    // Lenghts e spans are collections of QDoubleSpinBox; suggesting their size.
+
+    lengths.reserve(maximum_spans);
+    loads.reserve(maximum_spans);
+    // This is clumsy but it will do for now
+    lengths.append(span1);
+    lengths.append(span2);
+    lengths.append(span3);
+    lengths.append(span4);
+    lengths.append(span5);
+    loads.append(load1);
+    loads.append(load2);
+    loads.append(load3);
+    loads.append(load4);
+    loads.append(load5);
 #if defined(Q_WS_S60)
     showMaximized();
 #endif
@@ -48,6 +67,8 @@ TrussDialog::TrussDialog(QWidget *parent) :
 //   then setting the flags of the items, and unset Qt::ItemIsSelectable
     //   Show/hide
    connect(spans_count, SIGNAL(valueChanged(int)), this,SLOT(update_spans(int)));
+   connect(material_button, SIGNAL(clicked()),&material_dialog,SLOT(show()));
+   connect(section_button, SIGNAL(clicked()),&section_dialog, SLOT(show()));
 }
 
 

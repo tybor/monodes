@@ -104,12 +104,17 @@ Canvas::Canvas() {
 void Canvas::dialog_closed(int res) {
     std::cout<<"Dialog closed\n";
     qreal x = 0.0;
-    Node *left = new Node(x,0.0, dialog.left_constrain());
+    Node *left = new Node(x,0.0, hinge);
     add_node(*left);
-    for (int span=1, int spans=dialog.spans_count->value(); span<=spans; ++span){
-        x += dialog.lengths[span];
-        Node *middle(x,0.0, hinge);
-        add_node(*middle);
+    int spans=dialog.spans_count->value(); // Caching the number of spans
+    for (int span=0; span<=spans; ++span){
+        QDoubleSpinBox *spinbox = dialog.lengths[span];
+        x += spinbox->value();
+        Node *right = new Node(x,0.0, hinge);
+        add_node(*right);
+        Beam *b = new Beam(left,right);
+        add_beam(*b);
+        left = right; // The left node of the next span is the right of current
     }
 }
 

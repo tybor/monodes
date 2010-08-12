@@ -30,6 +30,9 @@ class SectionDialog : public QDialog, private Ui::SectionDialog
 public:
     explicit SectionDialog(QWidget *parent = 0);
 
+public slots:
+    void redraw();
+
 protected:
     void changeEvent(QEvent *e);
 };

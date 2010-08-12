@@ -19,10 +19,29 @@
 
 
 #include "sectiondialog.h"
+#include <assert.h>
 
 SectionDialog::SectionDialog(QWidget *parent) :
-    QDialog(parent){
+    QDialog(parent)
+{
     setupUi(this);
+    // Create  the scene holding the preview of the section
+    QGraphicsScene *scene =  new QGraphicsScene(this);
+    sectionPreview->setScene(scene);
+    redraw();
+
+    // Update the preview when values change.
+    connect(widthSpin,SIGNAL(valueChanged(double)),this,SLOT(redraw()));
+    connect(heightSpin,SIGNAL(valueChanged(double)),this,SLOT(redraw()));
+}
+
+void SectionDialog::redraw() {
+    QGraphicsScene *scene = sectionPreview->scene();
+    assert(scene!=NULL);
+    scene->clear();
+    qreal w = widthSpin->value();
+    qreal h = heightSpin->value();
+    scene->addRect(0,0,w,h,QPen(Qt::black,1), QBrush(Qt::red,Qt::BDiagPattern));
 }
 
 void SectionDialog::changeEvent(QEvent *e)
