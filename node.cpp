@@ -31,13 +31,18 @@
 #include <stdio.h>
 #include <iostream>
 
+#include <assert.h>
+
 #include "node.h"
 #include "nodedialog.h"
 #include "beam.h"
-#include "assert.h"
+#include "truss.h"
+
 
 /* Constants used for drawings */
 static const qreal fraction_of_span = 12.0; ///< the node will be big as this fraction of its spans.
+static const qreal smaller=0.5;
+static const qreal bigger=1.0;
 //static const QPoint horiz_trail[3] = {
 //    QPoint(),
 //    QPoint(-bigger, -bigger),
@@ -59,7 +64,6 @@ Node::Node (qreal an_x, qreal an_y, enum Constrain a_constrain)
     node_v=0.2;
     node_fi=0.3;
     my_constrain = a_constrain;
-    longest=0.0;
     std::cout<<"New node "<<*this<<std::endl<<std::flush;
 }
 
@@ -68,17 +72,7 @@ void Node::add_beam(Beam *a_beam) {
     assert(a_beam!=NULL);
     assert((this==&(a_beam->first())) || (this ==&a_beam->second()));
     beams_list << a_beam;
-    if (a_beam->length()>longest) {
-        longest= a_beam->length();
-        std::cout<<"new longest beam"<<longest<<std::endl<<std::flush;
-    } else {
-        std::cout<<"longest beam is still "<<longest<<std::endl<<std::flush;
-    }
 }
-
-qreal Node::longest_span() const {
-    return longest;
-};
 
 QList<Beam *> Node::beams() const {
     return beams_list;
@@ -101,10 +95,9 @@ qreal Node::distance (const Node &another) const {
     /// Distance between Current and another
     qreal dx = x()-another.x();
     qreal dy = y()-another.y();
-    qreal dx2 = dx*dx;
+    qreal dx2 = dx*dx; /* what a nice language! In C++ you can't write x^2 when x is a qreal! */
     qreal dy2 = dy*dy;
     return sqrt(dx2+dy2);
-    /* what a nice language! In C++ you can't write x^2 when x is a qreal! */
 }
 
 qreal Node::u() { return node_u; }
@@ -132,14 +125,13 @@ void Node::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 QRectF Node::boundingRect() const
 {
     // bouding rectangle - the region where the item is paing - is made a little bigger than it may be for simplicy sake. I'm not sure that a proper switch and a more precise bounding may be useful, perhpas the computational burden is a waste of efforts.
-    return QRectF(-25, -25, 50, 50);
+    return QRectF(-bigger,bigger,2*bigger,2*bigger);
 }
 
 QPainterPath Node::shape() const
 {
-    qreal s = longest / fraction_of_span;
     QPainterPath path;
-    path.addEllipse(-s, -s, 2*s, 2*s);
+    path.addEllipse(-bigger, -bigger, 2*bigger, 2*bigger);
     return path;
 }
 
@@ -149,19 +141,17 @@ QPointF Node::deformed_pos() {
 
 void Node::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *)
 {
-    //static const int smaller=3;
-    //static const int bigger=6;
-    const QPen lightest(Qt::gray, longest/100.0);
-    const QPen light(Qt::black, longest/80.0);
-    const QPen heavy(Qt::black,longest/40.0);
+    std::cout<<" painting node";
+    const QPen lightest(Qt::gray, smaller/12.0);
+    const QPen light(Qt::black, smaller/10.0);
+    const QPen heavy(Qt::black, smaller/8.0);
     static const QPointF origin;
-    qreal s = longest / fraction_of_span;
-    std::cout<<*this<<" connected to "<<beams_list.count()<<" beams (longest is "<<longest<<") scaled by "<<s<<"\n"<<std::flush;
+
     switch (my_constrain) {
     case uncostrained: // nothing
         painter->setPen(light);
-        painter->drawLine(QLineF(-s,0.0, s,0.0));
-        painter->drawLine(QLineF(0.0,-s,0.0,s));
+        painter->drawLine(QLineF(-smaller,0.0, smaller,0.0));
+        painter->drawLine(QLineF(0.0,-smaller,0.0,smaller));
         break;
         // TODO:
         //	case vertical_trailer: // A triangle with a vertical line
@@ -177,14 +167,14 @@ void Node::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWid
         //	    break;
     case hinge: // A circle with some radial lines
         painter->setPen(heavy);
-        painter->drawLine(QLineF(0.0, 0.0, -2.0*s, -s));
-        painter->drawLine(QLineF(0.0, 0.0, -s, -2.0*s));
-        painter->drawLine(QLineF(0.0, 0.0, 0.0, -2.0*s));
-        painter->drawLine(QLineF(0.0, 0.0,  s, -2.0*s));
-        painter->drawLine(QLineF(0.0, 0.0, 2.0*s, -s));
+        painter->drawLine(QLineF(0.0, 0.0, -bigger, -smaller));
+        painter->drawLine(QLineF(0.0, 0.0, -smaller, -bigger));
+        painter->drawLine(QLineF(0.0, 0.0, 0.0, -bigger));
+        painter->drawLine(QLineF(0.0, 0.0,  smaller, -bigger));
+        painter->drawLine(QLineF(0.0, 0.0, bigger, -smaller));
         painter->setBrush(QBrush(Qt::white));
         painter->setPen(light);
-        painter->drawEllipse(origin, s,s);
+        painter->drawEllipse(origin, smaller,smaller);
         break;
         // TODO: support them
         //	case vertical_shoe:
@@ -199,10 +189,10 @@ void Node::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWid
         //	    break;
     case restrained: // Incastro, no free degrees
         painter->setPen(heavy);
-        painter->drawLine(0.0, -2.0*s, 0.0, 2.0*s);
+        painter->drawLine(0.0, -bigger, 0.0, bigger);
         painter->setPen(Qt::NoPen);
         painter->setBrush(QBrush(Qt::black,Qt::FDiagPattern));
-        painter->drawRect(QRect(0, -2.0*s, 2.0*s, 4.0*s));
+        painter->drawRect(QRect(0, -bigger, bigger*2, bigger*2));
         break;
         // default: // nothing should NOT be necessary
     }

@@ -31,12 +31,12 @@ NodeDialog::NodeDialog(Node &a_node, QWidget *parent) :
 #if defined(Q_WS_S60)
     showMaximized();
 #endif
-    if (node.beams().count()==1) {
-	// This node is an extreme, it may be free, hinged or fixed.
-	Beam *ab=node.beams().first();
-    } else { // We are in the middle of the beam. Hinged assumed
+//    if (node.beams().count()==1) {
+//	// This node is an extreme, it may be free, hinged or fixed.
+//	Beam *ab=node.beams().first();
+//    } else { // We are in the middle of the beam. Hinged assumed
 
-    }
+//    }
 }
 
 void NodeDialog::changeEvent(QEvent *e)

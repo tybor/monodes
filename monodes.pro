@@ -23,7 +23,8 @@ SOURCES += main.cpp\
     materialdialog.cpp \
     trussdialog.cpp \
     licensedialog.cpp \
-    sectiondialog.cpp
+    sectiondialog.cpp \
+    truss.cpp
 
 HEADERS  += \
     node.h \
@@ -38,7 +39,8 @@ HEADERS  += \
     materialdialog.h \
     trussdialog.h \
     licensedialog.h \
-    sectiondialog.h
+    sectiondialog.h \
+    truss.h
 
 FORMS    += \
     trussdialog.ui \

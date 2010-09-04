@@ -24,6 +24,7 @@
 #include <QGraphicsView>
 #include "node.h"
 #include "beam.h"
+#include "truss.h"
 #include "trussdialog.h"
 
 class Canvas : public QGraphicsView
@@ -34,31 +35,16 @@ public:
     Canvas();
     /// Ask the user input data to make a continous beam.
 
-    void solve();
-
-    QList<Node*> nodes() const;
-    QList<Beam*> beams() const;
+    Truss *t; /// The truss currently being showd by this view.
+    TrussDialog dialog; ///< The entry dialog to set spans, lengths, loads, material and section
 
     void zoom_to_fit();
     void zoom_in();
     void zoom_out();
-    qreal bearing_size; /// Drawing size of bearing
-    qreal load_scale; /// The scale applied to loads
-
-    void add_node (Node &a_node);
-    void add_beam (Beam &a_beam);
-    unsigned int support_conditions_count() const; // The number of support conditions of all nodes
-
-    Material *material; ///< The one material currently supported
-    Section *section; ///< The one section currently supported
-    TrussDialog dialog; ///< The entry dialog to set spans, lengths, loads, material and section
 
 protected:
     void keyPressEvent(QKeyEvent *event);
     void wheelEvent(QWheelEvent *event);
-private:
-    QList<Node *> nodes_list;
-    QList<Beam *> beams_list;
 
 signals:
 

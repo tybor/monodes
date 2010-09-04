@@ -82,7 +82,7 @@ private:
     // Displacements
     qreal node_u, node_v, node_fi;
     QList<Beam *> beams_list;
-
+\
 signals:
 
 public slots:

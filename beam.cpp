@@ -320,8 +320,9 @@ QRectF Beam::boundingRect() const
 
 void Beam::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 {
+    std::cout<<" painting beam"<<std::endl<<std::flush;
     // A beam is simply a line
-    painter->setPen(QPen(Qt::black, length()/50.0) );
+    painter->setPen(QPen(Qt::black, 1.0/*length()/50.0*/) );
     painter->drawLine(first_node->pos(),second_node->pos());
     // Draw the loads, written with the assumption that all beams are horizontal. TODO: remove this assumption.
     QRect load_rect(first().pos().x(), first().pos().y(),
