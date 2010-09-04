@@ -45,6 +45,10 @@ public:
     Node &first() const;
     Node &second() const;
     qreal length() const;
+
+    // Currently sticking to one, uniform load orthogonal to the beam
+    qreal load;
+
     void set_section (Section &a_section);
     Section &section() const;
 
@@ -68,8 +72,6 @@ private:
     Section *s;
     Material *m;
 
-    // Currently sticking to one, uniform load orthogonal to the beam
-    qreal load;
 
     void compute_stiffness();
     bool stiffness_computed;

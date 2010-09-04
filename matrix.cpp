@@ -63,11 +63,11 @@ Matrix::Matrix (const Matrix &another) {
 }
 
 Matrix::~Matrix() {
-    std::cout<<"Deleting a "<<
-	    rows_count<<"x"<<cols_count<<
-	    " matrix..."<<std::flush;
+//    std::cout<<"Deleting a "<<
+//	    rows_count<<"x"<<cols_count<<
+//	    " matrix..."<<std::flush;
     delete coefficients;
-    std::cout<<"deleted.\n"<<std::flush;
+//    std::cout<<"deleted.\n"<<std::flush;
 }
 
 qreal Matrix::at(unsigned int a_row, unsigned int a_col) const {

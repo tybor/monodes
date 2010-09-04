@@ -89,7 +89,7 @@
         <number>2</number>
        </property>
        <property name="maximum">
-        <number>4</number>
+        <number>5</number>
        </property>
        <property name="value">
         <number>3</number>
@@ -138,8 +138,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>330</width>
-        <height>327</height>
+        <width>328</width>
+        <height>328</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="gridLayout" columnstretch="0,1,1">
@@ -334,6 +334,15 @@ p, li { white-space: pre-wrap; }
         <widget class="QDoubleSpinBox" name="span5">
          <property name="buttonSymbols">
           <enum>QAbstractSpinBox::PlusMinus</enum>
+         </property>
+         <property name="minimum">
+          <double>0.300000000000000</double>
+         </property>
+         <property name="maximum">
+          <double>1000.000000000000000</double>
+         </property>
+         <property name="value">
+          <double>3.000000000000000</double>
          </property>
         </widget>
        </item>

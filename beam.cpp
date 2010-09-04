@@ -206,9 +206,10 @@ Beam::Beam(Node *a_node, Node *another_node)
 
     first_node = a_node;
     second_node = another_node;
+    beam_length = first().distance(second());
     first_node->add_beam(this);
     second_node->add_beam(this);
-    beam_length = first().distance(second());
+    std::cout<<"New beam "<<first()<<"--"<<second()<<" (length="<<length()<<")\n"<<std::flush;
     load = 10.0;
 }
 
@@ -311,7 +312,7 @@ void Beam::compute_stiffness() {
 
 QRectF Beam::boundingRect() const
 {
-    qreal extra=2.0;
+    qreal extra=length()/30.0;
     QRectF result = QRectF(first_node->pos(),  second_node->pos()).normalized();
     result.adjust(-extra, -extra, extra, extra);
     return result;
@@ -320,39 +321,38 @@ QRectF Beam::boundingRect() const
 void Beam::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 {
     // A beam is simply a line
-    painter->setPen(QPen(Qt::black, 1));
+    painter->setPen(QPen(Qt::black, length()/50.0) );
     painter->drawLine(first_node->pos(),second_node->pos());
-    // Draw the loads
-    // The following is written with the assumption that all beams are horizontal. TODO: remove this assumption.
+    // Draw the loads, written with the assumption that all beams are horizontal. TODO: remove this assumption.
     QRect load_rect(first().pos().x(), first().pos().y(),
-		    second().pos().x(), second().pos().y()+load);
+                    second().pos().x(), second().pos().y()+load);
     painter->drawText(load_rect, Qt::AlignCenter,
-		      QString("%1 kg/m").arg(load));
+                      QString("%1 kg/m").arg(load));
     painter->setPen(QPen(Qt::red,1));
     painter->setBrush(QBrush(Qt::red,Qt::VerPattern));
     painter->drawRect(load_rect);
 
     // TODO: Draw axial stress, shear stress and moment
 
-    // Draw deformated beam.
-    painter->setPen(Qt::blue);
-    // painter->drawLine(first().deformed_pos(),second().deformed_pos());
-    // It would be nice to draw it using splines, but it seems that it is not that easy. Let's draw it as always did, by points; so wow many points shall we draw? Let's naively say currently 32.
-    QPolygonF deformed;
+//    // Draw deformated beam.
+//    painter->setPen(Qt::blue);
+//    // painter->drawLine(first().deformed_pos(),second().deformed_pos());
+//    // It would be nice to draw it using splines, but it seems that it is not that easy. Let's draw it as always did, by points; so wow many points shall we draw? Let's naively say currently 32.
+//    QPolygonF deformed;
 
-    const int steps=32;
-    qreal step=1.0/steps; // Beware that 1 is NOT 1.0. If you write it 1/steps, step will be exactly zero.
-    const int ampl=1.0; // TODO make it user defined, or even better computed for best view.
-    qreal csi=0;
-    QPointF step_vector((second().pos() - first().pos())/steps);
-    QPointF current(first().pos());
-    for (int i=0; i<=steps; ++i) {
-	QPointF delta(u(csi)*ampl,v(csi)*ampl);
-	deformed<< current+delta;
-	csi +=step;
-	current+=step_vector;
-    }
-     painter->drawPolyline(deformed);
+//    const int steps=32;
+//    qreal step=1.0/steps; // Beware that 1 is NOT 1.0. If you write it 1/steps, step will be exactly zero.
+//    const int ampl=1.0; // TODO make it user defined, or even better computed for best view.
+//    qreal csi=0;
+//    QPointF step_vector((second().pos() - first().pos())/steps);
+//    QPointF current(first().pos());
+//    for (int i=0; i<=steps; ++i) {
+//	QPointF delta(u(csi)*ampl,v(csi)*ampl);
+//	deformed<< current+delta;
+//	csi +=step;
+//	current+=step_vector;
+//    }
+//     painter->drawPolyline(deformed);
 }
 
 void Beam::mousePressEvent(QGraphicsSceneMouseEvent *event)
@@ -362,10 +362,8 @@ void Beam::mousePressEvent(QGraphicsSceneMouseEvent *event)
     std::cout<<"beam pressed at "
             <<event->pos().x()<<","<<event->pos().y()
             <<std::endl<<std::flush;
-    BeamDialog dialog(*this); //= new QDialog;
-
+    BeamDialog dialog(*this);
     int res = dialog.exec();
-    //QGraphicsProxyWidget *dialog_item = scene()->addWidget(dialog);
     update();
     //QGraphicsItem::mousePressEvent(event);
 }

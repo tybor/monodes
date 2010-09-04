@@ -101,31 +101,31 @@ enum Constrain TrussDialog::right_constrain() {
 }
 
 void TrussDialog::update_spans(int spans) {
-    QComboBox *left=left_bearing, *right=right_bearing;
-    switch (spans) {
-    case 1: // A free extreme node require a fixed bearing on the other side
-	switch (right->currentIndex()) {
-	case unconstrained: // right must be fixed
-	    right->setCurrentIndex(fixed_joint);
-	    break;
-	case hinged: // right cannot be uncostrained
-	    if (right->currentIndex()==unconstrained) {
-		// Change it to something more sensible
-		right->setCurrentIndex(hinged);
-	    }
-	    break;
-	case fixed_joint: // Any right bearing is allowed
-	    break;
-	};
-	break;
-    case 2: // A free extreme node require the other not to be free either
-	break;
-    default: // Everything else is allowed.
-	break;
-    };
+//    QComboBox *left=left_bearing, *right=right_bearing;
+//    switch (spans) {
+//    case 1: // A free extreme node require a fixed bearing on the other side
+//	switch (right->currentIndex()) {
+//	case unconstrained: // right must be fixed
+//	    right->setCurrentIndex(fixed_joint);
+//	    break;
+//	case hinged: // right cannot be uncostrained
+//	    if (right->currentIndex()==unconstrained) {
+//		// Change it to something more sensible
+//		right->setCurrentIndex(hinged);
+//	    }
+//	    break;
+//	case fixed_joint: // Any right bearing is allowed
+//	    break;
+//	};
+//	break;
+//    case 2: // A free extreme node require the other not to be free either
+//	break;
+//    default: // Everything else is allowed.
+//	break;
+//    };
 
     int span; int col;
-    // Shows all span length and load for rows from 2 to spans
+    // Shows all span length and load for rows from 2 to spans.
     for (span=2; span<=spans;++span)
 	for (col=0; col<=2; ++col)
             gridLayout->itemAtPosition(span,col)->widget()->show();

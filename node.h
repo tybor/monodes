@@ -45,6 +45,7 @@ public:
 
     void add_beam (Beam *a_beam);
     QList<Beam *> beams() const;
+    qreal longest_span() const; /// The length of the longest beam connected to current Node.
     unsigned int support_conditions_count() const; // The number of support conditions of this node
 
     qreal distance(const Node &anode) const;
@@ -57,6 +58,8 @@ public:
     // Constrains
     enum Constrain constrain() const;
     void set_constrain(enum Constrain a_constrain);
+    // the indexes of the degrees of freedom of displacements and rotation; the index is -1 when the degree of freedom is locked by a restrain.
+    int dof_x, dof_y, dof_tetha;
 
     enum { Type = UserType + 1 };
     int type() const { return Type; }
@@ -72,11 +75,10 @@ protected:
    void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
 
 private:
-    // the indexes of the degrees of freedom
-    // they are -1 when the dof is bound.
-    int dof_x, dof_y, dof_tetha;
     enum Constrain my_constrain;
 
+    // Longest span
+    qreal longest;
     // Displacements
     qreal node_u, node_v, node_fi;
     QList<Beam *> beams_list;
@@ -86,6 +88,8 @@ signals:
 public slots:
 
 };
+
+std::ostream &operator<<(std::ostream &s, Node &a_node);
 
 #endif // NODE_H
 

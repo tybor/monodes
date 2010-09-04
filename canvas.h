@@ -32,8 +32,8 @@ class Canvas : public QGraphicsView
     Q_OBJECT
 public:
     Canvas();
-    /// Makes a continous beam with 1 extra_bearing, in addition to the left and the right. Left and right are hinges. The beam is rectangular (b=8cm, h=15cm) and made of steel. A uniform load is added to the right span. Left span is 3m long, middle is 5m.
-//
+    /// Ask the user input data to make a continous beam.
+
     void solve();
 
     QList<Node*> nodes() const;
@@ -42,17 +42,23 @@ public:
     void zoom_to_fit();
     void zoom_in();
     void zoom_out();
+    qreal bearing_size; /// Drawing size of bearing
+    qreal load_scale; /// The scale applied to loads
 
     void add_node (Node &a_node);
     void add_beam (Beam &a_beam);
     unsigned int support_conditions_count() const; // The number of support conditions of all nodes
 
-private:
-    QList<Node *> nodes_list;
-    QList<Beam *> beams_list;
     Material *material; ///< The one material currently supported
     Section *section; ///< The one section currently supported
     TrussDialog dialog; ///< The entry dialog to set spans, lengths, loads, material and section
+
+protected:
+    void keyPressEvent(QKeyEvent *event);
+    void wheelEvent(QWheelEvent *event);
+private:
+    QList<Node *> nodes_list;
+    QList<Beam *> beams_list;
 
 signals:
 

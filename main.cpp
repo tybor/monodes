@@ -8,12 +8,8 @@ int main(int argc, char *argv[])
 {
     QApplication application(argc, argv);
     Canvas beam;
-
-#if defined(Q_WS_S60)
-    beam.showMaximized();
-#else
-    beam.show();
-#endif
+    // Show the initial dialog
+    beam.dialog.show();
 
     return application.exec();
 }
