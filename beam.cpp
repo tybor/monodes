@@ -27,11 +27,12 @@
 
 #include <stdio.h>
 #include <iostream>
+#include <assert.h>
 
 #include "beam.h"
 #include "beamdialog.h"
 #include "node.h"
-#include "assert.h"
+#include "truss.h"
 
 /* Hermite functions */
 //C		PLOT
@@ -213,7 +214,7 @@ Beam::Beam(Node *a_node, Node *another_node)
     load = 10.0;
 }
 
-// How difficoult to get read-only fields, that in Eiffel are for free!!!
+// How difficoult to get read-only fields, that in Eiffel are for free!!! Symmetrically setters are always free and you can't get rid of them even when you would like to, so you must make it private...
 Node &Beam::first() const { return *first_node; }
 Node &Beam::second() const { return *second_node; }
 qreal Beam::length() const { return beam_length;}
@@ -258,8 +259,8 @@ void Beam::compute_stiffness() {
     // Geometric
     qreal dx = first().x() - second().y();
     qreal dy = first().y() - second().y();
-    qreal l2= dx*dx + dy*dy;
-    qreal l = sqrt(l2);
+    qreal l = length();
+    qreal l2= l*l; // It may also be dx*dx + dy*dy;
     qreal l3 = l * l2;
     qreal ca = dx / l; // Cos(alpha)
     qreal sa = dy / l; // Sin(alpha)
@@ -321,17 +322,19 @@ QRectF Beam::boundingRect() const
 void Beam::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 {
     std::cout<<" painting beam"<<std::endl<<std::flush;
+    Truss &truss = static_cast<Truss&> (*parentItem());
     // A beam is simply a line
-    painter->setPen(QPen(Qt::black, 1.0/*length()/50.0*/) );
+    painter->setPen(QPen(Qt::black, section().height()/100.0 /* remember that height in section dialog is in centimeters, and beams are in meters*/));
     painter->drawLine(first_node->pos(),second_node->pos());
     // Draw the loads, written with the assumption that all beams are horizontal. TODO: remove this assumption.
-    QRect load_rect(first().pos().x(), first().pos().y(),
-                    second().pos().x(), second().pos().y()+load);
-    painter->drawText(load_rect, Qt::AlignCenter,
-                      QString("%1 kg/m").arg(load));
-    painter->setPen(QPen(Qt::red,1));
-    painter->setBrush(QBrush(Qt::red,Qt::VerPattern));
-    painter->drawRect(load_rect);
+//    painter->setViewTransformEnabled(false);
+//    QRectF load_rect(first().pos(),second().pos());
+//    load_rect.adjust(0.0, 0.0, 0.0, load/truss.load_scale);
+//    painter->drawText(load_rect, Qt::AlignCenter,
+//                      QString("%1 kg/m").arg(load));
+//    painter->setPen(QPen(Qt::red,1));
+//    painter->setBrush(QBrush(Qt::red,Qt::VerPattern));
+//    painter->drawRect(load_rect);
 
     // TODO: Draw axial stress, shear stress and moment
 

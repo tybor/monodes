@@ -38,7 +38,9 @@ public:
     void add_beam (Beam &a_beam);
     unsigned int support_conditions_count() const; // The number of support conditions of all nodes
     qreal longest_beam; /// The lenght of the longest beam, used to determinate the drawing size of bearings
+    qreal highest_load; /// The maximum distributed load
     qreal load_scale; /// The scale applied to loads
+    qreal strongest_beam; // The highest moment of inertia of a beam.
 
     Material *material; ///< The one material currently supported
     Section *section; ///< The one section currently supported

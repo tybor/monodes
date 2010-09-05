@@ -32,6 +32,9 @@ Truss::Truss()
     material = new Material(210000.0,0.9,1.4e-6); // Steel
     section = new Section(8.0, 15.0);
     longest_beam = 0.0;
+    highest_load = 0.0;
+    strongest_beam = 0.0;
+    load_scale = 1.0;
 //    left->set_material(*stee/l); left->set_section(*section);
 //    right->set_material(*steel); right; right->set_section(*section);
 }
@@ -48,9 +51,16 @@ void Truss::add_beam(Beam &a_beam) {
     if (a_beam.length()>longest_beam) {
         longest_beam=a_beam.length();
         std::cout<<"new longest beam:"<<longest_beam<<std::endl<<std::flush;
+        // Correcting the scale of all nodes.
         qreal s=longest_beam/20.0;
         foreach (Node *n, nodes()) n->setScale(s);
     }
+    qreal load_module = fabs(a_beam.load);
+    if (load_module>highest_load) {
+        highest_load = load_module;
+        load_scale = longest_beam/highest_load;
+    }
+
     beams_list.append(&a_beam);
 }
 

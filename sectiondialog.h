@@ -23,7 +23,7 @@
 
 #include "ui_sectiondialog.h"
 
-class SectionDialog : public QDialog, private Ui::SectionDialog
+class SectionDialog : public QDialog, public Ui::SectionDialog
 {
     Q_OBJECT
 

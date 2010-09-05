@@ -23,7 +23,7 @@
 
 #include "ui_materialdialog.h"
 
-class MaterialDialog : public QDialog, private Ui::MaterialDialog
+class MaterialDialog : public QDialog, public Ui::MaterialDialog
 {
     Q_OBJECT
 

@@ -23,6 +23,12 @@
 #include "matrix.h"
 #include "truss.h"
 
+#include "trussdialog.h"
+#include "materialdialog.h"
+#include "material.h"
+#include "sectiondialog.h"
+#include "section.h"
+
 #include "QTransform"
 #include <QDialog>
 #include <QPushButton>
@@ -73,8 +79,16 @@ void Canvas::dialog_closed(int res) {
     show();
 #   endif
     t = new Truss();
-
     scene()->addItem(t);
+
+    Material *material = new Material(
+            dialog.material_dialog.elasticModulus->value(),
+            dialog.material_dialog.poissonRatio->value(),
+            dialog.material_dialog.thermalExpansion->value());
+    t->material = material;
+    Section *section = new Section(dialog.section_dialog.widthSpin->value(),dialog.section_dialog.heightSpin->value());
+    t->section = section;
+
     qreal x = 0.0;
     Node *left = new Node(x,0.0, hinge);
     t->add_node(*left);
@@ -85,6 +99,8 @@ void Canvas::dialog_closed(int res) {
         Node *right = new Node(x,0.0, hinge);
         t->add_node(*right);
         Beam *b = new Beam(left,right);
+        b->set_section(*section);
+        b->set_material(*material);
         t->add_beam(*b);
         left = right; // The left node of the next span is the right of current
     }
