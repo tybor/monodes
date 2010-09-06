@@ -313,50 +313,53 @@ void Beam::compute_stiffness() {
 
 QRectF Beam::boundingRect() const
 {
-    qreal extra=length()/30.0;
+    Truss &truss = static_cast<Truss&> (*parentItem());
+    //qreal extra=length()/40.0;
     QRectF result = QRectF(first_node->pos(),  second_node->pos()).normalized();
-    result.adjust(-extra, -extra, extra, extra);
+    result.adjust(0.0, 0.0, 0.0, load*truss.load_scale);
+    //result.adjust(-extra, -extra, extra, extra);
     return result;
 }
 
 void Beam::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 {
-    std::cout<<" painting beam"<<std::endl<<std::flush;
+    /// std::cout<<" painting beam"<<std::endl<<std::flush;
     Truss &truss = static_cast<Truss&> (*parentItem());
     // A beam is simply a line
     painter->setPen(QPen(Qt::black, section().height()/100.0 /* remember that height in section dialog is in centimeters, and beams are in meters*/));
     painter->drawLine(first_node->pos(),second_node->pos());
     // Draw the loads, written with the assumption that all beams are horizontal. TODO: remove this assumption.
-//    painter->setViewTransformEnabled(false);
-//    QRectF load_rect(first().pos(),second().pos());
-//    load_rect.adjust(0.0, 0.0, 0.0, load/truss.load_scale);
-//    painter->drawText(load_rect, Qt::AlignCenter,
-//                      QString("%1 kg/m").arg(load));
-//    painter->setPen(QPen(Qt::red,1));
-//    painter->setBrush(QBrush(Qt::red,Qt::VerPattern));
-//    painter->drawRect(load_rect);
+    painter->setViewTransformEnabled(false);
+    QRectF load_rect(first().pos(),second().pos());
+    load_rect.adjust(0.0, 0.0, 0.0, load*truss.load_scale);
+    std::cout<<"beam load "<<load_rect.x()<<","<<load_rect.y()<<" "<<load_rect.width()<<","<<load_rect.height()<<std::endl<<std::flush;
+    painter->drawText(load_rect, Qt::AlignCenter,
+                      QString("%1 kg/m").arg(load));
+    painter->setPen(QPen(Qt::red,1));
+    painter->setBrush(QBrush(Qt::red,Qt::VerPattern));
+    painter->drawRect(load_rect);
 
     // TODO: Draw axial stress, shear stress and moment
 
-//    // Draw deformated beam.
-//    painter->setPen(Qt::blue);
-//    // painter->drawLine(first().deformed_pos(),second().deformed_pos());
-//    // It would be nice to draw it using splines, but it seems that it is not that easy. Let's draw it as always did, by points; so wow many points shall we draw? Let's naively say currently 32.
-//    QPolygonF deformed;
+    // Draw deformated beam.
+    painter->setPen(QPen(Qt::blue,section().height()/100.0 /* remember that height in section dialog is in centimeters, and beams are in meters*/));
+    // painter->drawLine(first().deformed_pos(),second().deformed_pos());
+    // It would be nice to draw it using splines, but it seems that it is not that easy. Let's draw it as always did, by points; so how many points shall we draw? Let's naively say currently 32.
+    QPolygonF deformed;
 
-//    const int steps=32;
-//    qreal step=1.0/steps; // Beware that 1 is NOT 1.0. If you write it 1/steps, step will be exactly zero.
-//    const int ampl=1.0; // TODO make it user defined, or even better computed for best view.
-//    qreal csi=0;
-//    QPointF step_vector((second().pos() - first().pos())/steps);
-//    QPointF current(first().pos());
-//    for (int i=0; i<=steps; ++i) {
-//	QPointF delta(u(csi)*ampl,v(csi)*ampl);
-//	deformed<< current+delta;
-//	csi +=step;
-//	current+=step_vector;
-//    }
-//     painter->drawPolyline(deformed);
+    const int steps=32;
+    qreal step=1.0/steps; // Beware that 1 is NOT 1.0. If you write it 1/steps, step will be exactly zero.
+    const int ampl=10.0; // TODO make it user defined, or even better computed for best view.
+    qreal csi=0;
+    QPointF step_vector((second().pos() - first().pos())/steps);
+    QPointF current(first().pos());
+    for (int i=0; i<=steps; ++i) {
+        QPointF delta(u(csi)*ampl,v(csi)*ampl);
+        deformed<< current+delta;
+        csi +=step;
+        current+=step_vector;
+    }
+     painter->drawPolyline(deformed);
 }
 
 void Beam::mousePressEvent(QGraphicsSceneMouseEvent *event)

@@ -60,9 +60,9 @@ Node::Node (qreal an_x, qreal an_y, enum Constrain a_constrain)
 {
     setPos(an_x, an_y);
     // TODO: remove those!
-    node_u=0.1;
-    node_v=0.2;
-    node_fi=0.3;
+    node_u=0.0;
+    node_v=0.0; // Only rotations!
+    node_fi=0.5;
     my_constrain = a_constrain;
     std::cout<<"New node "<<*this<<std::endl<<std::flush;
 }
@@ -141,7 +141,6 @@ QPointF Node::deformed_pos() {
 
 void Node::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *)
 {
-    std::cout<<" painting node";
     const QPen lightest(Qt::gray, smaller/12.0);
     const QPen light(Qt::black, smaller/10.0);
     const QPen heavy(Qt::black, smaller/8.0);

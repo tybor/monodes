@@ -54,19 +54,21 @@ Canvas::Canvas() {
     connect(&dialog, SIGNAL(finished(int)), this, SLOT(dialog_closed(int)));
 
     // Add zoom buttons; the following is clumsy; "-" overrides "+" button.
-//    QPushButton *zoomin_button = new QPushButton ("+");
-    //QPushButton *zoomout_button = new QPushButton ("-");
-    //QGraphicsProxyWidget *proxy2 = scene->addWidget (zoomout_button);
+//    zooms = new QGraphicsAnchorLayout();
+//    zoomin_button = new QPushButton("+");
+//    zoomout_button = new QPushButton ("-");
+//    zoomin = scene->addWidget (zoomin_button);
+//    //zoomout = scene->addWidget (zoomout_button);
 
     //setMinimumSize(150, 100);
     setWindowTitle(tr("Mobile nodes"));
-    // Show a nice squared paper background
+    // Prepare a nice squared paper background
     setBackgroundBrush(QBrush(QImage(":/images/paper4.jpg")));
     // Trasformation to view the model as the engineers expects, i.e. y growing upwards.
-    setTransform(QTransform
-                (1.0,  0.0, 0.0,
-                 0.0, -1.0, 0.0,
-                 0.0,  0.0, 1.0), false);
+//    setTransform(QTransform
+//                (1.0,  0.0, 0.0,
+//                 0.0, -1.0, 0.0,
+//                 0.0,  0.0, 1.0), false);
 
     dialog.show();
 }
@@ -109,6 +111,12 @@ void Canvas::dialog_closed(int res) {
 
 void Canvas::zoom_to_fit() {
    fitInView(t,Qt::KeepAspectRatio);
+   // Move "+" and "-" buttons
+   // zooms->addCornerAnchors(&t,Qt::TopLeftCorner, zoomin,Qt::BottomRightCorner);
+
+   // Set a proper size for the squared paper background
+   //backgroundBrush().setMatrix (QMatrix(10.0, 2.0, 2.0, 10.0, 0.0,0.0));
+           // QMatrix(t->longest_beam, 0.0,0.0,t->longest_beam,0.0,0.0));
 }
 
 void Canvas::zoom_in(){

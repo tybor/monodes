@@ -21,11 +21,12 @@
 #ifndef TRUSS_H
 #define TRUSS_H
 
-#include <QGraphicsItem>
+#include <QtGui>
 #include "node.h"
 #include "beam.h"
 
 class Truss : public QGraphicsItem
+        // TODO: inherit from "public QGraphicsLayoutItem" to allow dynamic placing of widgets like "+" and "-"
 {
 public:
     Truss();

@@ -21,7 +21,8 @@
 #ifndef CANVAS_H
 #define CANVAS_H
 
-#include <QGraphicsView>
+//#include <QGraphicsView>
+#include <QtGui>
 #include "node.h"
 #include "beam.h"
 #include "truss.h"
@@ -51,6 +52,10 @@ signals:
 public slots:
     void dialog_closed(int res); ///< The feature called when the main dialog is closed.
 
+private:
+    QPushButton *zoomin_button, *zoomout_button;
+    QGraphicsAnchorLayout *zooms;
+    QGraphicsProxyWidget *zoomin,*zoomout;
 };
 
 #endif // CANVAS_H
