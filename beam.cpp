@@ -211,10 +211,10 @@ Beam::Beam(Node *a_node, Node *another_node)
     first_node->add_beam(this);
     second_node->add_beam(this);
     std::cout<<"New beam "<<first()<<"--"<<second()<<" (length="<<length()<<")\n"<<std::flush;
-    load = 10.0;
+    load = 0.0;
 }
 
-// How difficoult to get read-only fields, that in Eiffel are for free!!! Symmetrically setters are always free and you can't get rid of them even when you would like to, so you must make it private...
+// How difficoult to get read-only fields, that in Eiffel are for free!!! Symmetrically setters are always free and you can't get rid of them even when you would like to, so you must make it private, writing both the setter and the getter. So in conclusion Eiffel's approach - the default is fields writable only from inside its object and read-only from outside is what saves efforts.
 Node &Beam::first() const { return *first_node; }
 Node &Beam::second() const { return *second_node; }
 qreal Beam::length() const { return beam_length;}
@@ -325,24 +325,34 @@ void Beam::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 {
     /// std::cout<<" painting beam"<<std::endl<<std::flush;
     Truss &truss = static_cast<Truss&> (*parentItem());
+    qreal line_width = section().height();
     // A beam is simply a line
-    painter->setPen(QPen(Qt::black, section().height()/100.0 /* remember that height in section dialog is in centimeters, and beams are in meters*/));
+    painter->setPen(QPen(Qt::black, line_width));
     painter->drawLine(first_node->pos(),second_node->pos());
-    // Draw the loads, written with the assumption that all beams are horizontal. TODO: remove this assumption.
+    // Draw the load, assuming horizontal beams. TODO: remove this assumption.
     painter->setViewTransformEnabled(false);
     QRectF load_rect(first().pos(),second().pos());
-    load_rect.adjust(0.0, 0.0, 0.0, load*truss.load_scale);
-    std::cout<<"beam load "<<load_rect.x()<<","<<load_rect.y()<<" "<<load_rect.width()<<","<<load_rect.height()<<std::endl<<std::flush;
-    painter->drawText(load_rect, Qt::AlignCenter,
-                      QString("%1 kg/m").arg(load));
-    painter->setPen(QPen(Qt::red,1));
-    painter->setBrush(QBrush(Qt::red,Qt::VerPattern));
+    load_rect.adjust(0.0, -load*truss.load_scale-2.0*line_width, 0.0, -2.0*line_width );
+    //std::cout<<"beam load "<<load_rect.x()<<","<<load_rect.y()<<" "<<load_rect.width()<<","<<load_rect.height()<<std::endl<<std::flush;
+    painter->setPen(QPen(Qt::red));
+    painter->setBrush(QBrush(QColor(255,96,96,128)));
+    QString label("%1 kg/m");
+    label = label.arg(load);
+    QFont font;
+    /* Pick the size that fits the load rectangle better */
+    QRectF text_rect(painter->boundingRect(load_rect,label)); // The size we would occupy
+    font.setPointSizeF( font.pointSizeF() * fmin(
+            load_rect.width() / text_rect.width(),
+            load_rect.height() / text_rect.height()
+            ));
+    painter->setFont(font);
     painter->drawRect(load_rect);
+    painter->drawText(load_rect, Qt::AlignCenter, label);
 
     // TODO: Draw axial stress, shear stress and moment
 
     // Draw deformated beam.
-    painter->setPen(QPen(Qt::blue,section().height()/100.0 /* remember that height in section dialog is in centimeters, and beams are in meters*/));
+    painter->setPen(QPen(QColor(0, 0, 255, 128),section().height()));
     // painter->drawLine(first().deformed_pos(),second().deformed_pos());
     // It would be nice to draw it using splines, but it seems that it is not that easy. Let's draw it as always did, by points; so how many points shall we draw? Let's naively say currently 32.
     QPolygonF deformed;

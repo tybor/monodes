@@ -166,11 +166,11 @@ void Node::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWid
         //	    break;
     case hinge: // A circle with some radial lines
         painter->setPen(heavy);
-        painter->drawLine(QLineF(0.0, 0.0, -bigger, -smaller));
-        painter->drawLine(QLineF(0.0, 0.0, -smaller, -bigger));
-        painter->drawLine(QLineF(0.0, 0.0, 0.0, -bigger));
-        painter->drawLine(QLineF(0.0, 0.0,  smaller, -bigger));
-        painter->drawLine(QLineF(0.0, 0.0, bigger, -smaller));
+        painter->drawLine(QLineF(0.0, 0.0, -bigger, smaller));
+        painter->drawLine(QLineF(0.0, 0.0, -smaller, bigger));
+        painter->drawLine(QLineF(0.0, 0.0, 0.0, bigger));
+        painter->drawLine(QLineF(0.0, 0.0,  smaller, bigger));
+        painter->drawLine(QLineF(0.0, 0.0, bigger, smaller));
         painter->setBrush(QBrush(Qt::white));
         painter->setPen(light);
         painter->drawEllipse(origin, smaller,smaller);

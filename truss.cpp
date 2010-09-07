@@ -48,19 +48,6 @@ void Truss::add_node(Node &a_node) {
 
 void Truss::add_beam(Beam &a_beam) {
     a_beam.setParentItem(this); // a_beam will be a child item of current truss, so there's no need to add it.
-    if (a_beam.length()>longest_beam) {
-        longest_beam=a_beam.length();
-        std::cout<<"new longest beam:"<<longest_beam<<std::endl<<std::flush;
-        // Correcting the scale of all nodes.
-        qreal s=longest_beam/10.0;
-        foreach (Node *n, nodes()) n->setTransform(QTransform::fromScale (s,s),false);
-    }
-    qreal load_module = fabs(a_beam.load);
-    if (load_module>highest_load) {
-        highest_load = load_module;
-        load_scale = longest_beam/highest_load/5.0;
-    }
-
     beams_list.append(&a_beam);
 }
 

@@ -138,8 +138,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>330</width>
-        <height>327</height>
+        <width>328</width>
+        <height>328</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="gridLayout" columnstretch="0,1,1">
@@ -213,7 +213,7 @@ p, li { white-space: pre-wrap; }
           <double>10000.000000000000000</double>
          </property>
          <property name="value">
-          <double>100.000000000000000</double>
+          <double>300.000000000000000</double>
          </property>
         </widget>
        </item>
@@ -224,6 +224,9 @@ p, li { white-space: pre-wrap; }
          </property>
          <property name="accelerated">
           <bool>true</bool>
+         </property>
+         <property name="value">
+          <double>3.000000000000000</double>
          </property>
         </widget>
        </item>
@@ -252,7 +255,7 @@ p, li { white-space: pre-wrap; }
           <double>10000.000000000000000</double>
          </property>
          <property name="value">
-          <double>100.000000000000000</double>
+          <double>500.000000000000000</double>
          </property>
         </widget>
        </item>
@@ -263,6 +266,9 @@ p, li { white-space: pre-wrap; }
          </property>
          <property name="accelerated">
           <bool>true</bool>
+         </property>
+         <property name="value">
+          <double>2.000000000000000</double>
          </property>
         </widget>
        </item>
@@ -291,7 +297,7 @@ p, li { white-space: pre-wrap; }
           <double>10000.000000000000000</double>
          </property>
          <property name="value">
-          <double>100.000000000000000</double>
+          <double>200.000000000000000</double>
          </property>
         </widget>
        </item>
@@ -302,6 +308,9 @@ p, li { white-space: pre-wrap; }
          </property>
          <property name="accelerated">
           <bool>true</bool>
+         </property>
+         <property name="value">
+          <double>10.000000000000000</double>
          </property>
         </widget>
        </item>
@@ -330,7 +339,7 @@ p, li { white-space: pre-wrap; }
           <double>10000.000000000000000</double>
          </property>
          <property name="value">
-          <double>100.000000000000000</double>
+          <double>200.000000000000000</double>
          </property>
         </widget>
        </item>
@@ -341,6 +350,9 @@ p, li { white-space: pre-wrap; }
          </property>
          <property name="accelerated">
           <bool>true</bool>
+         </property>
+         <property name="value">
+          <double>3.000000000000000</double>
          </property>
         </widget>
        </item>
@@ -369,7 +381,7 @@ p, li { white-space: pre-wrap; }
           <double>10000.000000000000000</double>
          </property>
          <property name="value">
-          <double>100.000000000000000</double>
+          <double>200.000000000000000</double>
          </property>
         </widget>
        </item>
@@ -380,6 +392,9 @@ p, li { white-space: pre-wrap; }
          </property>
          <property name="accelerated">
           <bool>true</bool>
+         </property>
+         <property name="value">
+          <double>3.000000000000000</double>
          </property>
         </widget>
        </item>
