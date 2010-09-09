@@ -4,6 +4,7 @@
 #include <iostream>
 #include <assert.h>
 #include "nodedialog.h"
+
 int main(int argc, char *argv[])
 {
     QApplication application(argc, argv);

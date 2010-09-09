@@ -15,7 +15,6 @@ SOURCES += main.cpp\
     canvas.cpp \
     beam.cpp \
     linearsystem.cpp \
-    matrix.cpp \
     material.cpp \
     section.cpp \
     nodedialog.cpp \
@@ -31,7 +30,6 @@ HEADERS  += \
     canvas.h \
     beam.h \
     linearsystem.h \
-    matrix.h \
     material.h \
     section.h \
     nodedialog.h \
@@ -52,6 +50,9 @@ FORMS    += \
 
 CONFIG += mobility
 MOBILITY = 
+
+CONFIG += link_pkgconfig
+PKGCONFIG += eigen2
 
 symbian {
     TARGET.UID3 = 0xe0bb5b77

@@ -19,23 +19,24 @@
 
 
 #include "linearsystem.h"
-#include "matrix.h"
 #include "assert.h"
 
-LinearSystem::LinearSystem (Matrix a_stiffness, Matrix some_loads) {
-    assert(a_stiffness.rows() == some_loads.rows());
+LinearSystem::LinearSystem (const Matrix<qreal, Dynamic, Dynamic> &a_stiffness,
+                            const Matrix<qreal, Dynamic, Dynamic> &some_loads) {
+    //assert(/* square stiffness */ a_stiffness.rows()==a_stiffness.cols());
+    //assert(/* coherent matrices */ a_stiffness.rows() == some_loads.rows());
 
-    stiffness = a_stiffness;
-    loads = some_loads;
+    //stiffness = Matrix(a_stiffness);
+    //loads = Matrix(some_loads);
 }
 
 void LinearSystem::run()
-{
-    //qreal sol[][] = new qreal[stiffness.size()][loads.size()]
-    // currently empty
+{    
+    //displacements = Matrix(stiffness.rows(), loads.cols());
+
 }
 
-Matrix LinearSystem::solutions()
+const Matrix<qreal, Dynamic, Dynamic> &LinearSystem::solutions()
 {
-    return displacements;
+    //return displacements;
 }

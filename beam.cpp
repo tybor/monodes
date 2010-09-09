@@ -239,18 +239,18 @@ Material &Beam::material() const {
     return *m;
 }
 
-Matrix &Beam::stiffness() {
+Matrix<double, 6, 6> &Beam::stiffness() {
     // Computes the stiffness matrix in local coordinates, exploiting modulus equality similarities of various terms.
     if (!stiffness_computed) compute_stiffness();
     return st;
 }
 
-Matrix &Beam::local_stiffness() {
+Matrix<double, 6, 6> &Beam::local_stiffness() {
     if (!stiffness_computed) compute_stiffness();
     return local_st;
 }
 
-Matrix &Beam::transformation() {
+Matrix<double, 6, 6> &Beam::transformation() {
     if (!stiffness_computed) compute_stiffness();
     return tr;
 }
@@ -284,29 +284,24 @@ void Beam::compute_stiffness() {
     qreal fl_sh = 6*E*J/(l2*(1+fi));
     qreal sh_fl = (2-fi)*E*J/(l*(1+fi));
 
-    qreal m[36] = {
-	axial,  0,    0,    -axial, 0,    0,
-	0,    flex,   fl_sh,  0,    -flex,  fl_sh,
-	0,    fl_sh,  shear,  0,    -fl_sh, sh_fl,
-	-axial, 0,    0,    axial,  0,    0,
-	0,    -flex,  -fl_sh, 0,    flex,   -fl_sh,
-	0,    fl_sh,  sh_fl,  0,    -fl_sh, shear
-    };
-    /*Matrix */
-    local_st = Matrix(6,6,m);
+    local_st <<
+            axial,  0,    0,    -axial, 0,    0,
+            0,    flex,   fl_sh,  0,    -flex,  fl_sh,
+            0,    fl_sh,  shear,  0,    -fl_sh, sh_fl,
+            -axial, 0,    0,    axial,  0,    0,
+            0,    -flex,  -fl_sh, 0,    flex,   -fl_sh,
+            0,    fl_sh,  sh_fl,  0,    -fl_sh, shear;
 
     // Transforming stiffness matrix from local coordinates into global one
-    // TODO: cache the transformation matrix
-    qreal t[36] = {
-	ca, -sa, 0.0, 0.0, 0.0, 0.0,
-	sa, ca, 0.0, 0.0, 0.0, 0.0,
-	0.0, 0.0, 1.0, 0.0, 0.0, 0.0,
-	0.0, 0.0, 0.0, ca, -sa, 0.0,
-	0.0, 0.0, 0.0, sa, ca, 0.0,
-	0.0, 0.0, 0.0, 0.0, 0.0, 1.0};
-    tr = Matrix(6,6,t);
+    tr <<
+            ca, -sa, 0.0, 0.0, 0.0, 0.0,
+            sa, ca, 0.0, 0.0, 0.0, 0.0,
+            0.0, 0.0, 1.0, 0.0, 0.0, 0.0,
+            0.0, 0.0, 0.0, ca, -sa, 0.0,
+            0.0, 0.0, 0.0, sa, ca, 0.0,
+            0.0, 0.0, 0.0, 0.0, 0.0, 1.0;
 
-    st = (tr * local_st)*(tr.transposed());
+    st = (tr * local_st)/* *(tr.transposed())*/;
     // Seeing all those zeros in the transformation matrix makes tempting to provide an ad-hoc funtions to compute this product
     stiffness_computed = true;
 }
@@ -353,7 +348,6 @@ void Beam::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 
     // Draw deformated beam.
     painter->setPen(QPen(QColor(0, 0, 255, 128),section().height()));
-    // painter->drawLine(first().deformed_pos(),second().deformed_pos());
     // It would be nice to draw it using splines, but it seems that it is not that easy. Let's draw it as always did, by points; so how many points shall we draw? Let's naively say currently 32.
     QPolygonF deformed;
 

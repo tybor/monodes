@@ -22,28 +22,35 @@
 #define LINEARSYSTEM_H
 
 #include <QThread>
-#include "matrix.h"
+#include <Eigen/Core>
+// import most common Eigen types
+USING_PART_OF_NAMESPACE_EIGEN
+using Eigen::Dynamic;
+// To avoid alignment issues. See http://eigen.tuxfamily.org/dox/UnalignedArrayAssert.html
+#define EIGEN_DONT_VECTORIZE 1
+#define EIGEN_DISABLE_UNALIGNED_ARRAY_ASSERT 1
 
 class LinearSystem : public QThread
         // A linear system running as a separate thread, specialized in solving the systems resulting from the
         // stiffness method of structural analysis.
 {
 public:
-        LinearSystem (Matrix stiffness, Matrix loads);
+        LinearSystem (const Matrix<qreal, Dynamic, Dynamic> &stiffness,
+                      const Matrix<qreal, Dynamic, Dynamic> &loads);
         // a new solving linear system for a structure with `a_dofs' degrees of freedom with `a_lcc' load cases
         //add_stiffness (unsigned int i, unsigned int j, qreal stiffness); /// Add stiffness at index i,j
         //add_load (unsigned int dof, unsigned int lc, qreal load);
 
-        Matrix solutions();
+        const Matrix<qreal, Dynamic, Dynamic> &solutions();
 protected:
      void run();
  private:
      unsigned int dof; /// Degrees of freedom
      unsigned int lcc; /// Load cases count
 
-     Matrix stiffness;
-     Matrix displacements;
-     Matrix loads;
+     Matrix<qreal, Dynamic, Dynamic> stiffness;
+     Matrix<qreal, Dynamic, Dynamic> displacements;
+     Matrix<qreal, Dynamic, Dynamic> loads;
 
 signals:
 

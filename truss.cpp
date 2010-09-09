@@ -85,8 +85,13 @@ void Truss::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWi
     // Nothing; the drawing of a truss is made by its children items, namely nodes and beams.
 }
 
+unsigned int Truss::support_conditions_count() const {
+    unsigned int result=0;
+    foreach (Node *node, nodes())
+        result += node->support_conditions_count();
+}
 void Truss::solve() {
-    unsigned int dofs=nodes().size()*3; // degrees of freedom
+    unsigned int dofs=nodes().size()*3 - support_conditions_count(); // degrees of freedom
     unsigned int lcc=1; // load cases count; currently fixed at 1.
 
     // Degrees of freedom numbering
@@ -99,11 +104,13 @@ void Truss::solve() {
             n.dof_x = ++dof;
             n.dof_y = ++dof;
             n.dof_tetha = ++dof;
+            std::cout<<n;
             break;
             // TODO:	case vertical_trailer: break;
             // TODO:    case horizontal_trailer: break;
         case hinge:
             n.dof_tetha = ++dof;
+            std::cout<<n;
             break;
             // TODO: case vertical_shoe:break;
             // TODO: case horizontal_shoe:break;
@@ -114,8 +121,29 @@ void Truss::solve() {
             break;
         }
     }
-    // TODO: this shall be a SymmetricSquareMatrix
-    Matrix m(dofs,dofs);
-    // Sum all the stiffness
 
+//    std::cout<<"Degrees of freedom:";
+//    foreach (Node *n, nodes()) std::cout<<*n<<std::endl;
+//    // TODO: this shall be a SymmetricSquareMatrix
+//    Matrix m(dofs,dofs);
+//    Matrix l(dofs,1);
+//    // Sum all the stiffness
+//    foreach (Beam *beam, beams()) {
+//        Matrix st = beam->stiffness();
+//        Node &n1 = beam->first(); Node &n2 = beam->second();
+//        int dofs[7] = {-1, // C++ arrays starts from index 0. Shame on them!
+//                       n1.dof_x, n1.dof_y, n1.dof_tetha,
+//                       n2.dof_x, n2.dof_y, n2.dof_tetha};
+//        for (int i=1; i<=6; ++i) {
+//            int dof1 = dofs[i];
+//            if (dof1>0) { /* This degree of freedom is unbounded */
+//                // TODO: Adding distributed loads
+//                for (int j=1; j<=6; ++j) {
+//                    int dof2=dofs[j];
+//                    if (dof2>0) m.add(st.at(i,j), dof1,dof2);
+//                }
+//            }
+//        }
+//    }
+//    std::cout<<"Stiffness matrix:"<<std::endl<<m<<std::endl<<std::flush;
 }

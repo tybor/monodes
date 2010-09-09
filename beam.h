@@ -21,7 +21,15 @@
 #define BEAM_H
 
 #include <QtGui>
-#include "matrix.h"
+#include <Eigen/Core>
+
+// import most common Eigen types
+USING_PART_OF_NAMESPACE_EIGEN
+using Eigen::Dynamic;
+// To avoid alignment issues. See http://eigen.tuxfamily.org/dox/UnalignedArrayAssert.html
+#define EIGEN_DONT_VECTORIZE 1
+#define EIGEN_DISABLE_UNALIGNED_ARRAY_ASSERT 1
+
 #include "section.h"
 #include "material.h"
 
@@ -55,9 +63,11 @@ public:
     void set_material (Material &a_material);
     Material &material() const;
 
-    Matrix &stiffness(); // In global coordinates
-    Matrix &local_stiffness();
-    Matrix &transformation(); // the transformation matrix
+
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW // See http://eigen.tuxfamily.org/dox/StructHavingEigenMembers.html
+    Matrix<qreal, 6, 6> &stiffness(); // In global coordinates
+    Matrix<qreal, 6, 6> &local_stiffness();
+    Matrix<qreal, 6, 6> &transformation(); // the transformation matrix
 
 protected:
     QRectF boundingRect() const;
@@ -75,9 +85,9 @@ private:
 
     void compute_stiffness();
     bool stiffness_computed;
-    Matrix st;
-    Matrix local_st;
-    Matrix tr;
+    Matrix<double, 6, 6> st;
+    Matrix<double, 6, 6> local_st;
+    Matrix<double, 6, 6> tr;
 
     qreal u(qreal csi);
     qreal v(qreal csi);

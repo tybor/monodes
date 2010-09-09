@@ -63,6 +63,7 @@ Node::Node (qreal an_x, qreal an_y, enum Constrain a_constrain)
     node_u=0.0;
     node_v=0.0; // Only rotations!
     node_fi=0.5;
+    dof_x = 0; dof_y=0; dof_tetha=0;
     my_constrain = a_constrain;
     std::cout<<"New node "<<*this<<std::endl<<std::flush;
 }
@@ -88,6 +89,7 @@ unsigned int Node::support_conditions_count() const {
                 // TODO: case vertical_shoe:break;
                 // TODO: case horizontal_shoe:break;
     case restrained: return 3; break;
+    default: return 0; break;
     }
 }
 
@@ -215,7 +217,11 @@ void Node::set_constrain(enum Constrain a_constrain) {
 }
 
 std::ostream &operator<<(std::ostream &s, Node &a_node) {
-    s<<"("<<a_node.x()<<","<<a_node.y()<<")";
+    s<<"("<<a_node.x()<<","<<a_node.y()
+            <<" dof x "<<a_node.dof_x
+            <<" dof y "<<a_node.dof_y
+            <<" dof tetha "<<a_node.dof_tetha
+            <<") ";
     return s;
 }
 

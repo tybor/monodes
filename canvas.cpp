@@ -20,7 +20,6 @@
 #include "canvas.h"
 #include "node.h"
 #include "beam.h"
-#include "matrix.h"
 #include "truss.h"
 
 #include "trussdialog.h"
@@ -108,6 +107,7 @@ void Canvas::dialog_closed(int res) {
         left = right; // The left node of the next span is the right of current
     }
     zoom_to_fit();
+    t->solve();
 }
 
 void Canvas::zoom_to_fit() {
