@@ -42,6 +42,7 @@ qreal f5(qreal csi);
 qreal f6(qreal csi);
 
 class Node; // Forward declaration
+class Truss; // Forward declaration
 
 class Beam : public QGraphicsItem
 {
@@ -69,9 +70,9 @@ public:
     Matrix<qreal, 6, 6> &local_stiffness();
     Matrix<qreal, 6, 6> &transformation(); // the transformation matrix
 
-protected:
     QRectF boundingRect() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+protected:
     void mousePressEvent(QGraphicsSceneMouseEvent *event);
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
 
@@ -82,12 +83,13 @@ private:
     Section *s;
     Material *m;
 
+    Truss &truss() const; // The truss containing current beam
 
     void compute_stiffness();
     bool stiffness_computed;
-    Matrix<double, 6, 6> st;
-    Matrix<double, 6, 6> local_st;
-    Matrix<double, 6, 6> tr;
+    Matrix<qreal, 6, 6> st;
+    Matrix<qreal, 6, 6> local_st;
+    Matrix<qreal, 6, 6> tr;
 
     qreal u(qreal csi);
     qreal v(qreal csi);

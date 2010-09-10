@@ -63,6 +63,8 @@ Canvas::Canvas() {
     setWindowTitle(tr("Mobile nodes"));
     // Prepare a nice squared paper background
     setBackgroundBrush(QBrush(QImage(":/images/paper4.jpg")));
+    setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     // Trasformation to view the model as the engineers expects, i.e. y growing upwards.
 //    setTransform(QTransform
 //                (1.0,  0.0, 0.0,
@@ -74,13 +76,13 @@ Canvas::Canvas() {
 
 void Canvas::dialog_closed(int res) {
     //std::cout<<"Dialog closed\n";
+    t = new Truss();
+    scene()->addItem(t);
 #   if defined(Q_WS_S60)
     showMaximized();
 #   else
     show();
 #   endif
-    t = new Truss();
-    scene()->addItem(t);
 
     Material *material = new Material(
             dialog.material_dialog.elasticModulus->value(),
@@ -196,3 +198,9 @@ void Canvas::wheelEvent(QWheelEvent *event)
     scale(s,s);
 }
 
+void Canvas::resizeEvent (QResizeEvent *event) {
+    if (t)
+        if (! (t->beams().empty()))
+            fitInView(t,Qt::KeepAspectRatio);
+
+}

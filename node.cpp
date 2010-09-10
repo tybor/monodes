@@ -126,14 +126,20 @@ void Node::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 
 QRectF Node::boundingRect() const
 {
-    // bouding rectangle - the region where the item is paing - is made a little bigger than it may be for simplicy sake. I'm not sure that a proper switch and a more precise bounding may be useful, perhpas the computational burden is a waste of efforts.
-    return QRectF(-bigger,bigger,2*bigger,2*bigger);
+    QPainterPath path;
+    static const qreal halfpen = smaller/8.0;
+    qreal low = bigger+halfpen;
+    qreal high = 2*low;
+    return QRectF(-low,-low,high,high);
 }
 
 QPainterPath Node::shape() const
 {
     QPainterPath path;
-    path.addEllipse(-bigger, -bigger, 2*bigger, 2*bigger);
+    static const qreal halfpen = smaller/8.0;
+    qreal low = bigger+halfpen;
+    qreal high = 2*low;
+    path.addEllipse(-low,-low,high,high);
     return path;
 }
 

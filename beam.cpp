@@ -239,21 +239,25 @@ Material &Beam::material() const {
     return *m;
 }
 
-Matrix<double, 6, 6> &Beam::stiffness() {
+Matrix<qreal, 6, 6> &Beam::stiffness() {
     // Computes the stiffness matrix in local coordinates, exploiting modulus equality similarities of various terms.
     if (!stiffness_computed) compute_stiffness();
     return st;
 }
 
-Matrix<double, 6, 6> &Beam::local_stiffness() {
+Matrix<qreal, 6, 6> &Beam::local_stiffness() {
     if (!stiffness_computed) compute_stiffness();
     return local_st;
 }
 
-Matrix<double, 6, 6> &Beam::transformation() {
+Matrix<qreal, 6, 6> &Beam::transformation() {
     if (!stiffness_computed) compute_stiffness();
     return tr;
 }
+
+Truss &Beam::truss() const {
+    return static_cast<Truss&> (*parentItem());
+};
 
 void Beam::compute_stiffness() {
     // Geometric
@@ -308,10 +312,14 @@ void Beam::compute_stiffness() {
 
 QRectF Beam::boundingRect() const
 {
-    Truss &truss = static_cast<Truss&> (*parentItem());
-    //qreal extra=length()/40.0;
+    qreal line_width = section().height();
+    qreal load_scale = truss().load_scale;
     QRectF result = QRectF(first_node->pos(),  second_node->pos()).normalized();
-    result.adjust(0.0, 0.0, 0.0, load*truss.load_scale);
+    // Accounting the load
+    result.adjust(0.0, 0.0, 0.0, load*truss().load_scale);
+    // Accounting the space between the beam and the load
+    result.adjust(0.0, -load*load_scale-2.0*line_width, 0.0, -2.0*line_width );
+
     //result.adjust(-extra, -extra, extra, extra);
     return result;
 }
@@ -319,7 +327,7 @@ QRectF Beam::boundingRect() const
 void Beam::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 {
     /// std::cout<<" painting beam"<<std::endl<<std::flush;
-    Truss &truss = static_cast<Truss&> (*parentItem());
+    Truss &t = truss();
     qreal line_width = section().height();
     // A beam is simply a line
     painter->setPen(QPen(Qt::black, line_width));
@@ -327,7 +335,7 @@ void Beam::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
     // Draw the load, assuming horizontal beams. TODO: remove this assumption.
     painter->setViewTransformEnabled(false);
     QRectF load_rect(first().pos(),second().pos());
-    load_rect.adjust(0.0, -load*truss.load_scale-2.0*line_width, 0.0, -2.0*line_width );
+    load_rect.adjust(0.0, -load*t.load_scale-2.0*line_width, 0.0, -2.0*line_width );
     //std::cout<<"beam load "<<load_rect.x()<<","<<load_rect.y()<<" "<<load_rect.width()<<","<<load_rect.height()<<std::endl<<std::flush;
     painter->setPen(QPen(Qt::red));
     painter->setBrush(QBrush(QColor(255,96,96,128)));

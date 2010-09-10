@@ -61,23 +61,10 @@ QList<Beam*> Truss::beams() const {
 
 QRectF Truss::boundingRect() const
 {
-    // Find the smallest and the biggest coordinate.
-    qreal x1=0.0, x2=0.0, y1=0.0, y2=0.0;
-    for (QList<Node*>::const_iterator i=nodes_list.begin(); i != nodes_list.end(); ++i) {
-        Node &n=**i;
-        if (n.x()<x1) x1=n.x();
-        if (n.x()>x2) x2=n.x();
-        if (n.y()<y1) y1=n.y();
-        if (n.y()>y2) y2=n.y();
-    }
-
-    qreal dx = x2-x1; qreal dy = y2-y1;
-    // Add a little border.
-    qreal border = fmax(dx,dy)/20.0;
-    x1 -= border; dx += border; dx += border;
-    y1 -= border; dy += border; dy += border;
-    std::cout<<"Truss bouding rect: ("<<x1<<","<<y1<<") + ("<<dx<<","<<dy<<")"<<std::endl<<std::flush;
-    return QRectF(x1,y1,dx,dy);
+    QRectF result;
+    foreach (Beam *beam, beams()) {result |=beam->boundingRect();}
+    foreach (Node *node, nodes()) {result |=node->boundingRect();}
+    return result;
 }
 
 void Truss::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *w)
@@ -91,59 +78,62 @@ unsigned int Truss::support_conditions_count() const {
         result += node->support_conditions_count();
 }
 void Truss::solve() {
-    unsigned int dofs=nodes().size()*3 - support_conditions_count(); // degrees of freedom
-    unsigned int lcc=1; // load cases count; currently fixed at 1.
+    int dofs=nodes().size()*3 - support_conditions_count(); // degrees of freedom
+    int lcc=1; // load cases count; currently fixed at 1.
 
     // Degrees of freedom numbering
     unsigned int dof = 0;
-    for (QList<Node*>::iterator i=nodes_list.begin(); i!=nodes_list.end(); ++i) {
-        assert (/* non null node*/ *i != NULL);
-        Node &n = **i;
-        switch (n.constrain()) {
+    foreach (Node *n, nodes()) {
+        assert (/* non null node*/ n != NULL);
+        switch (n->constrain()) {
         case uncostrained:
-            n.dof_x = ++dof;
-            n.dof_y = ++dof;
-            n.dof_tetha = ++dof;
+            n->dof_x = dof++;
+            n->dof_y = dof++;
+            n->dof_tetha = dof++;
             std::cout<<n;
             break;
             // TODO:	case vertical_trailer: break;
             // TODO:    case horizontal_trailer: break;
         case hinge:
-            n.dof_tetha = ++dof;
+            n->dof_x = -1;
+            n->dof_y = -1;
+            n->dof_tetha = dof++;
             std::cout<<n;
             break;
             // TODO: case vertical_shoe:break;
             // TODO: case horizontal_shoe:break;
         case restrained:
-            n.dof_x = -1;
-            n.dof_y = -1;
-            n.dof_tetha = -1;
+            n->dof_x = -1;
+            n->dof_y = -1;
+            n->dof_tetha = -1;
             break;
         }
     }
 
-//    std::cout<<"Degrees of freedom:";
-//    foreach (Node *n, nodes()) std::cout<<*n<<std::endl;
-//    // TODO: this shall be a SymmetricSquareMatrix
-//    Matrix m(dofs,dofs);
-//    Matrix l(dofs,1);
-//    // Sum all the stiffness
-//    foreach (Beam *beam, beams()) {
-//        Matrix st = beam->stiffness();
-//        Node &n1 = beam->first(); Node &n2 = beam->second();
-//        int dofs[7] = {-1, // C++ arrays starts from index 0. Shame on them!
-//                       n1.dof_x, n1.dof_y, n1.dof_tetha,
-//                       n2.dof_x, n2.dof_y, n2.dof_tetha};
-//        for (int i=1; i<=6; ++i) {
-//            int dof1 = dofs[i];
-//            if (dof1>0) { /* This degree of freedom is unbounded */
-//                // TODO: Adding distributed loads
-//                for (int j=1; j<=6; ++j) {
-//                    int dof2=dofs[j];
-//                    if (dof2>0) m.add(st.at(i,j), dof1,dof2);
-//                }
-//            }
-//        }
-//    }
-//    std::cout<<"Stiffness matrix:"<<std::endl<<m<<std::endl<<std::flush;
+    std::cout<<"Degrees of freedom:";
+    foreach (Node *n, nodes()) std::cout<<*n<<std::endl;
+    // TODO: move the matrices into a linearsystem!
+    Matrix<qreal, Dynamic, Dynamic> stiffness(dofs,dofs);
+    Matrix<qreal, Dynamic, 1> loads(dofs);
+    // Sum all the stiffness at the proper degree of freedom
+    foreach (Beam *beam, beams()) {
+        Matrix<qreal,6,6> &beam_stiffness = beam->stiffness();
+        Node &n1 = beam->first(); Node &n2 = beam->second();
+        int dofs[6] = {n1.dof_x, n1.dof_y, n1.dof_tetha,
+                       n2.dof_x, n2.dof_y, n2.dof_tetha};
+        for (int i=0; i<6; ++i) {
+            int dof1 = dofs[i];
+            if (dof1>=0) { /* This degree of freedom is unbounded */
+                // TODO: Adding distributed loads
+                for (int j=0; j<6; ++j) {
+                    int dof2=dofs[j];
+                    if (dof2>=0) {
+                        std::cout<<"stiffness("<<dof1<<","<<dof2<<") += beam_stiffness("<<i<<","<<j<<");"<<std::endl<<std::flush;
+                        stiffness(dof1,dof2) += beam_stiffness(i,j);
+                    }
+                }
+            }
+        }
+    }
+    std::cout<<"Stiffness matrix:"<<std::endl<<stiffness<<std::endl<<std::flush;
 }
