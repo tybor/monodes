@@ -22,8 +22,20 @@
 #define TRUSS_H
 
 #include <QtGui>
+
+#include <Eigen/Core>
+#include <Eigen/Array>
+
+// import most common Eigen types
+USING_PART_OF_NAMESPACE_EIGEN
+using Eigen::Dynamic;
+// To avoid alignment issues. See http://eigen.tuxfamily.org/dox/UnalignedArrayAssert.html
+#define EIGEN_DONT_VECTORIZE 1
+#define EIGEN_DISABLE_UNALIGNED_ARRAY_ASSERT 1
+
 #include "node.h"
 #include "beam.h"
+#include "linearsystem.h"
 
 class Truss : public QGraphicsItem
         // TODO: inherit from "public QGraphicsLayoutItem" to allow dynamic placing of widgets like "+" and "-"
@@ -34,6 +46,7 @@ public:
     QList<Beam*> beams() const;
 
     void solve();
+    unsigned int dofs_count() const; /// Number of degrees of freedom of the solution.
 
     void add_node (Node &a_node);
     void add_beam (Beam &a_beam);
@@ -46,6 +59,14 @@ public:
     Material *material; ///< The one material currently supported
     Section *section; ///< The one section currently supported
 
+    bool is_solving_immediate()
+            /// Will any change in the Current truss trigger a new solution?
+    { return immediate_solving; };
+
+    void set_immediate_solving (bool a_value)
+            /// Set is_solving_immediate to a_value.
+    { immediate_solving = a_value; };
+
     QRectF boundingRect() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 
@@ -53,6 +74,8 @@ private:
     QList<Node *> nodes_list;
     QList<Beam *> beams_list;
 
+    LinearSystem *solving_system;
+    bool immediate_solving;
 };
 
 #endif // TRUSS_H

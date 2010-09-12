@@ -17,15 +17,18 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-
-#include "truss.h"
-#include "node.h"
-#include "beam.h"
-
 #include <assert.h>
 #include <stdio.h>
 #include <iostream>
 #include <math.h>
+
+#include <Eigen/Core>
+#include <Eigen/Array>
+#include <Eigen/LU>
+
+#include "truss.h"
+#include "node.h"
+#include "beam.h"
 
 Truss::Truss()
 {
@@ -35,8 +38,7 @@ Truss::Truss()
     highest_load = 0.0;
     strongest_beam = 0.0;
     load_scale = 1.0;
-//    left->set_material(*stee/l); left->set_section(*section);
-//    right->set_material(*steel); right; right->set_section(*section);
+    immediate_solving = false;
 }
 
 void Truss::add_node(Node &a_node) {
@@ -76,9 +78,15 @@ unsigned int Truss::support_conditions_count() const {
     unsigned int result=0;
     foreach (Node *node, nodes())
         result += node->support_conditions_count();
+    return result;
 }
+
+unsigned int Truss::dofs_count() const {
+    return nodes().size()*3 - support_conditions_count(); // degrees of freedom
+}
+
 void Truss::solve() {
-    int dofs=nodes().size()*3 - support_conditions_count(); // degrees of freedom
+    int dofs=dofs_count();
     int lcc=1; // load cases count; currently fixed at 1.
 
     // Degrees of freedom numbering
@@ -114,26 +122,52 @@ void Truss::solve() {
     foreach (Node *n, nodes()) std::cout<<*n<<std::endl;
     // TODO: move the matrices into a linearsystem!
     Matrix<qreal, Dynamic, Dynamic> stiffness(dofs,dofs);
+    stiffness.setZero(); // Why, oh WHY C++ DOES NOT INITIALIZE objects??????? Without this command the following assertion that most people would take for granted will miserably fail.
+    assert (stiffness.isZero());
     Matrix<qreal, Dynamic, 1> loads(dofs);
+    loads.setZero();
+    assert(loads.isZero());
     // Sum all the stiffness at the proper degree of freedom
     foreach (Beam *beam, beams()) {
         Matrix<qreal,6,6> &beam_stiffness = beam->stiffness();
+        assert (beam_stiffness == beam_stiffness.transpose());
+        Matrix<qreal,6,1> &nodal_forces = beam->nodal_forces();
         Node &n1 = beam->first(); Node &n2 = beam->second();
         int dofs[6] = {n1.dof_x, n1.dof_y, n1.dof_tetha,
                        n2.dof_x, n2.dof_y, n2.dof_tetha};
         for (int i=0; i<6; ++i) {
             int dof1 = dofs[i];
             if (dof1>=0) { /* This degree of freedom is unbounded */
-                // TODO: Adding distributed loads
+                loads(dof1) += nodal_forces[i];
                 for (int j=0; j<6; ++j) {
                     int dof2=dofs[j];
                     if (dof2>=0) {
-                        std::cout<<"stiffness("<<dof1<<","<<dof2<<") += beam_stiffness("<<i<<","<<j<<");"<<std::endl<<std::flush;
+                        std::cout<<"stiffness("<<dof1<<","<<dof2<<") += beam_stiffness("<<i<<","<<j<<") "
+                                <<beam_stiffness(i,j)<<";"<<std::endl<<std::flush;
                         stiffness(dof1,dof2) += beam_stiffness(i,j);
                     }
                 }
             }
         }
     }
-    std::cout<<"Stiffness matrix:"<<std::endl<<stiffness<<std::endl<<std::flush;
+    std::cout<<"(st- st^t).max = "<<(stiffness - stiffness.transpose()).maxCoeff()<<std::endl
+            <<"Stiffness:"<<std::endl<<stiffness<<std::endl
+            <<"Loads: "<<loads<<std::flush;
+
+    assert(/* strictly symmetrical */ stiffness == stiffness.transpose()); /// stiffness.isApprox(stiffness.transpose()));
+
+    // TODO: We shall compute it in a separate thread!
+    //    solving_system = new LinearSystem (stiffness, loads);
+    //    solving_system->run();
+    Matrix<qreal, Dynamic, Dynamic> displacements (stiffness.rows(), loads.cols());
+    stiffness.lu().solve(loads, &displacements);
+    std::cout<<"Displacement found:"<<displacements<<std::endl;
+    prepareGeometryChange(); // Before updating node displacements
+    foreach (Node *n, nodes()) {
+        if (n->dof_x >= 0) n->set_u(displacements[n->dof_x]);
+        if (n->dof_y >= 0) n->set_v(displacements[n->dof_y]);
+        if (n->dof_tetha >= 0) n->set_fi(displacements[n->dof_tetha]);
+        std::cout<<*n<<std::endl;
+    }
+
 }

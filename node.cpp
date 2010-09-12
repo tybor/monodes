@@ -85,7 +85,7 @@ unsigned int Node::support_conditions_count() const {
     case uncostrained: return 0; break;
         // TODO:	case vertical_trailer: break;
         // TODO:    case horizontal_trailer: break;
-    case hinge: return 1; break;
+    case hinge: return 2; break;
                 // TODO: case vertical_shoe:break;
                 // TODO: case horizontal_shoe:break;
     case restrained: return 3; break;
@@ -105,6 +105,10 @@ qreal Node::distance (const Node &another) const {
 qreal Node::u() { return node_u; }
 qreal Node::v() { return node_v; }
 qreal Node::fi() { return node_fi; }
+
+void Node::set_u(qreal anu) { node_u = anu; }
+void Node::set_v(qreal av) { node_v = av; }
+void Node::set_fi(qreal afi) { node_fi = afi; }
 
 void Node::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
@@ -224,9 +228,10 @@ void Node::set_constrain(enum Constrain a_constrain) {
 
 std::ostream &operator<<(std::ostream &s, Node &a_node) {
     s<<"("<<a_node.x()<<","<<a_node.y()
-            <<" dof x "<<a_node.dof_x
-            <<" dof y "<<a_node.dof_y
-            <<" dof tetha "<<a_node.dof_tetha
+            <<" dofs x:"<<a_node.dof_x
+            <<" y:"<<a_node.dof_y
+            <<" tetha:"<<a_node.dof_tetha
+            <<" u:"<<a_node.u()<<" v:"<<a_node.v()<<" fi:"<<a_node.fi()
             <<") ";
     return s;
 }

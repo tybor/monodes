@@ -28,11 +28,14 @@
 #include <stdio.h>
 #include <iostream>
 #include <assert.h>
+#include <math.h>
 
 #include "beam.h"
 #include "beamdialog.h"
 #include "node.h"
 #include "truss.h"
+
+#include <Eigen/Array> // To compare matrices
 
 /* Hermite functions */
 //C		PLOT
@@ -255,6 +258,11 @@ Matrix<qreal, 6, 6> &Beam::transformation() {
     return tr;
 }
 
+Matrix<qreal, 6, 1> &Beam::nodal_forces() {
+    if (!stiffness_computed) compute_stiffness();
+    return f;
+}
+
 Truss &Beam::truss() const {
     return static_cast<Truss&> (*parentItem());
 };
@@ -272,7 +280,8 @@ void Beam::compute_stiffness() {
     // Material
     qreal E=material().young_modulus();
     qreal nu = material().poisson_ratio();
-    //qreal alfa = material().coefficient of thermal expansion();
+    qreal alfa = material().thermal_expansion_coefficient();
+    qreal G = E / (2.0*(1+nu));
 
     // Section
     qreal A=section().area();
@@ -289,12 +298,14 @@ void Beam::compute_stiffness() {
     qreal sh_fl = (2-fi)*E*J/(l*(1+fi));
 
     local_st <<
-            axial,  0,    0,    -axial, 0,    0,
-            0,    flex,   fl_sh,  0,    -flex,  fl_sh,
-            0,    fl_sh,  shear,  0,    -fl_sh, sh_fl,
-            -axial, 0,    0,    axial,  0,    0,
-            0,    -flex,  -fl_sh, 0,    flex,   -fl_sh,
-            0,    fl_sh,  sh_fl,  0,    -fl_sh, shear;
+            axial,  0.0,    0.0,    -axial, 0.0,    0.0,
+            0.0,    flex,   fl_sh,  0.0,    -flex,  fl_sh,
+            0.0,    fl_sh,  shear,  0.0,    -fl_sh, sh_fl,
+            -axial, 0.0,    0.0,    axial,  0.0,    0.0,
+            0.0,    -flex,  -fl_sh, 0.0,    flex,   -fl_sh,
+            0.0,    fl_sh,  sh_fl,  0.0,    -fl_sh, shear;
+
+    assert(local_st==local_st.transpose());
 
     // Transforming stiffness matrix from local coordinates into global one
     tr <<
@@ -305,8 +316,66 @@ void Beam::compute_stiffness() {
             0.0, 0.0, 0.0, sa, ca, 0.0,
             0.0, 0.0, 0.0, 0.0, 0.0, 1.0;
 
-    st = (tr * local_st)/* *(tr.transposed())*/;
-    // Seeing all those zeros in the transformation matrix makes tempting to provide an ad-hoc funtions to compute this product
+    assert (tr==tr.transpose());
+    st = (tr * local_st)*(tr.transpose());
+    assert (st == st.transpose());
+
+//    C     VETTORE FORZE NODALI EQUIVALENTI PER TUTTE LE CONDIZIONI DI CARICO.
+//    C     INIZIALIZZAZIONE DEL CICLO REALIZZATO CON IF E GOTO
+//          LC = 0
+//    C     INCREMENTO DI CONTATORE DEL CICLO SULLE CONDIZIONI DI CARICO
+//     90   LC = LC + 1
+//          DO 100 I = 1, 6           ! Azzero il vettore dei carichi
+//             FNE(I) = 0.0           ! in coord. locali
+//     100  CONTINUE
+
+    // Initializing nodal forces vector
+    f = Matrix<qreal,6,1>(6,1);
+    f.setZero(); /// Nodal loads initialization
+    // Loads
+    qreal px = 0.0; /// Constant axial distribuited load
+    qreal py1 = load; /// Transversal linear load: value on first vertex
+    qreal py2 = load; /// Transversal linear load: value on second vertex
+    qreal utd = 0.0; /// Upper thermal delta
+    qreal ltd = 0.0; /// Lower thermal delta
+
+    qreal weight = section().area() * material().weight(); /// Self weight
+    /// Updating loads with self weight
+    px -= weight*sa;
+    py1 -= weight*ca;
+    py2 -= weight*ca;
+
+    /// Nodal forces corresponding to distributed loads
+    qreal fh = px * length()/2.0;
+    qreal pp = py1, qq = py2 -py1;
+
+    /// To compute shear deformation of distributed loads
+    qreal aa = length() / (12.0 * E * J);
+    qreal bb = section().shear_factor() / (length()* G * A);
+    qreal cc = bb / (aa+bb);
+
+    f(0) += fh; /// Horizontal force on first node
+    f(1) += (0.5 * pp + 0.15*qq*(1.0+cc/9.0))*length(); /// Vertical force on first node
+    f(2) += (pp/12.0 + qq*(1.0+cc/4.0)/30.0)*pow(length(),2); /// Moment on first node
+
+    f(3) += fh; /// Horizontal force on second node
+    f(4) += (0.5*pp + 0.35*qq*(1.0-cc/21.0))*length(); /// Vertical force on second node
+    f(5) += - (pp/12.0 + qq*(1.0-cc/6.0)/20.0)*pow(length(),2); /// Moment on second node
+
+    // Nodal forces corresponding  to thermal changes
+    qreal atd = alfa * E * A * (utd+ltd)/2; // Average thermal delta
+    qreal fm = alfa * E * J * (utd-ltd)/h;
+    f(0) -= atd;
+    f(2) += fm;
+    f(3) += atd;
+    f(5) -= fm;
+
+    /// Computing nodal forces in absolute reference system
+    f = tr * f; // Local vector is overwritten.
+//    C     TORNO INDIETRO PER ELABORARE LA PROSSIMA CONDIZIONE DI CARICO
+//          IF (LC.LE.NCOND) GOTO 90
+//          RETURN
+//          END
     stiffness_computed = true;
 }
 
@@ -361,10 +430,10 @@ void Beam::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 
     const int steps=32;
     qreal step=1.0/steps; // Beware that 1 is NOT 1.0. If you write it 1/steps, step will be exactly zero.
-    const int ampl=10.0; // TODO make it user defined, or even better computed for best view.
+    const int ampl=1000.0; // TODO make it user defined, or even better computed for best view.
     qreal csi=0;
-    QPointF step_vector((second().pos() - first().pos())/steps);
-    QPointF current(first().pos());
+    QPointF step_vector((second().deformed_pos() - first().deformed_pos())/steps);
+    QPointF current(first().deformed_pos());
     for (int i=0; i<=steps; ++i) {
         QPointF delta(u(csi)*ampl,v(csi)*ampl);
         deformed<< current+delta;

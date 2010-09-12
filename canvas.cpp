@@ -92,6 +92,10 @@ void Canvas::dialog_closed(int res) {
     t->material = material;
     t->section = section;
 
+    t->set_immediate_solving(false);
+    // To avoid re-solving the truess at each and every change. If immediate solving is not turned off during truss building this feature would have O(n^4) complexity with n the degress of freedom. In fact we will solve n/6 linear systems each one an O(m^3) problem with m growing from 1 to n, so the complexity is O( 1/6 * (n^4/4 + n^3/2 + n^2/4)) = O(n^4) . Keeping such a bad performance to get results that will be thrown away as soon as they get computed is a plain waste of resources.
+
+    // See http://www.math.com/tables/expansion/power.htm and http://en.wikipedia.org/wiki/Geometric_series for power series.
     qreal x = 0.0;
     Node *left = new Node(x,0.0, hinge);
     t->add_node(*left);
@@ -110,6 +114,10 @@ void Canvas::dialog_closed(int res) {
     }
     zoom_to_fit();
     t->solve();
+    std::cout<<"DOFs: "<<t->dofs_count()<<" nodes "<<t->nodes().count()<<std::endl;
+    assert(/* the solutions has the right number of degrees of freedom*/
+            t->dofs_count() == t->nodes().count());
+    t->set_immediate_solving(true);
 }
 
 void Canvas::zoom_to_fit() {

@@ -53,6 +53,10 @@ public:
     qreal v();
     qreal fi();
 
+    void set_u (qreal a_value);
+    void set_v (qreal a_value);
+    void set_fi (qreal a_value);
+
     QPointF deformed_pos(); ///< Position of node in deformed
 
     // Constrains
@@ -82,7 +86,7 @@ private:
     // Displacements
     qreal node_u, node_v, node_fi;
     QList<Beam *> beams_list;
-\
+
 signals:
 
 public slots:

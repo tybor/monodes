@@ -17,26 +17,31 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <Eigen/LU>
+#include <assert.h>
+#include <stdio.h>
 
 #include "linearsystem.h"
-#include "assert.h"
 
 LinearSystem::LinearSystem (const Matrix<qreal, Dynamic, Dynamic> &a_stiffness,
                             const Matrix<qreal, Dynamic, Dynamic> &some_loads) {
-    //assert(/* square stiffness */ a_stiffness.rows()==a_stiffness.cols());
-    //assert(/* coherent matrices */ a_stiffness.rows() == some_loads.rows());
+    assert(/* square stiffness */ a_stiffness.rows()==a_stiffness.cols());
+    assert(/* coherent matrices */ a_stiffness.cols() == some_loads.rows());
 
-    //stiffness = Matrix(a_stiffness);
-    //loads = Matrix(some_loads);
+    /// Everything got copied here. Avoid it if possible.
+    stiffness = Matrix<qreal, Dynamic, Dynamic>(a_stiffness);
+    loads = Matrix<qreal, Dynamic, Dynamic>(some_loads);
+    displacements = Matrix<qreal, Dynamic, Dynamic>(some_loads.rows(),some_loads.rows());
 }
 
 void LinearSystem::run()
 {    
-    //displacements = Matrix(stiffness.rows(), loads.cols());
-
+    displacements = Matrix<qreal, Dynamic, Dynamic>(stiffness.rows(), loads.cols());
+    stiffness.lu().solve(loads, &displacements);
+    std::cout<<"Displacement found:"<<displacements<<std::endl;
 }
 
 const Matrix<qreal, Dynamic, Dynamic> &LinearSystem::solutions()
 {
-    //return displacements;
+    return displacements;
 }

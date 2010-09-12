@@ -66,9 +66,10 @@ public:
 
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW // See http://eigen.tuxfamily.org/dox/StructHavingEigenMembers.html
-    Matrix<qreal, 6, 6> &stiffness(); // In global coordinates
-    Matrix<qreal, 6, 6> &local_stiffness();
+    Matrix<qreal, 6, 6> &stiffness(); // Stiffness matrix in global coordinates
+    Matrix<qreal, 6, 6> &local_stiffness(); // Stiffness matrix in local coordinates
     Matrix<qreal, 6, 6> &transformation(); // the transformation matrix
+    Matrix<qreal, 6, 1> &nodal_forces(); // nodal forces in global coordinates
 
     QRectF boundingRect() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
@@ -87,9 +88,11 @@ private:
 
     void compute_stiffness();
     bool stiffness_computed;
-    Matrix<qreal, 6, 6> st;
-    Matrix<qreal, 6, 6> local_st;
-    Matrix<qreal, 6, 6> tr;
+    Matrix<qreal, 6, 6> st; ///< Global stiffness.
+    Matrix<qreal, 6, 6> local_st; ///< Local stiffness.
+    Matrix<qreal, 6, 6> tr; ///< Transformation matrix.
+    Matrix<qreal, 6, 1> gf; ///< nodal forces in global cohordinates.
+    Matrix<qreal, 6, 1> f; ///< nodal forces.
 
     qreal u(qreal csi);
     qreal v(qreal csi);

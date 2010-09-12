@@ -37,13 +37,10 @@ class LinearSystem : public QThread
 public:
         LinearSystem (const Matrix<qreal, Dynamic, Dynamic> &stiffness,
                       const Matrix<qreal, Dynamic, Dynamic> &loads);
-        // a new solving linear system for a structure with `a_dofs' degrees of freedom with `a_lcc' load cases
-        //add_stiffness (unsigned int i, unsigned int j, qreal stiffness); /// Add stiffness at index i,j
-        //add_load (unsigned int dof, unsigned int lc, qreal load);
 
+        void run();
         const Matrix<qreal, Dynamic, Dynamic> &solutions();
-protected:
-     void run();
+
  private:
      unsigned int dof; /// Degrees of freedom
      unsigned int lcc; /// Load cases count

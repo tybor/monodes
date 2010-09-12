@@ -23,12 +23,14 @@
 Material::Material()
 {
     Material(1.0,1.0,1.0);
+    density = 0.0;
 }
 
 Material::Material(qreal an_E, qreal a_nu, qreal an_alfa) {
     E=an_E;
     nu=a_nu;
     alfa=an_alfa;
+    density = 0.0;
 }
 
 qreal Material::young_modulus() const {return E;}
