@@ -65,6 +65,10 @@ Canvas::Canvas() {
     setBackgroundBrush(QBrush(QImage(":/images/paper4.jpg")));
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
+    // We want to show informations about the currently pointed object. So we need to switch on mouse traking in this view and in its viewport.
+    setMouseTracking(true);
+    viewport()->setMouseTracking(true);
     // Trasformation to view the model as the engineers expects, i.e. y growing upwards.
 //    setTransform(QTransform
 //                (1.0,  0.0, 0.0,

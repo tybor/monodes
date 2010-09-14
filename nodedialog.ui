@@ -7,49 +7,44 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>342</width>
-    <height>404</height>
+    <width>383</width>
+    <height>425</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Node</string>
   </property>
-  <layout class="QFormLayout" name="formLayout">
-   <property name="fieldGrowthPolicy">
-    <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
-   </property>
-   <item row="2" column="0">
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="0" column="0" colspan="4">
+    <widget class="QComboBox" name="node_bearing">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <item>
+      <property name="text">
+       <string>Unconstrained</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Hinged</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Fixed</string>
+      </property>
+     </item>
+    </widget>
+   </item>
+   <item row="1" column="0">
     <widget class="QLabel" name="node_xLabel">
      <property name="text">
       <string>X</string>
      </property>
     </widget>
    </item>
-   <item row="2" column="1">
-    <widget class="QDoubleSpinBox" name="node_x_pos">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="0">
-    <widget class="QLabel" name="node_yLabel">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-     <property name="text">
-      <string>Y</string>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="1">
-    <widget class="QDoubleSpinBox" name="node_y_pos">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="5" column="0" colspan="2">
+   <item row="3" column="0" colspan="4">
     <widget class="QLabel" name="saggingLabel">
      <property name="enabled">
       <bool>false</bool>
@@ -62,9 +57,12 @@
      <property name="text">
       <string>Constraint/bearing sagging</string>
      </property>
+     <property name="textInteractionFlags">
+      <set>Qt::LinksAccessibleByMouse</set>
+     </property>
     </widget>
    </item>
-   <item row="6" column="0">
+   <item row="4" column="0">
     <widget class="QLabel" name="node_dxLabel">
      <property name="enabled">
       <bool>false</bool>
@@ -74,27 +72,90 @@
      </property>
     </widget>
    </item>
-   <item row="6" column="1">
-    <widget class="QDoubleSpinBox" name="node_dx">
+   <item row="7" column="0" colspan="2">
+    <widget class="QLabel" name="saggingLabel_2">
      <property name="enabled">
       <bool>false</bool>
      </property>
-    </widget>
-   </item>
-   <item row="7" column="0">
-    <widget class="QLabel" name="node_dyLabel">
-     <property name="enabled">
-      <bool>false</bool>
+     <property name="font">
+      <font>
+       <pointsize>8</pointsize>
+      </font>
      </property>
      <property name="text">
-      <string>Δy</string>
+      <string>Reactions</string>
      </property>
     </widget>
    </item>
-   <item row="7" column="1">
-    <widget class="QDoubleSpinBox" name="node_dy">
+   <item row="8" column="0">
+    <widget class="QLabel" name="h_label">
      <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="text">
+      <string>H</string>
+     </property>
+    </widget>
+   </item>
+   <item row="8" column="1" colspan="2">
+    <widget class="QLabel" name="h_value">
+     <property name="font">
+      <font>
+       <pointsize>12</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="lineWidth">
+      <number>1</number>
+     </property>
+     <property name="text">
+      <string>h value</string>
+     </property>
+     <property name="scaledContents">
       <bool>false</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="9" column="0">
+    <widget class="QLabel" name="n_label">
+     <property name="text">
+      <string>N</string>
+     </property>
+    </widget>
+   </item>
+   <item row="9" column="1" colspan="2">
+    <widget class="QLabel" name="n_value">
+     <property name="font">
+      <font>
+       <pointsize>12</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>N value</string>
+     </property>
+    </widget>
+   </item>
+   <item row="10" column="0">
+    <widget class="QLabel" name="m_label">
+     <property name="text">
+      <string>M</string>
+     </property>
+    </widget>
+   </item>
+   <item row="10" column="1" colspan="2">
+    <widget class="QLabel" name="m_value">
+     <property name="font">
+      <font>
+       <pointsize>12</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>M value</string>
      </property>
     </widget>
    </item>
@@ -118,7 +179,20 @@
      </property>
     </widget>
    </item>
-   <item row="12" column="0" colspan="2">
+   <item row="11" column="2">
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>2000</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="12" column="0" colspan="7">
     <widget class="QDialogButtonBox" name="buttonBox">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
@@ -128,7 +202,104 @@
      </property>
     </widget>
    </item>
-   <item row="8" column="0" colspan="2">
+   <item row="8" column="3">
+    <widget class="QLabel" name="u_label">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="text">
+      <string>u</string>
+     </property>
+    </widget>
+   </item>
+   <item row="8" column="4">
+    <widget class="QLabel" name="u_value">
+     <property name="font">
+      <font>
+       <pointsize>12</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="lineWidth">
+      <number>1</number>
+     </property>
+     <property name="text">
+      <string>u value</string>
+     </property>
+     <property name="scaledContents">
+      <bool>false</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="9" column="4">
+    <widget class="QLabel" name="v_value">
+     <property name="font">
+      <font>
+       <pointsize>12</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="lineWidth">
+      <number>1</number>
+     </property>
+     <property name="text">
+      <string>v value</string>
+     </property>
+     <property name="scaledContents">
+      <bool>false</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="9" column="3">
+    <widget class="QLabel" name="v_label">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="text">
+      <string>v</string>
+     </property>
+    </widget>
+   </item>
+   <item row="10" column="4">
+    <widget class="QLabel" name="fi_value">
+     <property name="font">
+      <font>
+       <pointsize>12</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="lineWidth">
+      <number>1</number>
+     </property>
+     <property name="text">
+      <string>fi value</string>
+     </property>
+     <property name="scaledContents">
+      <bool>false</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="10" column="3">
+    <widget class="QLabel" name="fi_label">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="text">
+      <string>φ</string>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="3" colspan="2">
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>Displacements</string>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="0" colspan="5">
     <widget class="QPushButton" name="insertButton">
      <property name="enabled">
       <bool>false</bool>
@@ -148,39 +319,55 @@
      </property>
     </widget>
    </item>
-   <item row="10" column="0">
-    <spacer name="verticalSpacer">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
+   <item row="1" column="1">
+    <widget class="QDoubleSpinBox" name="node_x_pos">
+     <property name="enabled">
+      <bool>true</bool>
      </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>2000</height>
-      </size>
+     <property name="accelerated">
+      <bool>true</bool>
      </property>
-    </spacer>
+    </widget>
    </item>
-   <item row="0" column="0" colspan="2">
-    <widget class="QComboBox" name="node_bearing">
+   <item row="1" column="2">
+    <widget class="QLabel" name="node_yLabel">
      <property name="enabled">
       <bool>false</bool>
      </property>
-     <item>
-      <property name="text">
-       <string>Unconstrained</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>Hinged</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>Fixed</string>
-      </property>
-     </item>
+     <property name="text">
+      <string>Y</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="3">
+    <widget class="QDoubleSpinBox" name="node_y_pos">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="1">
+    <widget class="QDoubleSpinBox" name="node_dx">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="2">
+    <widget class="QLabel" name="node_dyLabel">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="text">
+      <string>Δy</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="3">
+    <widget class="QDoubleSpinBox" name="node_dy">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
     </widget>
    </item>
   </layout>

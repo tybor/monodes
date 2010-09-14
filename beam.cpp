@@ -208,6 +208,8 @@ Beam::Beam(Node *a_node, Node *another_node)
     assert(a_node!=another_node);
     // assert(*a_node != *another_node);
 
+    setAcceptHoverEvents (true);
+
     first_node = a_node;
     second_node = another_node;
     beam_length = first().distance(second());
@@ -385,7 +387,7 @@ QRectF Beam::boundingRect() const
     qreal load_scale = truss().load_scale;
     QRectF result = QRectF(first_node->pos(),  second_node->pos()).normalized();
     // Accounting the load
-    result.adjust(0.0, 0.0, 0.0, load*truss().load_scale);
+    result.adjust(0.0, 0.0, 0.0, load*load_scale);
     // Accounting the space between the beam and the load
     result.adjust(0.0, -load*load_scale-2.0*line_width, 0.0, -2.0*line_width );
 
@@ -450,15 +452,23 @@ void Beam::mousePressEvent(QGraphicsSceneMouseEvent *event)
     std::cout<<"beam pressed at "
             <<event->pos().x()<<","<<event->pos().y()
             <<std::endl<<std::flush;
-    BeamDialog dialog(*this);
-    int res = dialog.exec();
-    update();
+    QPointF pos = event->pos();
+    setToolTip(QString("Beam pressed at (%1,%2)").arg(pos.x()).arg(pos.y()));
+   // update();
     //QGraphicsItem::mousePressEvent(event);
+}
+void Beam::hoverMoveEvent ( QGraphicsSceneHoverEvent * event ) {
+    QPointF pos = event->pos();
+    QString msg = QString("Beam at (%1,%2)").arg(pos.x()).arg(pos.y());
+    std::cout<<msg.toStdString()<<std::endl;
+    setToolTip(msg);
 }
 
 void Beam::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
     std::cout<<"rilasciata asta"<<std::endl<<std::flush;
-    update();
+    BeamDialog dialog(*this);
+    int res = dialog.exec();
+    // to need to redraw so no need to update();
     //QGraphicsItem::mouseReleaseEvent(event);
 }

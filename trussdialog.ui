@@ -138,8 +138,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>328</width>
-        <height>328</height>
+        <width>330</width>
+        <height>327</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="gridLayout" columnstretch="0,1,1">
@@ -225,6 +225,9 @@ p, li { white-space: pre-wrap; }
          <property name="accelerated">
           <bool>true</bool>
          </property>
+         <property name="maximum">
+          <double>10000.000000000000000</double>
+         </property>
          <property name="value">
           <double>3.000000000000000</double>
          </property>
@@ -266,6 +269,9 @@ p, li { white-space: pre-wrap; }
          </property>
          <property name="accelerated">
           <bool>true</bool>
+         </property>
+         <property name="maximum">
+          <double>10000.000000000000000</double>
          </property>
          <property name="value">
           <double>2.000000000000000</double>
@@ -309,6 +315,9 @@ p, li { white-space: pre-wrap; }
          <property name="accelerated">
           <bool>true</bool>
          </property>
+         <property name="maximum">
+          <double>10000.000000000000000</double>
+         </property>
          <property name="value">
           <double>10.000000000000000</double>
          </property>
@@ -351,6 +360,9 @@ p, li { white-space: pre-wrap; }
          <property name="accelerated">
           <bool>true</bool>
          </property>
+         <property name="maximum">
+          <double>10000.000000000000000</double>
+         </property>
          <property name="value">
           <double>3.000000000000000</double>
          </property>
@@ -392,6 +404,9 @@ p, li { white-space: pre-wrap; }
          </property>
          <property name="accelerated">
           <bool>true</bool>
+         </property>
+         <property name="maximum">
+          <double>10000.000000000000000</double>
          </property>
          <property name="value">
           <double>3.000000000000000</double>

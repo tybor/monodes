@@ -47,6 +47,7 @@ protected:
     void keyPressEvent(QKeyEvent *event);
     void wheelEvent(QWheelEvent *event);
     void resizeEvent (QResizeEvent *event);
+
 signals:
 
 public slots:

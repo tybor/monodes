@@ -28,6 +28,15 @@ NodeDialog::NodeDialog(Node &a_node, QWidget *parent) :
     /// Present the user the precise location of the node which may be edited and a way to change its support conditions
 {
     setupUi(this);
+    /// TODO: Reactions:
+    h_value->setText(QString("10000"));
+    n_value->setText(QString("2000"));
+    m_value->setText(QString("2000"));
+    /// Displacements
+    u_value->setText(QString("%1").arg(a_node.u()));
+    v_value->setText(QString("%1").arg(a_node.v()));
+    fi_value->setText(QString("%1").arg(a_node.fi()));
+
 #if defined(Q_WS_S60)
     showMaximized();
 #endif
