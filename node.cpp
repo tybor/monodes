@@ -59,13 +59,15 @@ static const qreal bigger=1.0;
 Node::Node (qreal an_x, qreal an_y, enum Constrain a_constrain)
 {
     setPos(an_x, an_y);
-    // TODO: remove those!
+    // Initialization
     node_u=0.0;
     node_v=0.0; // Only rotations!
-    node_fi=0.5;
+    node_fi=0.0;
     dof_x = 0; dof_y=0; dof_tetha=0;
     my_constrain = a_constrain;
+#ifdef DEBUG
     std::cout<<"New node "<<*this<<std::endl<<std::flush;
+#endif
 }
 
 
@@ -121,8 +123,10 @@ void Node::mousePressEvent(QGraphicsSceneMouseEvent *event)
 
 void Node::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
+#ifdef DEBUG
     std::cout<<"rilasciato ("<<x()<<","<<y()<<")"
             <<std::endl<<std::flush;
+#endif
     update();
     QGraphicsItem::mouseReleaseEvent(event);
 }

@@ -59,7 +59,7 @@ Canvas::Canvas() {
 //    zoomin = scene->addWidget (zoomin_button);
 //    //zoomout = scene->addWidget (zoomout_button);
 
-    //setMinimumSize(150, 100);
+    setMinimumSize(300, 300);
     setWindowTitle(tr("Mobile nodes"));
     // Prepare a nice squared paper background
     setBackgroundBrush(QBrush(QImage(":/images/paper4.jpg")));
@@ -118,7 +118,9 @@ void Canvas::dialog_closed(int res) {
     }
     zoom_to_fit();
     t->solve();
+#ifdef DEBUG
     std::cout<<"DOFs: "<<t->dofs_count()<<" nodes "<<t->nodes().count()<<std::endl;
+#endif
     assert(/* the solutions has the right number of degrees of freedom*/
             t->dofs_count() == t->nodes().count());
     t->set_immediate_solving(true);
@@ -139,7 +141,9 @@ void Canvas::zoom_to_fit() {
             2.0*highest_beam /* two times the highest beam */,
             t->longest_beam/20.0 /* 1/20 of longest beam. */ );
     foreach (Node *n, t->nodes()) {
+#ifdef DEBUG
         std::cout<<*n<<" scale "<<n->scale()<<" ";
+#endif
         n->setScale(s);
     }
 

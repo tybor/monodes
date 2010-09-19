@@ -98,7 +98,9 @@ void Truss::solve() {
             n->dof_x = dof++;
             n->dof_y = dof++;
             n->dof_tetha = dof++;
+#ifdef DEBUG
             std::cout<<n;
+#endif
             break;
             // TODO:	case vertical_trailer: break;
             // TODO:    case horizontal_trailer: break;
@@ -106,7 +108,9 @@ void Truss::solve() {
             n->dof_x = -1;
             n->dof_y = -1;
             n->dof_tetha = dof++;
+#ifdef DEBUG
             std::cout<<n;
+#endif
             break;
             // TODO: case vertical_shoe:break;
             // TODO: case horizontal_shoe:break;
@@ -118,8 +122,10 @@ void Truss::solve() {
         }
     }
 
+#ifdef DEBUG
     std::cout<<"Degrees of freedom:";
     foreach (Node *n, nodes()) std::cout<<*n<<std::endl;
+#endif
     // TODO: move the matrices into a linearsystem!
     Matrix<qreal, Dynamic, Dynamic> stiffness(dofs,dofs);
     stiffness.setZero(); // Why, oh WHY C++ DOES NOT INITIALIZE objects??????? Without this command the following assertion that most people would take for granted will miserably fail.
@@ -142,18 +148,22 @@ void Truss::solve() {
                 for (int j=0; j<6; ++j) {
                     int dof2=dofs[j];
                     if (dof2>=0) {
+#ifdef DEBUG
                         std::cout<<"stiffness("<<dof1<<","<<dof2<<") += beam_stiffness("<<i<<","<<j<<") "
                                 <<beam_stiffness(i,j)<<";"<<std::endl<<std::flush;
+#endif
                         stiffness(dof1,dof2) += beam_stiffness(i,j);
                     }
                 }
             }
         }
     }
+
+#ifdef DEBUG
     std::cout<<"(st- st^t).max = "<<(stiffness - stiffness.transpose()).maxCoeff()<<std::endl
             <<"Stiffness:"<<std::endl<<stiffness<<std::endl
             <<"Loads: "<<loads<<std::flush;
-
+#endif
     assert(/* strictly symmetrical */ stiffness == stiffness.transpose()); /// stiffness.isApprox(stiffness.transpose()));
 
     // TODO: We shall compute it in a separate thread!
@@ -161,13 +171,26 @@ void Truss::solve() {
     //    solving_system->run();
     Matrix<qreal, Dynamic, Dynamic> displacements (stiffness.rows(), loads.cols());
     stiffness.lu().solve(loads, &displacements);
+#ifdef DEBUG
     std::cout<<"Displacement found:"<<displacements<<std::endl;
+#endif
     prepareGeometryChange(); // Before updating node displacements
     foreach (Node *n, nodes()) {
         if (n->dof_x >= 0) n->set_u(displacements[n->dof_x]);
         if (n->dof_y >= 0) n->set_v(displacements[n->dof_y]);
         if (n->dof_tetha >= 0) n->set_fi(displacements[n->dof_tetha]);
+#   ifdef DEBUG
         std::cout<<*n<<std::endl;
+#   endif
     }
-
+    // Compute forces on each element
+    foreach (Beam *b, beams()) {
+        Matrix<qreal,6,1> local_displacements, global_displacements, nodal_forces;
+        global_displacements <<
+                b->first().u(), b->first().v(), b->first().fi(),
+                b->second().u(), b->second().v(), b->second().fi();
+        local_displacements = b->transformation().transpose() * global_displacements;
+        nodal_forces = b->stiffness() * local_displacements;
+        std::cout<<*b<<" stresses: "<<nodal_forces<<std::endl;
+    }
 }

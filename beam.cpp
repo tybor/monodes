@@ -35,8 +35,6 @@
 #include "node.h"
 #include "truss.h"
 
-#include <Eigen/Array> // To compare matrices
-
 /* Hermite functions */
 //C		PLOT
 //      SUBROUTINE PLOT
@@ -215,8 +213,11 @@ Beam::Beam(Node *a_node, Node *another_node)
     beam_length = first().distance(second());
     first_node->add_beam(this);
     second_node->add_beam(this);
-    std::cout<<"New beam "<<first()<<"--"<<second()<<" (length="<<length()<<")\n"<<std::flush;
     load = 0.0;
+#ifdef DEBUG
+    std::cout<<"New beam "<<first()<<"--"<<second()<<" (length="<<length()<<")\n"<<std::flush;
+#endif
+
 }
 
 // How difficoult to get read-only fields, that in Eiffel are for free!!! Symmetrically setters are always free and you can't get rid of them even when you would like to, so you must make it private, writing both the setter and the getter. So in conclusion Eiffel's approach - the default is fields writable only from inside its object and read-only from outside is what saves efforts.
@@ -262,7 +263,7 @@ Matrix<qreal, 6, 6> &Beam::transformation() {
 
 Matrix<qreal, 6, 1> &Beam::nodal_forces() {
     if (!stiffness_computed) compute_stiffness();
-    return f;
+    return gf;
 }
 
 Truss &Beam::truss() const {
@@ -373,7 +374,7 @@ void Beam::compute_stiffness() {
     f(5) -= fm;
 
     /// Computing nodal forces in absolute reference system
-    f = tr * f; // Local vector is overwritten.
+    gf = tr * f; // Local vector is overwritten.
 //    C     TORNO INDIETRO PER ELABORARE LA PROSSIMA CONDIZIONE DI CARICO
 //          IF (LC.LE.NCOND) GOTO 90
 //          RETURN
@@ -385,14 +386,13 @@ QRectF Beam::boundingRect() const
 {
     qreal line_width = section().height();
     qreal load_scale = truss().load_scale;
-    QRectF result = QRectF(first_node->pos(),  second_node->pos()).normalized();
-    // Accounting the load
-    result.adjust(0.0, 0.0, 0.0, load*load_scale);
-    // Accounting the space between the beam and the load
-    result.adjust(0.0, -load*load_scale-2.0*line_width, 0.0, -2.0*line_width );
+    QRectF result = QRectF(first_node->pos(),  second_node->pos());
+    // Accounting the load and some space between the beam and the load.
+    result.adjust(0.0, -load*load_scale-line_width,
+                  0.0,                 +line_width);
 
     //result.adjust(-extra, -extra, extra, extra);
-    return result;
+    return result.normalized();
 }
 
 void Beam::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
@@ -404,9 +404,11 @@ void Beam::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
     painter->setPen(QPen(Qt::black, line_width));
     painter->drawLine(first_node->pos(),second_node->pos());
     // Draw the load, assuming horizontal beams. TODO: remove this assumption.
+    // Leave a little space (a line width) between load and beam
     painter->setViewTransformEnabled(false);
     QRectF load_rect(first().pos(),second().pos());
-    load_rect.adjust(0.0, -load*t.load_scale-2.0*line_width, 0.0, -2.0*line_width );
+    load_rect.adjust(0.0, -load*t.load_scale-line_width,
+                     0.0,                   -line_width );
     //std::cout<<"beam load "<<load_rect.x()<<","<<load_rect.y()<<" "<<load_rect.width()<<","<<load_rect.height()<<std::endl<<std::flush;
     painter->setPen(QPen(Qt::red));
     painter->setBrush(QBrush(QColor(255,96,96,128)));
@@ -442,16 +444,24 @@ void Beam::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
         csi +=step;
         current+=step_vector;
     }
-     painter->drawPolyline(deformed);
+    painter->drawPolyline(deformed);
+
+#ifdef DEBUG
+    // Draw boundingRect with a thin green line
+    painter->setPen(QPen(Qt::green, 3, Qt::DotLine));
+    painter->setBrush(Qt::NoBrush);
+    painter->drawRect(boundingRect());
+#endif
 }
 
 void Beam::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
     // Present the user the precise location of the node which may be edited and a way to change its support conditions
-
+#ifdef DEBUG
     std::cout<<"beam pressed at "
             <<event->pos().x()<<","<<event->pos().y()
             <<std::endl<<std::flush;
+#endif
     QPointF pos = event->pos();
     setToolTip(QString("Beam pressed at (%1,%2)").arg(pos.x()).arg(pos.y()));
    // update();
@@ -459,16 +469,34 @@ void Beam::mousePressEvent(QGraphicsSceneMouseEvent *event)
 }
 void Beam::hoverMoveEvent ( QGraphicsSceneHoverEvent * event ) {
     QPointF pos = event->pos();
-    QString msg = QString("Beam at (%1,%2)").arg(pos.x()).arg(pos.y());
+    // Find the neareast point of the beam
+    QLineF me = QLineF(first().pos(),second().pos());
+    QLineF normal = me.normalVector();
+    normal.translate(pos - first().pos());
+    QPointF nearest;
+    QLineF::IntersectType intersect_type = normal.intersect(me, &nearest);
+    assert(intersect_type != QLineF::NoIntersection);
+    QString msg = QString("Beam at (%1,%2)").arg(nearest.x()).arg(nearest.y());
+#ifdef DEBUG
     std::cout<<msg.toStdString()<<std::endl;
+#endif
     setToolTip(msg);
 }
 
 void Beam::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
+#ifdef DEBUG
     std::cout<<"rilasciata asta"<<std::endl<<std::flush;
+#endif
     BeamDialog dialog(*this);
     int res = dialog.exec();
     // to need to redraw so no need to update();
     //QGraphicsItem::mouseReleaseEvent(event);
 }
+
+
+std::ostream &operator<<(std::ostream &s, Beam &a_beam) {
+    s<<a_beam.first()<<"-"<<a_beam.second();
+    return s;
+}
+

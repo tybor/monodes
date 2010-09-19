@@ -22,6 +22,7 @@
 
 #include <QtGui>
 #include <Eigen/Core>
+#include <Eigen/Array> // To compare matrices
 
 // import most common Eigen types
 USING_PART_OF_NAMESPACE_EIGEN
@@ -102,5 +103,7 @@ private:
 // no public slots:
 
 };
+
+std::ostream &operator<<(std::ostream &s, Beam &a_beam);
 
 #endif // BEAM_H

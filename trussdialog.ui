@@ -86,7 +86,7 @@
         <enum>QAbstractSpinBox::PlusMinus</enum>
        </property>
        <property name="minimum">
-        <number>2</number>
+        <number>1</number>
        </property>
        <property name="maximum">
         <number>5</number>

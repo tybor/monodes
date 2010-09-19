@@ -2,3 +2,7 @@ Continous beams
 
 Simplified application to compute stresses and deformation of a mono-section continous beam.
 Will eventually evolte into a full-fledged truss application targeting mobile devices.
+
+
+Windows note: remember to add -mstackrealign when crosscompilig. See http://eigen.tuxfamily.org/dox/WrongStackAlignment.html
+
