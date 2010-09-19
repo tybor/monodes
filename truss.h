@@ -51,10 +51,8 @@ public:
     void add_node (Node &a_node);
     void add_beam (Beam &a_beam);
     unsigned int support_conditions_count() const; // The number of support conditions of all nodes
-    qreal longest_beam; /// The lenght of the longest beam, used to determinate the drawing size of bearings
-    qreal highest_load; /// The maximum distributed load
-    qreal load_scale; /// The scale applied to loads
-    qreal strongest_beam; // The highest moment of inertia of a beam.
+    //qreal longest_beam; /// The lenght of the longest beam, used to determinate the drawing size of bearings
+    //qreal highest_load; /// The maximum distributed load
 
     Material *material; ///< The one material currently supported
     Section *section; ///< The one section currently supported
@@ -69,10 +67,19 @@ public:
 
     QRectF boundingRect() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+    void update_scales(); ///< Updates the scale used to draw nodes, deformed beams, loads, bearing reactions.
+    qreal load_scale; /// The scale applied to loads
 
 private:
     QList<Node *> nodes_list;
     QList<Beam *> beams_list;
+
+    qreal longest; /// Length of the longest beam
+    qreal shortest; /// Length of the shortest beam
+    qreal highest; /// Height of the highest beam
+
+    qreal deformation_scale; /// Scale applied to displacement of the beam.
+    qreal strongest_beam; // The highest moment of inertia of a beam.
 
     LinearSystem *solving_system;
     bool immediate_solving;

@@ -214,6 +214,8 @@ Beam::Beam(Node *a_node, Node *another_node)
     first_node->add_beam(this);
     second_node->add_beam(this);
     load = 0.0;
+    member_end_forces_computed = false;
+    max_deflection = 0.0;
 #ifdef DEBUG
     std::cout<<"New beam "<<first()<<"--"<<second()<<" (length="<<length()<<")\n"<<std::flush;
 #endif
@@ -261,9 +263,22 @@ Matrix<qreal, 6, 6> &Beam::transformation() {
     return tr;
 }
 
-Matrix<qreal, 6, 1> &Beam::nodal_forces() {
+Matrix<qreal, 6, 1> &Beam::fixed_end_forces() {
     if (!stiffness_computed) compute_stiffness();
     return gf;
+}
+
+Matrix<qreal, 6, 1> &Beam::member_end_forces() {
+    if (!member_end_forces_computed) {
+        Matrix<qreal,6,1> local_displacements,global_displacements;
+        global_displacements <<
+                first().u(), first().v(), first().fi(),
+                second().u(), second().v(), second().fi();
+        local_displacements = transformation().transpose() * global_displacements;
+        mef = stiffness() * local_displacements;
+        member_end_forces_computed = true;
+    }
+    return mef;
 }
 
 Truss &Beam::truss() const {
@@ -374,22 +389,22 @@ void Beam::compute_stiffness() {
     f(5) -= fm;
 
     /// Computing nodal forces in absolute reference system
-    gf = tr * f; // Local vector is overwritten.
-//    C     TORNO INDIETRO PER ELABORARE LA PROSSIMA CONDIZIONE DI CARICO
-//          IF (LC.LE.NCOND) GOTO 90
-//          RETURN
-//          END
+    gf = tr * f;
     stiffness_computed = true;
+}
+
+qreal Beam::maximum_deflection() {
+    return max_deflection;
 }
 
 QRectF Beam::boundingRect() const
 {
     qreal line_width = section().height();
-    qreal load_scale = truss().load_scale;
+    //qreal load_scale = truss().load_scale;
     QRectF result = QRectF(first_node->pos(),  second_node->pos());
     // Accounting the load and some space between the beam and the load.
-    result.adjust(0.0, -load*load_scale-line_width,
-                  0.0,                 +line_width);
+    //result.adjust(0.0, -load*load_scale-line_width,
+    //              0.0,                 +line_width);
 
     //result.adjust(-extra, -extra, extra, extra);
     return result.normalized();
@@ -430,20 +445,7 @@ void Beam::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
     // Draw deformated beam.
     painter->setPen(QPen(QColor(0, 0, 255, 128),section().height()));
     // It would be nice to draw it using splines, but it seems that it is not that easy. Let's draw it as always did, by points; so how many points shall we draw? Let's naively say currently 32.
-    QPolygonF deformed;
 
-    const int steps=32;
-    qreal step=1.0/steps; // Beware that 1 is NOT 1.0. If you write it 1/steps, step will be exactly zero.
-    const int ampl=1000.0; // TODO make it user defined, or even better computed for best view.
-    qreal csi=0;
-    QPointF step_vector((second().deformed_pos() - first().deformed_pos())/steps);
-    QPointF current(first().deformed_pos());
-    for (int i=0; i<=steps; ++i) {
-        QPointF delta(u(csi)*ampl,v(csi)*ampl);
-        deformed<< current+delta;
-        csi +=step;
-        current+=step_vector;
-    }
     painter->drawPolyline(deformed);
 
 #ifdef DEBUG
@@ -452,6 +454,25 @@ void Beam::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
     painter->setBrush(Qt::NoBrush);
     painter->drawRect(boundingRect());
 #endif
+}
+void Beam::compute_deformed() {
+    const int steps=32;
+    deformed = QPolygonF();
+    deformed.reserve(steps); // reserve at least steps points, to avoid unnecessary reallocations.
+    qreal step=1.0/steps; // Beware that 1 is NOT 1.0. If you write it 1/steps, step will be exactly zero.
+    //const int ampl=1000.0; // TODO make it user defined, or even better computed for best view.
+    qreal csi=0;
+    QPointF step_vector( (second().deformed_pos() - first().deformed_pos() )/steps);
+    QPointF current(first().deformed_pos());
+    for (int i=0; i<=steps; ++i) {
+        //QPointF delta(u(csi)*ampl,v(csi)*ampl);
+        qreal ui = u(csi), vi=v(csi);
+        QPointF delta(ui,vi);
+        max_deflection = fmax(vi,max_deflection);
+        deformed<< current+delta;
+        csi +=step;
+        current+=step_vector;
+    }
 }
 
 void Beam::mousePressEvent(QGraphicsSceneMouseEvent *event)

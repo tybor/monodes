@@ -127,33 +127,13 @@ void Canvas::dialog_closed(int res) {
 }
 
 void Canvas::zoom_to_fit() {
-    qreal length=0.0, highest_beam =0.0, highest_load=0.0;
-    foreach (Beam *a_beam, t->beams()) {
-        length = a_beam->length();
-        if (length>t->longest_beam) t->longest_beam = length;
-        qreal h=a_beam->section().height();
-        if (h>highest_beam) highest_beam=h;
-        qreal load_module = fabs(a_beam->load);
-        if (load_module>highest_load) highest_load=load_module;
-    }
-    t->load_scale=t->longest_beam/highest_load/2.0; /// The highest load will be high the half of the longest beam.
-    qreal s = fmax( /* the radius of the nodes will be the biggest of */
-            2.0*highest_beam /* two times the highest beam */,
-            t->longest_beam/20.0 /* 1/20 of longest beam. */ );
-    foreach (Node *n, t->nodes()) {
-#ifdef DEBUG
-        std::cout<<*n<<" scale "<<n->scale()<<" ";
-#endif
-        n->setScale(s);
-    }
-
+    t->update_scales();
    fitInView(t,Qt::KeepAspectRatio);
    // Move "+" and "-" buttons
    // zooms->addCornerAnchors(&t,Qt::TopLeftCorner, zoomin,Qt::BottomRightCorner);
 
    // Set a proper size for the squared paper background
-   //backgroundBrush().setMatrix (QMatrix(10.0, 2.0, 2.0, 10.0, 0.0,0.0));
-           // QMatrix(t->longest_beam, 0.0,0.0,t->longest_beam,0.0,0.0));
+   // backgroundBrush().setMatrix (QMatrix(t->longest_beam, 0.0,0.0,t->longest_beam,0.0,0.0));
 }
 
 void Canvas::zoom_in(){

@@ -70,8 +70,11 @@ public:
     Matrix<qreal, 6, 6> &stiffness(); // Stiffness matrix in global coordinates
     Matrix<qreal, 6, 6> &local_stiffness(); // Stiffness matrix in local coordinates
     Matrix<qreal, 6, 6> &transformation(); // the transformation matrix
-    Matrix<qreal, 6, 1> &nodal_forces(); // nodal forces in global coordinates
+    Matrix<qreal, 6, 1> &fixed_end_forces(); // fixed-end nodal forces in global coordinates
+    Matrix<qreal, 6, 1> &member_end_forces(); // The forces at the end of current element resulting from the applied loads and deformation of the structure.
 
+    void compute_deformed();
+    qreal maximum_deflection();
     QRectF boundingRect() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 protected:
@@ -82,6 +85,8 @@ protected:
 private:
     Node *first_node, *second_node;
     qreal beam_length;
+    QPolygonF deformed;
+    qreal max_deflection;
 
     Section *s;
     Material *m;
@@ -93,9 +98,10 @@ private:
     Matrix<qreal, 6, 6> st; ///< Global stiffness.
     Matrix<qreal, 6, 6> local_st; ///< Local stiffness.
     Matrix<qreal, 6, 6> tr; ///< Transformation matrix.
-    Matrix<qreal, 6, 1> gf; ///< nodal forces in global cohordinates.
-    Matrix<qreal, 6, 1> f; ///< nodal forces.
-
+    Matrix<qreal, 6, 1> gf; ///< nodal fixed-end forces in global cohordinates.
+    Matrix<qreal, 6, 1> f; ///< nodal fixed-end forces.
+    bool member_end_forces_computed;
+    Matrix<qreal, 6, 1> mef; ///< precomputed member end forces
     qreal u(qreal csi);
     qreal v(qreal csi);
 // no signals:

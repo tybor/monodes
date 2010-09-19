@@ -65,6 +65,9 @@ Node::Node (qreal an_x, qreal an_y, enum Constrain a_constrain)
     node_fi=0.0;
     dof_x = 0; dof_y=0; dof_tetha=0;
     my_constrain = a_constrain;
+    vertical = 0.0;
+    horizonal = 0.0;
+    moment = 0.0;
 #ifdef DEBUG
     std::cout<<"New node "<<*this<<std::endl<<std::flush;
 #endif
@@ -211,6 +214,17 @@ void Node::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWid
         break;
         // default: // nothing should NOT be necessary
     }
+    // drawing a vertical arrow
+    painter->drawLine(0.0, -bigger, 0.0, -3.0*bigger);
+    painter->drawLine(0.0, -bigger, -bigger/15.0, -bigger/5.0);
+    painter->drawLine(0.0, -bigger, bigger/15.0, -bigger/5.0);
+    // Draw reaction.void Beam::compute_deformed() {
+
+    QFont font; font.setPointSizeF(bigger); painter->setFont(font);
+    painter->drawText(QRectF(bigger,bigger,2*bigger,2*bigger),
+                      QString("%1").arg(vertical));
+
+
 }
 
 enum Constrain Node::constrain() const {
@@ -230,13 +244,34 @@ void Node::set_constrain(enum Constrain a_constrain) {
     }
 }
 
+void Node::update_reactions() {
+    foreach (Beam *b, beams()) {
+        int horiz_idx, vert_idx, mom_idx;
+        if (this == &b->first()) {
+            horiz_idx = 0;
+            vert_idx = 1;
+            mom_idx = 2;
+        } else if (this == &b->second()) {
+            horiz_idx = 3;
+            vert_idx = 4;
+            mom_idx = 5;
+        }
+        horizonal += b->member_end_forces()[horiz_idx];
+        vertical+= b->member_end_forces()[vert_idx];
+        moment+= b->member_end_forces()[mom_idx];
+    }
+}
+
 std::ostream &operator<<(std::ostream &s, Node &a_node) {
     s<<"("<<a_node.x()<<","<<a_node.y()
             <<" dofs x:"<<a_node.dof_x
             <<" y:"<<a_node.dof_y
             <<" tetha:"<<a_node.dof_tetha
-            <<" u:"<<a_node.u()<<" v:"<<a_node.v()<<" fi:"<<a_node.fi()
-            <<") ";
+            <<" u:"<<a_node.u()<<" v:"<<a_node.v()<<" fi:"<<a_node.fi();
+    if (a_node.horizonal!=0.0) s<<" H: "<<a_node.horizonal;
+    if (a_node.vertical!=0.0) s<<" V: "<<a_node.vertical;
+    if (a_node.moment!=0.0) s<<" M: "<<a_node.moment;
+    s<<") ";
     return s;
 }
 

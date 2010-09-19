@@ -59,9 +59,11 @@ public:
 
     QPointF deformed_pos(); ///< Position of node in deformed
 
+    qreal vertical, horizonal, moment; /// Bearing reactions.
     // Constrains
     enum Constrain constrain() const;
     void set_constrain(enum Constrain a_constrain);
+    void update_reactions();
     // the indexes of the degrees of freedom of displacements and rotation; the index is -1 when the degree of freedom is locked by a restrain.
     int dof_x, dof_y, dof_tetha;
 
