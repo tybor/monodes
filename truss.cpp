@@ -50,11 +50,11 @@ void Truss::add_node(Node &a_node) {
 }
 
 void Truss::add_beam(Beam &a_beam) {
-    a_beam.setParentItem(this); // a_beam will be a child item of current truss, so there's no need to add it.
+    /// TODO: shall nodes of a_beam be added also?
     beams_list.append(&a_beam);
     longest = fmax(a_beam.length(), longest);
     shortest = fmin(a_beam.length(), shortest);
-    highest = fmax(a_beam.section().height(),highest);
+    highest = fmax(a_beam.section.height(),highest);
 }
 
 QList<Node*> Truss::nodes() const {

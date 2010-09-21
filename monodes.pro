@@ -24,7 +24,8 @@ SOURCES += main.cpp\
     licensedialog.cpp \
     sectiondialog.cpp \
     truss.cpp \
-    load.cpp
+    load.cpp \
+    reactions.cpp
 
 HEADERS  += \
     node.h \
@@ -40,7 +41,8 @@ HEADERS  += \
     licensedialog.h \
     sectiondialog.h \
     truss.h \
-    load.h
+    load.h \
+    reactions.h
 
 FORMS    += \
     trussdialog.ui \

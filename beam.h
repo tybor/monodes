@@ -48,7 +48,7 @@ class Truss; // Forward declaration
 class Beam : public QGraphicsItem
 {
 public:
-    Beam(Node *a_node, Node *another_node);
+    Beam(Node *a_node, Node *another_node, Truss &a_truss, Section &a_section, Material &a_material);
     enum { Type = UserType + 2 };
     int type() const { return Type; }
 
@@ -59,11 +59,11 @@ public:
     // Currently sticking to one, uniform load orthogonal to the beam
     qreal load;
 
-    void set_section (Section &a_section);
-    Section &section() const;
+    ///void set_section (Section &a_section);
+    Section &section;
 
-    void set_material (Material &a_material);
-    Material &material() const;
+    ///void set_material (Material &a_material);
+    Material &material;
 
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW // See http://eigen.tuxfamily.org/dox/StructHavingEigenMembers.html
@@ -83,15 +83,11 @@ protected:
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
 
 private:
+    Truss &truss;
     Node *first_node, *second_node;
     qreal beam_length;
     QPolygonF deformed;
     qreal max_deflection;
-
-    Section *s;
-    Material *m;
-
-    Truss &truss() const; // The truss containing current beam
 
     void compute_stiffness();
     bool stiffness_computed;
@@ -104,6 +100,9 @@ private:
     Matrix<qreal, 6, 1> mef; ///< precomputed member end forces
     qreal u(qreal csi);
     qreal v(qreal csi);
+
+    static const int deformed_points_count=32; /// Number
+
 // no signals:
 
 // no public slots:

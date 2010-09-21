@@ -35,124 +35,6 @@
 #include "node.h"
 #include "truss.h"
 
-/* Hermite functions */
-//C		PLOT
-//      SUBROUTINE PLOT
-//      INCLUDE 'common.h'
-
-//      REAL*8 QS(6), QSL(6), FNE(6), QF(6)
-//      REAL*8 NCODE(6), T(6,6)
-//      CHARACTER FILENAME*255
-//      LC = 0
-// 1    LC = LC + 1
-//C     COMPONGO IL NOME DEL FILE DA APRIRE COME LCASE.NUMERO_CONDIZIONE
-//C     DI_CARICO
-//      WRITE(FILENAME,'(A6,I3.3)') 'LCASE.', LC
-//c      WRITE(*,*) 'Filename is:', FILENAME
-//C     APRO IL FILE
-//      OPEN(33,FILE=FILENAME ,STATUS='UNKNOWN')
-
-//      WRITE(33,*) 1
-//      WRITE(33,*) NNODI,NELE
-//C     STAMPO LE COORDINATE DEI NODI
-//      DO 3 I = 1, NNODI
-//         WRITE(33,110) I,(COORD(I,J),J=1,2)
-// 110     FORMAT(2X,I5,3(2X,E12.6))
-// 3    CONTINUE
-//C     STAMPO LA MATRICE DI CONNETTIVITA'
-//      DO 5 I = 1, NELE
-//         WRITE(33,100) I, (IN(I,J), J=1,2)
-// 100     FORMAT(2X,10(I5,2X))
-// 5    CONTINUE
-//C     RIAVVOLGO IL FILE 9 (TEMPORANEO PER ST, T, FNE)
-//      REWIND(9)
-//C     CALCOLO SPOSTAMENTI E SOLECITAZIONI AGLI ESTREMI DELL'ELEMENTO
-//      DO 90 NE = 1, NELE
-//         N1 = IN(NE,1)
-//         N2 = IN(NE,2)
-//         DO 10 I = 1,3
-//            NCODE(I)   = IGL(N1,I)
-//            NCODE(I+3) = IGL(N2,I)
-// 10      CONTINUE
-//C     LETTURA MATRICE DI RIGIDEZZA DEL SINGOLO ELEMENTO NEL RIFERIMENTO
-//C     GLOBALE
-//         DO 21 I = 1,6
-//            DO 20 J = 1,6
-//               READ(9,*) ST(I,J)
-// 20         CONTINUE
-// 21      CONTINUE
-//C     LETTURA MATRICE DI TRASFORMAZIONE
-//         DO 31 I = 1,6
-//            DO 30 J = 1,6
-//               READ(9,*) T(I,J)
-// 30         CONTINUE
-// 31      CONTINUE
-//C     LETTURA FORZE NODALI EQUIVALENTI NEL RIFERIMENTO LOCALE
-//         DO 41 L = 1,NCOND
-//            DO 40 I = 1,6
-//               READ(9,*) FORCE
-//               IF (L.EQ.LC) FNE(I) = FORCE
-// 40         CONTINUE
-// 41      CONTINUE
-//C     SPOSTAMENTI DEL SINGOLO ELEMENTO NEL RIFERIMENTO GLOBALE
-//         DO 50 I = 1, 6
-//            GDL = NCODE(I)
-//            IF (GDL.LT.0) THEN
-//               QS(I) = 0.0
-//            ELSE
-//               QS(I) = VQ(GDL,LC)
-//            ENDIF
-// 50      CONTINUE
-//C     SPOSTAMENTI DEL SINGOLO ELEMENTO NEL RIFERIMENTO LOCALE
-//         DO 65 I = 1, 6
-//            QSL(I) = 0.0
-//            DO 60 J = 1, 6
-//               QSL(I) = QSL(I) + T(J,I)*QS(J)
-// 60         CONTINUE
-// 65      CONTINUE
-//C     SOLLECITAZIONI AGLI ESTREMI DELL'ELEMENTO NEL RIFERIMENTO LOCALE
-//         DO 80 I= 1,6
-//            QF(I) = -FNE(I)
-//            DO 70 J = 1,6
-//               QF(I) = QF(I) + ST(I,J)*QSL(J)
-// 70         CONTINUE
-// 80      CONTINUE
-//C     SPOSTAMENTI E SOLLECITAZIONI LUNGO L'ASTA E FINE STAMPA FILE 33.
-//         DX = COORD(N2,1) - COORD(N1,1)
-//         DY = COORD(N2,2) - COORD(N1,2)
-//         AL = DSQRT( DX**2.0 + DY**2.0 )
-//         CA = DX / AL
-//         SA = DY / AL
-//         WRITE(33,1010) NE,AL,CA,SA
-// 1010    FORMAT(2X,I5,3(2X,E12.6))
-//         PX = CARD(NE,1,LC)
-//         PY1 = CARD(NE,2,LC)
-//         PY2 = CARD(NE,3,LC)
-//         IS = ISEZ(NE)
-//         IM = IMAT(NE)
-//         AA = CSEZ(IS,1)
-//         PESO = CMAT(IM,5)
-//         PG = AA*PESO
-//         PX = PX - PG*SA
-//         PY1 = PY1 - PG*CA
-//         PY2 = PY2 - PG*CA
-//         DO 85 I = 0,20
-//            X = AL*DBLE(I)/DBLE(20.0)
-//            UU = U(QSL,X,AL)
-//            VV = V(QSL,X,AL)
-//            PY = PY1 + (PY2-PY1)*X/AL
-//            SSN = -QF(1) - PX*X
-//            SST = -QF(2) - (PY1+PY)*X/2.0
-//            SSM = -QF(3) + QF(2)*X + PY1*X**2.0/2.0+(PY-PY1)*X**2.0/6.0
-//            WRITE(33,120) X,UU,VV,SSN,-SST,-SSM
-// 120        FORMAT(2X,6(E12.6,1X))
-// 85      CONTINUE
-// 90   CONTINUE
-//      CLOSE(33)
-//      IF (LC.LT.NCOND) GOTO 1
-//      RETURN
-//      END
-
 // Hermite functions
 qreal f1 (qreal csi) {
     assert((0.0<=csi) && (csi<=1.0));
@@ -199,12 +81,17 @@ qreal Beam::v(qreal csi) {
 	    f5(csi)*second().v() + f6(csi)*second().fi()*length();
 }
 
-Beam::Beam(Node *a_node, Node *another_node)
+Beam::    Beam(Node *a_node, Node *another_node, Truss &a_truss, Section &a_section, Material &a_material)
+    : truss(a_truss),
+    section(a_section),
+    material(a_material)
 {
     assert(a_node!=NULL);
     assert(another_node!=NULL);
     assert(a_node!=another_node);
     // assert(*a_node != *another_node);
+    setParentItem(&truss);
+    truss.add_beam(*this);
 
     setAcceptHoverEvents (true);
 
@@ -216,6 +103,8 @@ Beam::Beam(Node *a_node, Node *another_node)
     load = 0.0;
     member_end_forces_computed = false;
     max_deflection = 0.0;
+    deformed = QPolygonF();
+    deformed.reserve(deformed_points_count); // pre-allocate enough points to draw deformated beam in order to avoid unnecessary reallocations.
 #ifdef DEBUG
     std::cout<<"New beam "<<first()<<"--"<<second()<<" (length="<<length()<<")\n"<<std::flush;
 #endif
@@ -227,25 +116,25 @@ Node &Beam::first() const { return *first_node; }
 Node &Beam::second() const { return *second_node; }
 qreal Beam::length() const { return beam_length;}
 
-void Beam::set_section(Section &a_section) {
-    s = &a_section;
-    stiffness_computed=false; // so the next time stiffness() will be invoked it will be recomputed
-}
+//void Beam::set_section(Section &a_section) {
+//    s = &a_section;
+//    stiffness_computed=false; // so the next time stiffness() will be invoked it will be recomputed
+//}
 
-Section &Beam::section() const {
-    assert (s!=NULL);
-    return *s;
-}
+//Section &Beam::section() const {
+//    assert (s!=NULL);
+//    return *s;
+//}
 
-void Beam::set_material (Material &a_material) {
-    m=&a_material;
-    stiffness_computed=false; // so the next time stiffness() will be invoked it will be recomputed
-}
+//void Beam::set_material (Material &a_material) {
+//    m=&a_material;
+//    stiffness_computed=false; // so the next time stiffness() will be invoked it will be recomputed
+//}
 
-Material &Beam::material() const {
-    assert (m!=NULL);
-    return *m;
-}
+//Material &Beam::material() const {
+//    assert (m!=NULL);
+//    return *m;
+//}
 
 Matrix<qreal, 6, 6> &Beam::stiffness() {
     // Computes the stiffness matrix in local coordinates, exploiting modulus equality similarities of various terms.
@@ -281,10 +170,6 @@ Matrix<qreal, 6, 1> &Beam::member_end_forces() {
     return mef;
 }
 
-Truss &Beam::truss() const {
-    return static_cast<Truss&> (*parentItem());
-};
-
 void Beam::compute_stiffness() {
     // Geometric
     qreal dx = first().x() - second().y();
@@ -296,16 +181,16 @@ void Beam::compute_stiffness() {
     qreal sa = dy / l; // Sin(alpha)
 
     // Material
-    qreal E=material().young_modulus();
-    qreal nu = material().poisson_ratio();
-    qreal alfa = material().thermal_expansion_coefficient();
+    qreal E=material.young_modulus();
+    qreal nu = material.poisson_ratio();
+    qreal alfa = material.thermal_expansion_coefficient();
     qreal G = E / (2.0*(1+nu));
 
     // Section
-    qreal A=section().area();
-    qreal J=section().moment_of_inertia();
-    qreal h=section().height();
-    qreal fi = section().shear_factor();
+    qreal A=section.area();
+    qreal J=section.moment_of_inertia();
+    qreal h=section.height();
+    qreal fi = section.shear_factor();
 
     // Axial deformability
     qreal axial = E*A/l;
@@ -338,15 +223,6 @@ void Beam::compute_stiffness() {
     st = (tr * local_st)*(tr.transpose());
     assert (st == st.transpose());
 
-//    C     VETTORE FORZE NODALI EQUIVALENTI PER TUTTE LE CONDIZIONI DI CARICO.
-//    C     INIZIALIZZAZIONE DEL CICLO REALIZZATO CON IF E GOTO
-//          LC = 0
-//    C     INCREMENTO DI CONTATORE DEL CICLO SULLE CONDIZIONI DI CARICO
-//     90   LC = LC + 1
-//          DO 100 I = 1, 6           ! Azzero il vettore dei carichi
-//             FNE(I) = 0.0           ! in coord. locali
-//     100  CONTINUE
-
     // Initializing nodal forces vector
     f = Matrix<qreal,6,1>(6,1);
     f.setZero(); /// Nodal loads initialization
@@ -357,7 +233,7 @@ void Beam::compute_stiffness() {
     qreal utd = 0.0; /// Upper thermal delta
     qreal ltd = 0.0; /// Lower thermal delta
 
-    qreal weight = section().area() * material().weight(); /// Self weight
+    qreal weight = section.area() * material.weight(); /// Self weight
     /// Updating loads with self weight
     px -= weight*sa;
     py1 -= weight*ca;
@@ -369,7 +245,7 @@ void Beam::compute_stiffness() {
 
     /// To compute shear deformation of distributed loads
     qreal aa = length() / (12.0 * E * J);
-    qreal bb = section().shear_factor() / (length()* G * A);
+    qreal bb = section.shear_factor() / (length()* G * A);
     qreal cc = bb / (aa+bb);
 
     f(0) += fh; /// Horizontal force on first node
@@ -399,12 +275,13 @@ qreal Beam::maximum_deflection() {
 
 QRectF Beam::boundingRect() const
 {
-    qreal line_width = section().height();
+    qreal line_width = section.height();
     //qreal load_scale = truss().load_scale;
     QRectF result = QRectF(first_node->pos(),  second_node->pos());
     // Accounting the load and some space between the beam and the load.
     //result.adjust(0.0, -load*load_scale-line_width,
     //              0.0,                 +line_width);
+    result.united(deformed.boundingRect());
 
     //result.adjust(-extra, -extra, extra, extra);
     return result.normalized();
@@ -413,8 +290,7 @@ QRectF Beam::boundingRect() const
 void Beam::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 {
     /// std::cout<<" painting beam"<<std::endl<<std::flush;
-    Truss &t = truss();
-    qreal line_width = section().height();
+    qreal line_width = section.height();
     // A beam is simply a line
     painter->setPen(QPen(Qt::black, line_width));
     painter->drawLine(first_node->pos(),second_node->pos());
@@ -422,7 +298,7 @@ void Beam::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
     // Leave a little space (a line width) between load and beam
     painter->setViewTransformEnabled(false);
     QRectF load_rect(first().pos(),second().pos());
-    load_rect.adjust(0.0, -load*t.load_scale-line_width,
+    load_rect.adjust(0.0, -load*truss.load_scale-line_width,
                      0.0,                   -line_width );
     //std::cout<<"beam load "<<load_rect.x()<<","<<load_rect.y()<<" "<<load_rect.width()<<","<<load_rect.height()<<std::endl<<std::flush;
     painter->setPen(QPen(Qt::red));
@@ -443,7 +319,7 @@ void Beam::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
     // TODO: Draw axial stress, shear stress and moment
 
     // Draw deformated beam.
-    painter->setPen(QPen(QColor(0, 0, 255, 128),section().height()));
+    painter->setPen(QPen(QColor(0, 0, 255, 128),section.height()));
     // It would be nice to draw it using splines, but it seems that it is not that easy. Let's draw it as always did, by points; so how many points shall we draw? Let's naively say currently 32.
 
     painter->drawPolyline(deformed);
@@ -456,20 +332,17 @@ void Beam::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 #endif
 }
 void Beam::compute_deformed() {
-    const int steps=32;
-    deformed = QPolygonF();
-    deformed.reserve(steps); // reserve at least steps points, to avoid unnecessary reallocations.
-    qreal step=1.0/steps; // Beware that 1 is NOT 1.0. If you write it 1/steps, step will be exactly zero.
+    qreal step=1.0/deformed_points_count; // Beware that 1 is NOT 1.0. If you write it 1/steps, step will be exactly zero.
     //const int ampl=1000.0; // TODO make it user defined, or even better computed for best view.
     qreal csi=0;
-    QPointF step_vector( (second().deformed_pos() - first().deformed_pos() )/steps);
+    QPointF step_vector( (second().deformed_pos() - first().deformed_pos() )/deformed_points_count);
     QPointF current(first().deformed_pos());
-    for (int i=0; i<=steps; ++i) {
+    for (int i=0; i<=deformed_points_count; ++i) {
         //QPointF delta(u(csi)*ampl,v(csi)*ampl);
         qreal ui = u(csi), vi=v(csi);
         QPointF delta(ui,vi);
         max_deflection = fmax(vi,max_deflection);
-        deformed<< current+delta;
+        deformed << current+delta;
         csi +=step;
         current+=step_vector;
     }

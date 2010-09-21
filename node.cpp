@@ -17,17 +17,6 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <QFormLayout>
-#include <QGraphicsScene>
-#include <QGraphicsSceneMouseEvent>
-#include <QPainter>
-#include <QStyleOption>
-#include <QDialog>
-#include <QRadioButton>
-#include <QPushButton>
-#include <QGraphicsLinearLayout>
-#include <QDoubleSpinBox>
-
 #include <stdio.h>
 #include <iostream>
 
@@ -39,10 +28,6 @@
 #include "truss.h"
 
 
-/* Constants used for drawings */
-static const qreal fraction_of_span = 12.0; ///< the node will be big as this fraction of its spans.
-static const qreal smaller=0.5;
-static const qreal bigger=1.0;
 //static const QPoint horiz_trail[3] = {
 //    QPoint(),
 //    QPoint(-bigger, -bigger),
@@ -160,11 +145,6 @@ QPointF Node::deformed_pos() {
 
 void Node::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *)
 {
-    const QPen lightest(Qt::gray, smaller/12.0);
-    const QPen light(Qt::black, smaller/10.0);
-    const QPen heavy(Qt::black, smaller/8.0);
-    static const QPointF origin;
-
     switch (my_constrain) {
     case uncostrained: // nothing
         painter->setPen(light);
@@ -214,17 +194,6 @@ void Node::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWid
         break;
         // default: // nothing should NOT be necessary
     }
-    // drawing a vertical arrow
-    painter->drawLine(0.0, -bigger, 0.0, -3.0*bigger);
-    painter->drawLine(0.0, -bigger, -bigger/15.0, -bigger/5.0);
-    painter->drawLine(0.0, -bigger, bigger/15.0, -bigger/5.0);
-    // Draw reaction.void Beam::compute_deformed() {
-
-    QFont font; font.setPointSizeF(bigger); painter->setFont(font);
-    painter->drawText(QRectF(bigger,bigger,2*bigger,2*bigger),
-                      QString("%1").arg(vertical));
-
-
 }
 
 enum Constrain Node::constrain() const {
@@ -245,6 +214,7 @@ void Node::set_constrain(enum Constrain a_constrain) {
 }
 
 void Node::update_reactions() {
+    /// Add the reaction of each connected beam
     foreach (Beam *b, beams()) {
         int horiz_idx, vert_idx, mom_idx;
         if (this == &b->first()) {

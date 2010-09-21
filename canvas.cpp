@@ -109,9 +109,7 @@ void Canvas::dialog_closed(int res) {
         x += spinbox->value();
         Node *right = new Node(x,0.0, hinge);
         t->add_node(*right);
-        Beam *b = new Beam(left,right);
-        b->set_section(*section);
-        b->set_material(*material);
+        Beam *b = new Beam(left,right,*t,*section,*material);
         b->load = dialog.loads[span]->value();
         t->add_beam(*b);
         left = right; // The left node of the next span is the right of current

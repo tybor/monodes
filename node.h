@@ -22,6 +22,7 @@
 #define NODE_H
 
 #include <QGraphicsItem>
+#include <QtGui>
 #include <QList>
 
 // Forward declarations
@@ -37,6 +38,16 @@ enum Constrain {
     //horizontal_shoe, // Pattino orizzontale, free horizontal displacement, fixed vertical displacement and rotation
     restrained // Incastro, no free degrees
 };
+
+/// Drawing constants
+static const qreal fraction_of_span = 12.0; ///< the node will be big as this fraction of its spans.
+static const qreal smaller=0.5;
+static const qreal bigger=1.0;
+
+static const QPen lightest(Qt::gray, smaller/12.0);
+static const QPen light(Qt::black, smaller/10.0);
+static const QPen heavy(Qt::black, smaller/8.0);
+static const QPointF origin;
 
 class Node : public QGraphicsItem
 {
