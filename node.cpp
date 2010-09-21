@@ -25,8 +25,8 @@
 #include "node.h"
 #include "nodedialog.h"
 #include "beam.h"
+#include "reactions.h"
 #include "truss.h"
-
 
 //static const QPoint horiz_trail[3] = {
 //    QPoint(),
@@ -230,6 +230,7 @@ void Node::update_reactions() {
         vertical+= b->member_end_forces()[vert_idx];
         moment+= b->member_end_forces()[mom_idx];
     }
+    Reactions *reactions=new Reactions(*this);
 }
 
 std::ostream &operator<<(std::ostream &s, Node &a_node) {

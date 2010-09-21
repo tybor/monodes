@@ -30,10 +30,9 @@ class Reactions : public QGraphicsItem
 public:
     Reactions(Node &parent);
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
-
+    QRectF boundingRect() const;
 private:
     Node &node;
-
 };
 
 #endif // REACTIONS_H

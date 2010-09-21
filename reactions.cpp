@@ -19,6 +19,7 @@
 
 
 #include "reactions.h"
+#include "node.h"
 
 Reactions::Reactions(Node &parent) :
         node(parent)
@@ -37,4 +38,9 @@ painter->drawLine(0.0, bigger, bigger/15.0, bigger/5.0);
 QFont font; font.setPointSizeF(bigger); painter->setFont(font);
 painter->drawText(QRectF(bigger,bigger,2*bigger,2*bigger),
                   QString("%1").arg(node.vertical));
+}
+
+QRectF Reactions::boundingRect() const
+{
+    return QRectF(-bigger, 0, 2.0*bigger, 3.0*bigger);
 }
