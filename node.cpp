@@ -230,6 +230,7 @@ void Node::update_reactions() {
         vertical+= b->member_end_forces()[vert_idx];
         moment+= b->member_end_forces()[mom_idx];
     }
+    /// TODO: remove eventual old reactions.
     Reactions *reactions=new Reactions(*this);
 }
 

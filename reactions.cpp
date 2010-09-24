@@ -30,11 +30,20 @@ Reactions::Reactions(Node &parent) :
 void Reactions::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
 // drawing a vertical arrow
 painter->setPen(heavy);
-painter->drawLine(0.0, bigger, 0.0, 3.0*bigger);
-painter->drawLine(0.0, bigger, -bigger/15.0, bigger/5.0);
-painter->drawLine(0.0, bigger, bigger/15.0, bigger/5.0);
+painter->drawLine(0.0, bigger, 0.0, 4.0*bigger);
+//painter->setPen(QPen(QColor(Qt::red)));
+painter->drawLine(QPointF(0.0, bigger), QPointF(-bigger/2, 2*bigger));
+painter->drawLine(QPointF(0.0, bigger), QPointF(bigger/2, 2*bigger));
 // Draw reaction.void Beam::compute_deformed() {
-
+QString label = QString("%1").arg(node.vertical);
+QFont font;
+/* Pick the size that fits the load rectangle better */
+QRectF text_rect(painter->boundingRect(load_rect,label)); // The size we would occupy
+font.setPointSizeF( font.pointSizeF() * fmin(
+        load_rect.width() / text_rect.width(),
+        load_rect.height() / text_rect.height()
+        ));
+painter->setFont(font);
 QFont font; font.setPointSizeF(bigger); painter->setFont(font);
 painter->drawText(QRectF(bigger,bigger,2*bigger,2*bigger),
                   QString("%1").arg(node.vertical));
