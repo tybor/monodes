@@ -67,10 +67,10 @@ QList<Beam*> Truss::beams() const {
 
 QRectF Truss::boundingRect() const
 {
-    QRectF result;
-    foreach (Beam *beam, beams()) {result |=beam->boundingRect();}
-    foreach (Node *node, nodes()) {result |=node->boundingRect();}
-    return result;
+    // Truss bounding rectangle is the one bounding all its children
+    return childrenBoundingRect();
+    //    foreach (Beam *beam, beams()) {result |=beam->boundingRect();}
+    //    foreach (Node *node, nodes()) {result |=node->boundingRect();}
 }
 
 void Truss::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *w)
@@ -84,7 +84,7 @@ void Truss::update_scales() {
     // Updates node-scale
     // Update load-scale
     qreal highest_load=0.0;
-    foreach (Beam *a_beam, beams()) highest_load = fmax(highest_load, fabs(a_beam->load));
+    foreach (Beam *a_beam, beams()) highest_load = fmax(highest_load, fabs(a_beam->constant_load()));
     load_scale= longest / highest_load/2.0; /// The highest load will be high the half of the longest beam.
     qreal s = fmax( /* the radius of the nodes will be the biggest of */
             2.0*highest /* two times the highest beam */,
@@ -161,6 +161,7 @@ void Truss::solve() {
     // Sum all the stiffness at the proper degree of freedom
     foreach (Beam *beam, beams()) {
         Matrix<qreal,6,6> &beam_stiffness = beam->stiffness();
+        std::cout<<beam_stiffness;
         assert (beam_stiffness == beam_stiffness.transpose());
         Matrix<qreal,6,1> &nodal_forces = beam->fixed_end_forces();
         Node &n1 = beam->first(); Node &n2 = beam->second();
@@ -189,7 +190,9 @@ void Truss::solve() {
             <<"Stiffness:"<<std::endl<<stiffness<<std::endl
             <<"Loads: "<<loads<<std::flush;
 #endif
-    assert(/* strictly symmetrical */ stiffness == stiffness.transpose()); /// stiffness.isApprox(stiffness.transpose()));
+    assert(/* Sometime the strictly symmetrical assertion, stiffness == stiffness.transpose() will fail, */
+            /* stiffness shall be symmetrical, accounting for numerical approximations */
+            stiffness.isApprox(stiffness.transpose()));
 
     // TODO: We shall compute it in a separate thread!
     //    solving_system = new LinearSystem (stiffness, loads);

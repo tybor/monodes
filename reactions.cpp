@@ -34,22 +34,27 @@ painter->drawLine(0.0, bigger, 0.0, 4.0*bigger);
 //painter->setPen(QPen(QColor(Qt::red)));
 painter->drawLine(QPointF(0.0, bigger), QPointF(-bigger/2, 2*bigger));
 painter->drawLine(QPointF(0.0, bigger), QPointF(bigger/2, 2*bigger));
-// Draw reaction.void Beam::compute_deformed() {
-QString label = QString("%1").arg(node.vertical);
+// Draw reaction.void
+painter->rotate(90);
+painter->translate(bigger/2,bigger);
+QRectF label_rect(QPointF(0.0, 0.0), QPointF(bigger, 3*bigger));
+
+painter->setPen(Qt::green); painter->drawRect(label_rect);; /// debug
+QString label = QString("N %1 kg").arg(node.vertical);
 QFont font;
-/* Pick the size that fits the load rectangle better */
-QRectF text_rect(painter->boundingRect(load_rect,label)); // The size we would occupy
+///* Pick the size that fits the load rectangle better */
+text_rect = painter->boundingRect(label_rect,label); // The size we would occupy
 font.setPointSizeF( font.pointSizeF() * fmin(
-        load_rect.width() / text_rect.width(),
-        load_rect.height() / text_rect.height()
+        label_rect.width() / text_rect.width(),
+        label_rect.height() / text_rect.height()
         ));
 painter->setFont(font);
-QFont font; font.setPointSizeF(bigger); painter->setFont(font);
-painter->drawText(QRectF(bigger,bigger,2*bigger,2*bigger),
-                  QString("%1").arg(node.vertical));
+painter->drawText(text_rect, label);
+painter->setPen(Qt::red);
+painter->drawRect(text_rect);
 }
 
 QRectF Reactions::boundingRect() const
 {
-    return QRectF(-bigger, 0, 2.0*bigger, 3.0*bigger);
+    return text_rect.adjusted(0.0, 0.0, bigger, bigger/2); // text_rect;
 }

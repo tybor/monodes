@@ -33,6 +33,7 @@ using Eigen::Dynamic;
 
 #include "section.h"
 #include "material.h"
+#include "load.h"
 
 /* Hermite functions */
 qreal f1(qreal csi);
@@ -48,7 +49,7 @@ class Truss; // Forward declaration
 class Beam : public QGraphicsItem
 {
 public:
-    Beam(Node *a_node, Node *another_node, Truss &a_truss, Section &a_section, Material &a_material);
+    Beam(Node &a_node, Node &another_node, Truss &a_truss, Section &a_section, Material &a_material);
     enum { Type = UserType + 2 };
     int type() const { return Type; }
 
@@ -56,8 +57,11 @@ public:
     Node &second() const;
     qreal length() const;
 
-    // Currently sticking to one, uniform load orthogonal to the beam
-    qreal load;
+    qreal constant_load() const; /// Temporary query for the applied load. Currently only one constant load is allowed.
+    void set_load(qreal an_amount);
+
+    Truss &truss;
+    Node &first_node, &second_node;
 
     ///void set_section (Section &a_section);
     Section &section;
@@ -83,11 +87,12 @@ protected:
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
 
 private:
-    Truss &truss;
-    Node *first_node, *second_node;
-    qreal beam_length;
-    QPolygonF deformed;
+    qreal beam_length, beam_length2;
+    QPolygonF deformed;    
     qreal max_deflection;
+    // Currently sticking to one, uniform load orthogonal to the beam
+    Load *load;
+    /// TODO: refine load into QList<Load*> loads;
 
     void compute_stiffness();
     bool stiffness_computed;

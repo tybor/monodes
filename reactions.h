@@ -33,6 +33,7 @@ public:
     QRectF boundingRect() const;
 private:
     Node &node;
+    QRectF text_rect;
 };
 
 #endif // REACTIONS_H

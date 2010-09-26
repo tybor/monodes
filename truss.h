@@ -65,7 +65,7 @@ public:
             /// Set is_solving_immediate to a_value.
     { immediate_solving = a_value; };
 
-    QRectF boundingRect() const;
+   QRectF boundingRect() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
     void update_scales(); ///< Updates the scale used to draw nodes, deformed beams, loads, bearing reactions.
     qreal load_scale; /// The scale applied to loads

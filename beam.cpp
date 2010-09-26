@@ -81,26 +81,31 @@ qreal Beam::v(qreal csi) {
 	    f5(csi)*second().v() + f6(csi)*second().fi()*length();
 }
 
-Beam::    Beam(Node *a_node, Node *another_node, Truss &a_truss, Section &a_section, Material &a_material)
-    : truss(a_truss),
-    section(a_section),
-    material(a_material)
+Beam::    Beam(Node &a_node, Node &another_node, Truss &a_truss, Section &a_section, Material &a_material) :
+        truss(a_truss),
+        first_node(a_node),
+        second_node(another_node),
+        section(a_section),
+        material(a_material)
 {
-    assert(a_node!=NULL);
-    assert(another_node!=NULL);
-    assert(a_node!=another_node);
-    // assert(*a_node != *another_node);
+    //assert( a_node==another_node));
     setParentItem(&truss);
     truss.add_beam(*this);
 
     setAcceptHoverEvents (true);
+    QPointF d = second().pos() - first().pos();
 
-    first_node = a_node;
-    second_node = another_node;
-    beam_length = first().distance(second());
-    first_node->add_beam(this);
-    second_node->add_beam(this);
-    load = 0.0;
+    beam_length2= d.x()*d.x() + d.y()*d.y();
+    beam_length = sqrt(beam_length2);
+    qreal cosa = d.x() / beam_length; // Cos(alpha)
+    qreal sina = d.y() / beam_length; // Sin(alpha)
+    setTransform(QTransform(
+            cosa, -sina,
+            sina, cosa,
+            d.x(), d.y()));
+    first_node.add_beam(this);
+    second_node.add_beam(this);
+    stiffness_computed = false;
     member_end_forces_computed = false;
     max_deflection = 0.0;
     deformed = QPolygonF();
@@ -112,8 +117,8 @@ Beam::    Beam(Node *a_node, Node *another_node, Truss &a_truss, Section &a_sect
 }
 
 // How difficoult to get read-only fields, that in Eiffel are for free!!! Symmetrically setters are always free and you can't get rid of them even when you would like to, so you must make it private, writing both the setter and the getter. So in conclusion Eiffel's approach - the default is fields writable only from inside its object and read-only from outside is what saves efforts.
-Node &Beam::first() const { return *first_node; }
-Node &Beam::second() const { return *second_node; }
+Node &Beam::first() const { return first_node; }
+Node &Beam::second() const { return second_node; }
 qreal Beam::length() const { return beam_length;}
 
 //void Beam::set_section(Section &a_section) {
@@ -166,18 +171,29 @@ Matrix<qreal, 6, 1> &Beam::member_end_forces() {
         local_displacements = transformation().transpose() * global_displacements;
         mef = stiffness() * local_displacements;
         member_end_forces_computed = true;
+        std::cout<<"Mef:"<<mef<<" gf:"<<gf<<std::endl;
     }
     return mef;
 }
 
+qreal Beam::constant_load() const {
+    if (load) return load->constant();
+    else return 0.0;
+}
+
+void Beam::set_load(qreal an_amount) {
+    load = new Load(*this,an_amount);
+}
+
 void Beam::compute_stiffness() {
     // Geometric
-    qreal dx = first().x() - second().y();
-    qreal dy = first().y() - second().y();
-    qreal l = length();
-    qreal l2= l*l; // It may also be dx*dx + dy*dy;
+    QPointF d= first().pos()-second().pos();
+    qreal dx = d.x();
+    qreal dy = d.y();
+    qreal l= beam_length;
+    qreal l2 = beam_length2;
     qreal l3 = l * l2;
-    qreal ca = dx / l; // Cos(alpha)
+    qreal ca = dx / l; // Cos(alpha) also transformation().m21 or m12
     qreal sa = dy / l; // Sin(alpha)
 
     // Material
@@ -228,8 +244,8 @@ void Beam::compute_stiffness() {
     f.setZero(); /// Nodal loads initialization
     // Loads
     qreal px = 0.0; /// Constant axial distribuited load
-    qreal py1 = load; /// Transversal linear load: value on first vertex
-    qreal py2 = load; /// Transversal linear load: value on second vertex
+    qreal py1 = constant_load(); /// Transversal linear load: value on first vertex
+    qreal py2 = constant_load(); /// Transversal linear load: value on second vertex
     qreal utd = 0.0; /// Upper thermal delta
     qreal ltd = 0.0; /// Lower thermal delta
 
@@ -275,14 +291,13 @@ qreal Beam::maximum_deflection() {
 
 QRectF Beam::boundingRect() const
 {
-    qreal line_width = section.height();
+    //qreal line_width = section.height();
     //qreal load_scale = truss().load_scale;
-    QRectF result = QRectF(first_node->pos(),  second_node->pos());
+    QRectF result = QRectF(first_node.pos(),  second_node.pos());
     // Accounting the load and some space between the beam and the load.
     //result.adjust(0.0, -load*load_scale-line_width,
     //              0.0,                 +line_width);
     result.united(deformed.boundingRect());
-
     //result.adjust(-extra, -extra, extra, extra);
     return result.normalized();
 }
@@ -293,28 +308,30 @@ void Beam::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
     qreal line_width = section.height();
     // A beam is simply a line
     painter->setPen(QPen(Qt::black, line_width));
-    painter->drawLine(first_node->pos(),second_node->pos());
-    // Draw the load, assuming horizontal beams. TODO: remove this assumption.
-    // Leave a little space (a line width) between load and beam
-    painter->setViewTransformEnabled(false);
-    QRectF load_rect(first().pos(),second().pos());
-    load_rect.adjust(0.0, -load*truss.load_scale-line_width,
-                     0.0,                   -line_width );
-    //std::cout<<"beam load "<<load_rect.x()<<","<<load_rect.y()<<" "<<load_rect.width()<<","<<load_rect.height()<<std::endl<<std::flush;
-    painter->setPen(QPen(Qt::red));
-    painter->setBrush(QBrush(QColor(255,96,96,128)));
-    QString label("%1 kg/m");
-    label = label.arg(load);
-    QFont font;
-    /* Pick the size that fits the load rectangle better */
-    QRectF text_rect(painter->boundingRect(load_rect,label)); // The size we would occupy
-    font.setPointSizeF( font.pointSizeF() * fmin(
-            load_rect.width() / text_rect.width(),
-            load_rect.height() / text_rect.height()
-            ));
-    painter->setFont(font);
-    painter->drawRect(load_rect);
-    painter->drawText(load_rect, Qt::AlignCenter, label);
+    painter->drawLine(first_node.pos(),second_node.pos());
+//    //    Draw the load, assuming horizontal beams. TODO: remove this assumption; if
+//    //    we always draw the beam from (0,0) to (length,0) and then rototranslate it
+//    //    to its actual position we can continue draw this horizontally
+//    // Leave a little space (a line width) between load and beam
+//    painter->setViewTransformEnabled(false);
+//    load_rect = QRectF(first().pos(),second().pos());
+//    load_rect.adjust(0.0, -load*truss.load_scale-line_width,
+//                     0.0,                   -line_width );
+//    //std::cout<<"beam load "<<load_rect.x()<<","<<load_rect.y()<<" "<<load_rect.width()<<","<<load_rect.height()<<std::endl<<std::flush;
+//    painter->setPen(QPen(Qt::red));
+//    painter->setBrush(QBrush(QColor(255,96,96,128)));
+//    QString label("%1 kg/m");
+//    label = label.arg(load);
+//    QFont font;
+//    /* Pick the size that fits the load rectangle better */
+//    QRectF text_rect(painter->boundingRect(load_rect,label)); // The size we would occupy
+//    font.setPointSizeF( font.pointSizeF() * fmin(
+//            load_rect.width() / text_rect.width(),
+//            load_rect.height() / text_rect.height()
+//            ));
+//    painter->setFont(font);
+//    painter->drawRect(load_rect);
+//    painter->drawText(load_rect, Qt::AlignCenter, label);
 
     // TODO: Draw axial stress, shear stress and moment
 
