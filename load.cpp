@@ -6,22 +6,23 @@ Load::Load(Beam &a_parent_beam, qreal a_constant_load) :
         beam(a_parent_beam)
 {
     setParentItem(&a_parent_beam);
+    amount = a_constant_load;
 }
 
 QRectF Load::boundingRect() const {
-    return QRectF(0,0, beam.length(), amount);
+    return QRectF(0.0,0.0, beam.length(), amount);
 }
 
-void Load::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
+void Load::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
     //    Draw the load, assuming horizontal beams. TODO: remove this assumption; if
     //    we always draw the beam from (0,0) to (length,0) and then rototranslate it
     //    to its actual position we can continue draw this horizontally
     // Leave a little space (a line width) between load and beam
     // painter->setViewTransformEnabled(false);
-    load_rect = QRectF (0, 0, beam.length(), amount);
-    load_rect.adjust(0.0, -amount*beam.truss.load_scale, 0.0, 0.0);
+    load_rect = QRectF (0.0, -amount*beam.truss.load_scale, 0.0, beam.length());
+    load_rect.moveBottom(-beam.section.height());
 
-    painter->setTransform(beam.transform());
+    //painter->setTransform(beam.transform());
     painter->setPen(QPen(Qt::red));
     painter->setBrush(QBrush(QColor(255,96,96,128)));
     QString label = QString("%1 kg/m").arg(amount);

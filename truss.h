@@ -45,6 +45,7 @@ public:
     QList<Node*> nodes() const;
     QList<Beam*> beams() const;
 
+    void enumerate_dofs(); ///< Assign identificative numbers to degree of freedom.
     void solve();
     unsigned int dofs_count() const; /// Number of degrees of freedom of the solution.
 
@@ -70,7 +71,6 @@ public:
     void update_scales(); ///< Updates the scale used to draw nodes, deformed beams, loads, bearing reactions.
     qreal load_scale; /// The scale applied to loads
 
-private:
     QList<Node *> nodes_list;
     QList<Beam *> beams_list;
 

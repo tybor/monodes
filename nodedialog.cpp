@@ -29,9 +29,9 @@ NodeDialog::NodeDialog(Node &a_node, QWidget *parent) :
 {
     setupUi(this);
     /// TODO: Reactions:
-    h_value->setText(QString("10000"));
-    n_value->setText(QString("2000"));
-    m_value->setText(QString("2000"));
+    h_value->setText(QString("%1").arg(a_node.horizonal));
+    n_value->setText(QString("%1").arg(a_node.vertical));
+    m_value->setText(QString("%1").arg(a_node.moment));
     /// Displacements
     u_value->setText(QString("%1").arg(a_node.u()));
     v_value->setText(QString("%1").arg(a_node.v()));

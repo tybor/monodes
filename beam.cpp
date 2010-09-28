@@ -90,19 +90,18 @@ Beam::    Beam(Node &a_node, Node &another_node, Truss &a_truss, Section &a_sect
 {
     //assert( a_node==another_node));
     setParentItem(&truss);
-    truss.add_beam(*this);
 
+    /// TODO: remove length caching!
     setAcceptHoverEvents (true);
     QPointF d = second().pos() - first().pos();
 
-    beam_length2= d.x()*d.x() + d.y()*d.y();
-    beam_length = sqrt(beam_length2);
-    qreal cosa = d.x() / beam_length; // Cos(alpha)
-    qreal sina = d.y() / beam_length; // Sin(alpha)
+    qreal l = length();
+    qreal cosa = d.x() / l; // Cos(alpha)
+    qreal sina = d.y() / l; // Sin(alpha)
     setTransform(QTransform(
             cosa, -sina,
             sina, cosa,
-            d.x(), d.y()));
+            first_node.x(), first_node.y()));
     first_node.add_beam(this);
     second_node.add_beam(this);
     stiffness_computed = false;
@@ -110,17 +109,21 @@ Beam::    Beam(Node &a_node, Node &another_node, Truss &a_truss, Section &a_sect
     max_deflection = 0.0;
     deformed = QPolygonF();
     deformed.reserve(deformed_points_count); // pre-allocate enough points to draw deformated beam in order to avoid unnecessary reallocations.
-#ifdef DEBUG
-    std::cout<<"New beam "<<first()<<"--"<<second()<<" (length="<<length()<<")\n"<<std::flush;
-#endif
-
+    truss.add_beam(*this);
 }
 
 // How difficoult to get read-only fields, that in Eiffel are for free!!! Symmetrically setters are always free and you can't get rid of them even when you would like to, so you must make it private, writing both the setter and the getter. So in conclusion Eiffel's approach - the default is fields writable only from inside its object and read-only from outside is what saves efforts.
 Node &Beam::first() const { return first_node; }
 Node &Beam::second() const { return second_node; }
-qreal Beam::length() const { return beam_length;}
 
+inline qreal Beam::length() const {
+    return sqrt(length2());
+}
+
+inline qreal Beam::length2() const {
+    QPointF d = second().pos()-first().pos();
+    return (d.x()*d.x() + d.y()*d.y());
+}
 //void Beam::set_section(Section &a_section) {
 //    s = &a_section;
 //    stiffness_computed=false; // so the next time stiffness() will be invoked it will be recomputed
@@ -171,7 +174,7 @@ Matrix<qreal, 6, 1> &Beam::member_end_forces() {
         local_displacements = transformation().transpose() * global_displacements;
         mef = stiffness() * local_displacements;
         member_end_forces_computed = true;
-        std::cout<<"Mef:"<<mef<<" gf:"<<gf<<std::endl;
+        //std::cout<<"Mef:"<<mef<<" gf:"<<gf<<std::endl;
     }
     return mef;
 }
@@ -190,8 +193,8 @@ void Beam::compute_stiffness() {
     QPointF d= first().pos()-second().pos();
     qreal dx = d.x();
     qreal dy = d.y();
-    qreal l= beam_length;
-    qreal l2 = beam_length2;
+    qreal l2 = length2();
+    qreal l = sqrt(l2);
     qreal l3 = l * l2;
     qreal ca = dx / l; // Cos(alpha) also transformation().m21 or m12
     qreal sa = dy / l; // Sin(alpha)
@@ -291,14 +294,12 @@ qreal Beam::maximum_deflection() {
 
 QRectF Beam::boundingRect() const
 {
-    //qreal line_width = section.height();
+    qreal line_width = section.height();
     //qreal load_scale = truss().load_scale;
-    QRectF result = QRectF(first_node.pos(),  second_node.pos());
+    QRectF result = QRectF(0,0, length(),0);
     // Accounting the load and some space between the beam and the load.
-    //result.adjust(0.0, -load*load_scale-line_width,
-    //              0.0,                 +line_width);
+    result.adjust(0.0, -line_width, 0.0, +line_width);
     result.united(deformed.boundingRect());
-    //result.adjust(-extra, -extra, extra, extra);
     return result.normalized();
 }
 
@@ -308,60 +309,48 @@ void Beam::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
     qreal line_width = section.height();
     // A beam is simply a line
     painter->setPen(QPen(Qt::black, line_width));
-    painter->drawLine(first_node.pos(),second_node.pos());
-//    //    Draw the load, assuming horizontal beams. TODO: remove this assumption; if
-//    //    we always draw the beam from (0,0) to (length,0) and then rototranslate it
-//    //    to its actual position we can continue draw this horizontally
-//    // Leave a little space (a line width) between load and beam
-//    painter->setViewTransformEnabled(false);
-//    load_rect = QRectF(first().pos(),second().pos());
-//    load_rect.adjust(0.0, -load*truss.load_scale-line_width,
-//                     0.0,                   -line_width );
-//    //std::cout<<"beam load "<<load_rect.x()<<","<<load_rect.y()<<" "<<load_rect.width()<<","<<load_rect.height()<<std::endl<<std::flush;
-//    painter->setPen(QPen(Qt::red));
-//    painter->setBrush(QBrush(QColor(255,96,96,128)));
-//    QString label("%1 kg/m");
-//    label = label.arg(load);
-//    QFont font;
-//    /* Pick the size that fits the load rectangle better */
-//    QRectF text_rect(painter->boundingRect(load_rect,label)); // The size we would occupy
-//    font.setPointSizeF( font.pointSizeF() * fmin(
-//            load_rect.width() / text_rect.width(),
-//            load_rect.height() / text_rect.height()
-//            ));
-//    painter->setFont(font);
-//    painter->drawRect(load_rect);
-//    painter->drawText(load_rect, Qt::AlignCenter, label);
+    painter->drawLine(QPointF(0,0),QPointF(length(),0));
 
-    // TODO: Draw axial stress, shear stress and moment
+    // TODO: Draw axial stress, shear stress and moment; better make them subitems to be drawn
 
     // Draw deformated beam.
-    painter->setPen(QPen(QColor(0, 0, 255, 128),section.height()));
-    // It would be nice to draw it using splines, but it seems that it is not that easy. Let's draw it as always did, by points; so how many points shall we draw? Let's naively say currently 32.
+    painter->setPen(QPen(QColor(0, 0, 255, 128),line_width));
+    //std::cout<<"Deformation scale "<<truss.deformation_scale<<std::endl;
+    painter->drawPolyline(scaled_deformed);
 
-    painter->drawPolyline(deformed);
-
-#ifdef DEBUG
+//#ifdef DEBUG
     // Draw boundingRect with a thin green line
     painter->setPen(QPen(Qt::green, 3, Qt::DotLine));
     painter->setBrush(Qt::NoBrush);
     painter->drawRect(boundingRect());
-#endif
+//#endif
 }
+
 void Beam::compute_deformed() {
+    deformed.clear();
     qreal step=1.0/deformed_points_count; // Beware that 1 is NOT 1.0. If you write it 1/steps, step will be exactly zero.
-    //const int ampl=1000.0; // TODO make it user defined, or even better computed for best view.
     qreal csi=0;
-    QPointF step_vector( (second().deformed_pos() - first().deformed_pos() )/deformed_points_count);
-    QPointF current(first().deformed_pos());
+    QPointF step_vector = QPointF(length(),0.0) / deformed_points_count;
+    QPointF current(0,0);
+    max_deflection = 0.0;
     for (int i=0; i<=deformed_points_count; ++i) {
         //QPointF delta(u(csi)*ampl,v(csi)*ampl);
         qreal ui = u(csi), vi=v(csi);
         QPointF delta(ui,vi);
-        max_deflection = fmax(vi,max_deflection);
+        max_deflection = fmax(fabs(vi),max_deflection);
         deformed << current+delta;
         csi +=step;
         current+=step_vector;
+    }
+    std::cout<<*this<<" max deflection "<<max_deflection<<std::endl;
+}
+
+void Beam::update_scale(qreal a_scale) {
+    scaled_deformed.clear();
+    scaled_deformed.reserve(deformed_points_count);
+    foreach (QPointF point, deformed) {
+        point.setY(point.y()*a_scale);
+        scaled_deformed<< point;
     }
 }
 
@@ -394,13 +383,13 @@ void Beam::hoverMoveEvent ( QGraphicsSceneHoverEvent * event ) {
     setToolTip(msg);
 }
 
-void Beam::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
+void Beam::mouseReleaseEvent(QGraphicsSceneMouseEvent *)
 {
 #ifdef DEBUG
     std::cout<<"rilasciata asta"<<std::endl<<std::flush;
 #endif
     BeamDialog dialog(*this);
-    int res = dialog.exec();
+    /* unused int res = */ dialog.exec();
     // to need to redraw so no need to update();
     //QGraphicsItem::mouseReleaseEvent(event);
 }

@@ -9,6 +9,8 @@ QT       += core gui
 TARGET = monodes
 TEMPLATE = app
 
+## C99 compatibility is required to use isfinite
+CFLAGS += -std=c99
 
 SOURCES += main.cpp\
     node.cpp \

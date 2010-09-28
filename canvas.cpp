@@ -62,7 +62,7 @@ Canvas::Canvas() {
     setMinimumSize(300, 300);
     setWindowTitle(tr("Mobile nodes"));
     // Prepare a nice squared paper background
-    setBackgroundBrush(QBrush(QImage(":/images/paper4.jpg")));
+    // setBackgroundBrush(QBrush(QImage(":/images/paper4.jpg")));
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
@@ -125,7 +125,6 @@ void Canvas::dialog_closed(int res) {
 }
 
 void Canvas::zoom_to_fit() {
-    t->update_scales();
    fitInView(t,Qt::KeepAspectRatio);
    // Move "+" and "-" buttons
    // zooms->addCornerAnchors(&t,Qt::TopLeftCorner, zoomin,Qt::BottomRightCorner);

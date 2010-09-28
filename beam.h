@@ -56,6 +56,7 @@ public:
     Node &first() const;
     Node &second() const;
     qreal length() const;
+    qreal length2() const; /// l0ength²
 
     qreal constant_load() const; /// Temporary query for the applied load. Currently only one constant load is allowed.
     void set_load(qreal an_amount);
@@ -78,6 +79,8 @@ public:
     Matrix<qreal, 6, 1> &member_end_forces(); // The forces at the end of current element resulting from the applied loads and deformation of the structure.
 
     void compute_deformed();
+    void update_scale(qreal a_scale);
+
     qreal maximum_deflection();
     QRectF boundingRect() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
@@ -87,8 +90,7 @@ protected:
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
 
 private:
-    qreal beam_length, beam_length2;
-    QPolygonF deformed;    
+    QPolygonF deformed, scaled_deformed;
     qreal max_deflection;
     // Currently sticking to one, uniform load orthogonal to the beam
     Load *load;

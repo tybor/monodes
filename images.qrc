@@ -1,8 +1,5 @@
 <RCC>
     <qresource prefix="/">
-        <file>images/paper1.png</file>
-        <file>images/paper2.png</file>
-        <file>images/paper3.png</file>
         <file>icone/cerniera.png</file>
         <file>icone/carrello.png</file>
         <file>icone/deleted-hinge.png</file>

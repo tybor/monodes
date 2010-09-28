@@ -68,7 +68,7 @@ public:
     void set_v (qreal a_value);
     void set_fi (qreal a_value);
 
-    QPointF deformed_pos(); ///< Position of node in deformed
+    QPointF displacement(); ///< Displacement of the deformed node.
 
     qreal vertical, horizonal, moment; /// Bearing reactions.
     // Constrains

@@ -1,6 +1,6 @@
 Continous beams
 
-Simplified application to compute stresses and deformation of a mono-section continous beam.
+Simplified application to compute stresses and deformation of a mono-section continous beam loaded with constant trasversal loads, one per span.
 Will eventually evolte into a full-fledged truss application targeting mobile devices.
 
 

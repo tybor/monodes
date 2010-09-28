@@ -100,11 +100,11 @@ void Node::set_u(qreal anu) { node_u = anu; }
 void Node::set_v(qreal av) { node_v = av; }
 void Node::set_fi(qreal afi) { node_fi = afi; }
 
-void Node::mousePressEvent(QGraphicsSceneMouseEvent *event)
+void Node::mousePressEvent(QGraphicsSceneMouseEvent *)
 {
     NodeDialog dialog(*this); // A dialog for current node
     //dialog.show();
-    int res = dialog.exec();
+    /* unused int res = */ dialog.exec();
     update();
     //QGraphicsItem::mousePressEvent(event);
 }
@@ -139,11 +139,11 @@ QPainterPath Node::shape() const
     return path;
 }
 
-QPointF Node::deformed_pos() {
-    return QPointF(x()+node_u,y()+node_v);
+QPointF Node::displacement() {
+    return QPointF(node_u,node_v);
 }
 
-void Node::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *)
+void Node::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 {
     switch (my_constrain) {
     case uncostrained: // nothing
@@ -225,10 +225,11 @@ void Node::update_reactions() {
             horiz_idx = 3;
             vert_idx = 4;
             mom_idx = 5;
-        }
-        horizonal += b->member_end_forces()[horiz_idx];
-        vertical+= b->member_end_forces()[vert_idx];
-        moment+= b->member_end_forces()[mom_idx];
+        };
+        Matrix<qreal,6,1> gmef /*global_member_end_forces */=  b->transformation()*b->member_end_forces();
+        horizonal += gmef [horiz_idx];
+        vertical+= gmef [vert_idx];
+        moment+= gmef [mom_idx];
     }
     /// TODO: remove eventual old reactions.
     Reactions *reactions=new Reactions(*this);

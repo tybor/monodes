@@ -27,7 +27,7 @@ Reactions::Reactions(Node &parent) :
     setParentItem(&parent);
 }
 
-void Reactions::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
+void Reactions::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
 // drawing a vertical arrow
 painter->setPen(heavy);
 painter->drawLine(0.0, bigger, 0.0, 4.0*bigger);
