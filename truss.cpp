@@ -73,10 +73,9 @@ QList<Beam*> Truss::beams() const {
 
 QRectF Truss::boundingRect() const
 {
-    // Truss bounding rectangle is the one bounding all its children
-    return childrenBoundingRect();
-    //    foreach (Beam *beam, beams()) {result |=beam->boundingRect();}
-    //    foreach (Node *node, nodes()) {result |=node->boundingRect();}
+    // Truss bounding rectangle is the one bounding all its children, slightly enlarged.
+    QRectF bound = childrenBoundingRect();
+    return bound.adjusted(-bound.width()/10,-bound.height()/10,bound.width()/10,bound.height()/10);
 }
 
 void Truss::paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *)

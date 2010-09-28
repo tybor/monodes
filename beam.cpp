@@ -299,7 +299,7 @@ QRectF Beam::boundingRect() const
     QRectF result = QRectF(0,0, length(),0);
     // Accounting the load and some space between the beam and the load.
     result.adjust(0.0, -line_width, 0.0, +line_width);
-    result.united(deformed.boundingRect());
+    result.united(scaled_deformed.boundingRect());
     return result.normalized();
 }
 
