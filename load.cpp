@@ -29,10 +29,13 @@ void Load::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
     QFont font;
     /* Pick the size that fits the load rectangle better */
     QRectF text_rect(painter->boundingRect(load_rect,label)); // The size we would occupy
-    font.setPointSizeF( font.pointSizeF() * fmin(
+    qreal new_size = font.pointSizeF() * fmin(
             load_rect.width() / text_rect.width(),
             load_rect.height() / text_rect.height()
-            ));
+            );
+    std::cout<<"size of load label:"<<new_size<<std::endl;
+    assert(new_size>0.0);
+    font.setPointSizeF(new_size );
     painter->setFont(font);
     painter->drawRect(load_rect);
     painter->drawText(load_rect, Qt::AlignCenter, label);

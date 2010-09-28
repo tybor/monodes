@@ -17,6 +17,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <assert.h>
+#include <iostream>
 
 #include "reactions.h"
 #include "node.h"
@@ -44,10 +46,12 @@ QString label = QString("N %1 kg").arg(node.vertical);
 QFont font;
 ///* Pick the size that fits the load rectangle better */
 text_rect = painter->boundingRect(label_rect,label); // The size we would occupy
-font.setPointSizeF( font.pointSizeF() * fmin(
+qreal new_size = font.pointSizeF() * fmin(
         label_rect.width() / text_rect.width(),
-        label_rect.height() / text_rect.height()
-        ));
+        label_rect.height() / text_rect.height());
+std::cout<<"Reaction label size:"<<new_size<<std::endl;
+assert(new_size>0.0);
+font.setPointSizeF(new_size);
 painter->setFont(font);
 painter->drawText(text_rect, label);
 painter->setPen(Qt::red);
