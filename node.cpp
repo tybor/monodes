@@ -126,7 +126,7 @@ QRectF Node::boundingRect() const
     static const qreal halfpen = smaller/8.0;
     qreal low = bigger+halfpen;
     qreal high = 2*low;
-    return QRectF(-low,-low,high,high)|childrenBoundingRect();
+    return QRectF(-low,-low,high,high);
 }
 
 QPainterPath Node::shape() const

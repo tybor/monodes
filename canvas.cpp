@@ -73,55 +73,56 @@ Canvas::Canvas() {
 //    setTransform(QTransform
 //                (1.0,  0.0, 0.0,
 //                 0.0, -1.0, 0.0,
-//                 0.0,  0.0, 1.0), false);
+    //                 0.0,  0.0, 1.0), false);
 
     dialog.show();
 }
 
 void Canvas::dialog_closed(int res) {
-    //std::cout<<"Dialog closed\n";
-    t = new Truss();
-    scene()->addItem(t);
+    if (res) {
+        //std::cout<<"Dialog closed\n";
+        t = new Truss();
+        scene()->addItem(t);
 #   if defined(Q_WS_S60)
-    showMaximized();
+        showMaximized();
 #   else
-    show();
+        show();
 #   endif
+        Material *material = new Material(
+                dialog.material_dialog.elasticModulus->value(),
+                dialog.material_dialog.poissonRatio->value(),
+                dialog.material_dialog.thermalExpansion->value());
+        Section *section = new Section(dialog.section_dialog.widthSpin->value(),dialog.section_dialog.heightSpin->value());
+        t->material = material;
+        t->section = section;
 
-    Material *material = new Material(
-            dialog.material_dialog.elasticModulus->value(),
-            dialog.material_dialog.poissonRatio->value(),
-            dialog.material_dialog.thermalExpansion->value());
-    Section *section = new Section(dialog.section_dialog.widthSpin->value(),dialog.section_dialog.heightSpin->value());
-    t->material = material;
-    t->section = section;
+        t->set_immediate_solving(false);
+        // To avoid re-solving the truess at each and every change. If immediate solving is not turned off during truss building this feature would have O(n^4) complexity with n the degress of freedom. In fact we will solve n/6 linear systems each one an O(m^3) problem with m growing from 1 to n, so the complexity is O( 1/6 * (n^4/4 + n^3/2 + n^2/4)) = O(n^4) . Keeping such a bad performance to get results that will be thrown away as soon as they get computed is a plain waste of resources.
 
-    t->set_immediate_solving(false);
-    // To avoid re-solving the truess at each and every change. If immediate solving is not turned off during truss building this feature would have O(n^4) complexity with n the degress of freedom. In fact we will solve n/6 linear systems each one an O(m^3) problem with m growing from 1 to n, so the complexity is O( 1/6 * (n^4/4 + n^3/2 + n^2/4)) = O(n^4) . Keeping such a bad performance to get results that will be thrown away as soon as they get computed is a plain waste of resources.
-
-    // See http://www.math.com/tables/expansion/power.htm and http://en.wikipedia.org/wiki/Geometric_series for power series.
-    qreal x = 0.0;
-    Node *left = new Node(x,0.0, hinge);
-    t->add_node(*left);
-    int spans=dialog.spans_count->value(); // Caching the number of spans
-    for (int span=0; span<spans; ++span){
-        QDoubleSpinBox *spinbox = dialog.lengths[span];
-        x += spinbox->value();
-        Node *right = new Node(x,0.0, hinge);
-        t->add_node(*right);
-        Beam *b = new Beam(*left,*right,*t,*section,*material);
-        b->set_load(dialog.loads[span]->value());
-        t->add_beam(*b);
-        left = right; // The left node of the next span is the right of current
-    }
-    zoom_to_fit();
-    t->solve();
+        // See http://www.math.com/tables/expansion/power.htm and http://en.wikipedia.org/wiki/Geometric_series for power series.
+        qreal x = 0.0;
+        Node *left = new Node(x,0.0, hinge);
+        t->add_node(*left);
+        int spans=dialog.spans_count->value(); // Caching the number of spans
+        for (int span=0; span<spans; ++span){
+            QDoubleSpinBox *spinbox = dialog.lengths[span];
+            x += spinbox->value();
+            Node *right = new Node(x,0.0, hinge);
+            t->add_node(*right);
+            Beam *b = new Beam(*left,*right,*t,*section,*material);
+            b->set_load(dialog.loads[span]->value());
+            t->add_beam(*b);
+            left = right; // The left node of the next span is the right of current
+        }
+        zoom_to_fit();
+        t->solve();
 #ifdef DEBUG
-    std::cout<<"DOFs: "<<t->dofs_count()<<" nodes "<<t->nodes().count()<<std::endl;
+        std::cout<<"DOFs: "<<t->dofs_count()<<" nodes "<<t->nodes().count()<<std::endl;
 #endif
-    assert(/* the solutions has the right number of degrees of freedom*/
-            t->dofs_count() == t->nodes().count());
-    t->set_immediate_solving(true);
+        assert(/* the solutions has the right number of degrees of freedom*/
+                t->dofs_count() == t->nodes().count());
+        t->set_immediate_solving(true);
+    }
 }
 
 void Canvas::zoom_to_fit() {

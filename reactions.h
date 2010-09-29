@@ -31,6 +31,8 @@ public:
     Reactions(Node &parent);
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
     QRectF boundingRect() const;
+    void mousePressEvent(QGraphicsSceneMouseEvent *);
+
 private:
     Node &node;
     QRectF text_rect;

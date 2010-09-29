@@ -22,6 +22,7 @@
 
 #include "reactions.h"
 #include "node.h"
+#include "nodedialog.h"
 
 Reactions::Reactions(Node &parent) :
         node(parent)
@@ -30,35 +31,53 @@ Reactions::Reactions(Node &parent) :
 }
 
 void Reactions::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
-// drawing a vertical arrow
-painter->setPen(heavy);
-painter->drawLine(0.0, bigger, 0.0, 4.0*bigger);
-//painter->setPen(QPen(QColor(Qt::red)));
-painter->drawLine(QPointF(0.0, bigger), QPointF(-bigger/2, 2*bigger));
-painter->drawLine(QPointF(0.0, bigger), QPointF(bigger/2, 2*bigger));
-// Draw reaction.void
-painter->rotate(90);
-painter->translate(bigger/2,bigger);
-QRectF label_rect(QPointF(0.0, 0.0), QPointF(bigger, 3*bigger));
+    // Drawing a little below the node
+    painter->translate(0.0, node.boundingRect().bottom()*1.2);
+    // Drawing a vertical arrow
+    painter->setPen(heavy);
+    painter->drawLine(0.0, 0.0, 0.0, 4.0*bigger);
+    //painter->setPen(QPen(QColor(Qt::red)));
+    painter->drawLine(QPointF(), QPointF(-bigger/2, 2*bigger));
+    painter->drawLine(QPointF(), QPointF(bigger/2, 2*bigger));
+    // Please note that those lines should be drawed providing QPointF objects; if you pass their actual coordinates they get casted into integers and you won't get what you intend.
 
-painter->setPen(Qt::green); painter->drawRect(label_rect);; /// debug
-QString label = QString("N %1 kg").arg(node.vertical);
-QFont font;
-///* Pick the size that fits the load rectangle better */
-text_rect = painter->boundingRect(label_rect,label); // The size we would occupy
-qreal new_size = font.pointSizeF() * fmin(
-        label_rect.width() / text_rect.width(),
-        label_rect.height() / text_rect.height());
-std::cout<<"Reaction label size:"<<new_size<<std::endl;
-assert(new_size>0.0);
-font.setPointSizeF(new_size);
-painter->setFont(font);
-painter->drawText(text_rect, label);
-painter->setPen(Qt::red);
-painter->drawRect(text_rect);
+    // Draw reaction
+    painter->rotate(90);
+    painter->translate(bigger/2,bigger);
+    painter->setPen(Qt::green);
+
+    //QRectF label_rect(QPointF(0.0, 0.0), QPointF(bigger, 3*bigger));
+    //painter->drawRect(label_rect);; /// debug
+    QString label = QString("N %1 kg").arg(node.vertical);
+
+    ///* Pick the size that fits the load rectangle better */
+    //    QFont font = QFont("sans");
+    //  text_rect = painter->boundingRect(QrectF(),label); // The size we would occupy
+    //    qreal new_size = font.pointSizeF() * fmin(
+    //            label_rect.width() / text_rect.width(),
+    //            label_rect.height() / text_rect.height());
+    //    std::cout<<"Reaction label size:"<<new_size<<std::endl;
+    //    assert(new_size>0.0);
+    //    font.setPointSizeF(new_size);
+    //    painter->setFont(font);
+    painter->drawText(text_rect, label);
+    painter->setPen(Qt::red);
+    painter->drawRect(text_rect);
 }
 
 QRectF Reactions::boundingRect() const
 {
-    return text_rect.adjusted(0.0, 0.0, bigger, bigger/2); // text_rect;
+    qreal displacement = node.boundingRect().bottom()*1.2;
+    return node.boundingRect().adjusted
+            (-bigger/2,  displacement,
+              bigger/2, displacement+4*bigger);
+}
+
+void Reactions::mousePressEvent(QGraphicsSceneMouseEvent *)
+{
+    NodeDialog dialog(node); // A dialog for current node
+    //dialog.show();
+    /* unused int res = */ dialog.exec();
+    update();
+    //QGraphicsItem::mousePressEvent(event);
 }
