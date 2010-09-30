@@ -120,7 +120,7 @@ void Canvas::dialog_closed(int res) {
         std::cout<<"DOFs: "<<t->dofs_count()<<" nodes "<<t->nodes().count()<<std::endl;
 #endif
         assert(/* the solutions has the right number of degrees of freedom*/
-                t->dofs_count() == t->nodes().count());
+                int(t->dofs_count()) == t->nodes().count());
         t->set_immediate_solving(true);
     }
 }
@@ -192,7 +192,7 @@ void Canvas::wheelEvent(QWheelEvent *event)
     scale(s,s);
 }
 
-void Canvas::resizeEvent (QResizeEvent *event) {
+void Canvas::resizeEvent (QResizeEvent *) {
     if (t)
         if (! (t->beams().empty()))
             fitInView(t,Qt::KeepAspectRatio);

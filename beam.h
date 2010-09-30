@@ -55,8 +55,8 @@ public:
 
     Node &first() const;
     Node &second() const;
-    qreal length() const;
-    qreal length2() const; /// l0ength²
+    qreal length() const; /// Beam length; the result will be cached.
+    qreal length2() const; /// length²
 
     qreal constant_load() const; /// Temporary query for the applied load. Currently only one constant load is allowed.
     void set_load(qreal an_amount);
@@ -91,6 +91,7 @@ protected:
 
 private:
     QPolygonF deformed, scaled_deformed;
+    qreal stored_length;
     qreal max_deflection;
     // Currently sticking to one, uniform load orthogonal to the beam
     Load *load;

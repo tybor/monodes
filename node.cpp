@@ -232,7 +232,7 @@ void Node::update_reactions() {
         moment+= gmef [mom_idx];
     }
     /// TODO: remove eventual old reactions.
-    Reactions *reactions=new Reactions(*this);
+    reactions = new Reactions(*this);
 }
 
 std::ostream &operator<<(std::ostream &s, Node &a_node) {

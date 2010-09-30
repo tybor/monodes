@@ -86,7 +86,8 @@ Beam::    Beam(Node &a_node, Node &another_node, Truss &a_truss, Section &a_sect
         first_node(a_node),
         second_node(another_node),
         section(a_section),
-        material(a_material)
+        material(a_material),
+        stored_length(sqrt(length2()))
 {
     //assert( a_node==another_node));
     setParentItem(&truss);
@@ -117,7 +118,7 @@ Node &Beam::first() const { return first_node; }
 Node &Beam::second() const { return second_node; }
 
 inline qreal Beam::length() const {
-    return sqrt(length2());
+    return stored_length;
 }
 
 inline qreal Beam::length2() const {

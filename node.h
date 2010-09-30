@@ -28,6 +28,7 @@
 // Forward declarations
 class Beam;
 class Canvas;
+class Reactions;
 
 enum Constrain {
     uncostrained, // Free no degrees of freedom bounded
@@ -99,6 +100,7 @@ private:
     // Displacements
     qreal node_u, node_v, node_fi;
     QList<Beam *> beams_list;
+    Reactions *reactions;
 
 signals:
 
