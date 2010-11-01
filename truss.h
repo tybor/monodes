@@ -70,6 +70,10 @@ public:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
     void update_scales(); ///< Updates the scale used to draw nodes, deformed beams, loads, bearing reactions.
     qreal load_scale; /// The scale applied to loads
+    qreal deformation_scale; /// Scale applied to displacement of the beam.
+    qreal axial_scale; /// The scale applied to axial internal forces
+    qreal shear_scale; /// The scale applied to shear internal forces
+    qreal moment_scale; /// The scale applied to moment internal forces
 
     QList<Node *> nodes_list;
     QList<Beam *> beams_list;
@@ -77,9 +81,16 @@ public:
     qreal longest; /// Length of the longest beam
     qreal shortest; /// Length of the shortest beam
     qreal highest; /// Height of the highest beam
+    qreal strongest_beam; /// The highest moment of inertia of a beam.
 
-    qreal deformation_scale; /// Scale applied to displacement of the beam.
-    qreal strongest_beam; // The highest moment of inertia of a beam.
+    Matrix<qreal, Dynamic, Dynamic> stiffness; /// Stiffness matrix
+    Matrix<qreal, Dynamic, 1> loads; /// Loads
+    Matrix<qreal, Dynamic, Dynamic> displacements; /// Solution
+
+//    Please note that everything is made public on purpose as I find C++
+//    information hiding clumsy and limited. Feature accessibility should be made
+//    Eiffel-like, that is at class level and allowing changes to the object only
+//    within its commands
 
     LinearSystem *solving_system;
     bool immediate_solving;

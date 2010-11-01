@@ -91,6 +91,9 @@ protected:
 
    void mousePressEvent(QGraphicsSceneMouseEvent *event);
    void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
+   void hoverEnterEvent(QGraphicsSceneHoverEvent *event);
+   void hoverMoveEvent ( QGraphicsSceneHoverEvent * event );
+
 
 private:
     enum Constrain my_constrain;

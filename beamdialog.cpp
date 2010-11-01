@@ -19,6 +19,7 @@
 
 
 #include "beamdialog.h"
+#include "beam.h"
 
 BeamDialog::BeamDialog(Beam &a_beam,QWidget *parent) :
     QDialog(parent),

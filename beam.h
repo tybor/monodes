@@ -55,8 +55,8 @@ public:
 
     Node &first() const;
     Node &second() const;
-    qreal length() const; /// Beam length; the result will be cached.
-    qreal length2() const; /// length²
+    inline qreal length() const {return stored_length; }; /// Beam length; the result will be cached.
+    inline qreal length2() const {return stored_length2; }; /// length²
 
     qreal constant_load() const; /// Temporary query for the applied load. Currently only one constant load is allowed.
     void set_load(qreal an_amount);
@@ -79,9 +79,13 @@ public:
     Matrix<qreal, 6, 1> &member_end_forces(); // The forces at the end of current element resulting from the applied loads and deformation of the structure.
 
     void compute_deformed();
-    void update_scale(qreal a_scale);
+    void update_plots(); /// Update the polygons for scaled deformed, axial,shear and moment
 
-    qreal maximum_deflection();
+    qreal maximum_deflection() const;
+    qreal maximum_axial() const;
+    qreal maximum_shear() const;
+    qreal maximum_moment() const;
+
     QRectF boundingRect() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 protected:
@@ -91,8 +95,16 @@ protected:
 
 private:
     QPolygonF deformed, scaled_deformed;
+    QPolygonF axial, scaled_axial;
+    QPolygonF shear, scaled_shear;
+    QPolygonF moment, scaled_moment;
     qreal stored_length;
+    qreal stored_length2;
+    qreal cosa,sina; // Cosine and sin directors
     qreal max_deflection;
+    qreal max_axial;
+    qreal max_shear;
+    qreal max_moment;
     // Currently sticking to one, uniform load orthogonal to the beam
     Load *load;
     /// TODO: refine load into QList<Load*> loads;
@@ -106,6 +118,7 @@ private:
     Matrix<qreal, 6, 1> f; ///< nodal fixed-end forces.
     bool member_end_forces_computed;
     Matrix<qreal, 6, 1> mef; ///< precomputed member end forces
+
     qreal u(qreal csi);
     qreal v(qreal csi);
 

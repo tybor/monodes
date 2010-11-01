@@ -53,6 +53,7 @@ Node::Node (qreal an_x, qreal an_y, enum Constrain a_constrain)
     vertical = 0.0;
     horizonal = 0.0;
     moment = 0.0;
+    setAcceptHoverEvents (true);
 #ifdef DEBUG
     std::cout<<"New node "<<*this<<std::endl<<std::flush;
 #endif
@@ -119,6 +120,23 @@ void Node::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
     QGraphicsItem::mouseReleaseEvent(event);
 }
 
+void Node::hoverEnterEvent(QGraphicsSceneHoverEvent *) {
+    QString msg = QString("Entering node  (%1,%2) u=%3, v=%4, fi=%5 \n"
+                          "N=%6 V=%7 M=%8").arg(pos().x()).arg(pos().y())
+            .arg(u()).arg(v()).arg(fi())
+            .arg(horizonal).arg(vertical).arg(moment);
+    std::cout<<msg.toStdString()<<std::endl;
+    setToolTip(msg);
+}
+
+void Node::hoverMoveEvent ( QGraphicsSceneHoverEvent *) {
+    QString msg = QString("Node  (%1,%2) u=%3, v=%4, fi=%5 \n"
+                          "N=%6 V=%7 M=%8").arg(pos().x()).arg(pos().y())
+            .arg(u()).arg(v()).arg(fi())
+            .arg(horizonal).arg(vertical).arg(moment);
+    std::cout<<msg.toStdString()<<std::endl;
+    setToolTip(msg);
+}
 
 QRectF Node::boundingRect() const
 {
@@ -214,22 +232,19 @@ void Node::set_constrain(enum Constrain a_constrain) {
 }
 
 void Node::update_reactions() {
+    horizonal = 0.0; vertical=0.0; moment=0.0;
     /// Add the reaction of each connected beam
     foreach (Beam *b, beams()) {
-        int horiz_idx, vert_idx, mom_idx;
-        if (this == &b->first()) {
-            horiz_idx = 0;
-            vert_idx = 1;
-            mom_idx = 2;
-        } else if (this == &b->second()) {
-            horiz_idx = 3;
-            vert_idx = 4;
-            mom_idx = 5;
-        };
         Matrix<qreal,6,1> gmef /*global_member_end_forces */=  b->transformation()*b->member_end_forces();
-        horizonal += gmef [horiz_idx];
-        vertical+= gmef [vert_idx];
-        moment+= gmef [mom_idx];
+        if (this == &b->first()) {
+            horizonal -= gmef [0];
+            vertical -= gmef [1];
+            moment -= gmef [2];
+        } else if (this == &b->second()) {
+            horizonal -= gmef [3];
+            vertical -= gmef [4];
+            moment -= gmef [5];
+        };
     }
     /// TODO: remove eventual old reactions.
     reactions = new Reactions(*this);

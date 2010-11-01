@@ -17,14 +17,6 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-//#include <QFormLayout>
-//#include <QGraphicsScene>
-//#include <QGraphicsSceneMouseEvent>
-//#include <QPainter>
-//#include <QStyleOption>
-//#include <QDialog>
-//#include <QDoubleSpinBox>
-
 #include <stdio.h>
 #include <iostream>
 #include <assert.h>
@@ -81,35 +73,43 @@ qreal Beam::v(qreal csi) {
 	    f5(csi)*second().v() + f6(csi)*second().fi()*length();
 }
 
-Beam::    Beam(Node &a_node, Node &another_node, Truss &a_truss, Section &a_section, Material &a_material) :
+Beam::Beam(Node &a_node, Node &another_node, Truss &a_truss, Section &a_section, Material &a_material) :
         truss(a_truss),
         first_node(a_node),
         second_node(another_node),
         section(a_section),
-        material(a_material),
-        stored_length(sqrt(length2()))
+        material(a_material)
 {
     //assert( a_node==another_node));
     setParentItem(&truss);
 
     /// TODO: remove length caching!
     setAcceptHoverEvents (true);
-    QPointF d = second().pos() - first().pos();
 
-    qreal l = length();
-    qreal cosa = d.x() / l; // Cos(alpha)
-    qreal sina = d.y() / l; // Sin(alpha)
+    // Computing length and lentgh²
+    QPointF d = second().pos()-first().pos();
+    stored_length2 = d.x()*d.x() + d.y()*d.y();
+    stored_length = sqrt(stored_length2);
+
+    cosa = d.x() / length(); // Cos(alpha)
+    sina = d.y() / length(); // Sin(alpha)
+
     setTransform(QTransform(
             cosa, -sina,
             sina, cosa,
             first_node.x(), first_node.y()));
-    first_node.add_beam(this);
-    second_node.add_beam(this);
     stiffness_computed = false;
     member_end_forces_computed = false;
     max_deflection = 0.0;
-    deformed = QPolygonF();
-    deformed.reserve(deformed_points_count); // pre-allocate enough points to draw deformated beam in order to avoid unnecessary reallocations.
+    // Allocate polygons for deformed, axial, shear and moment, pre-allocating enough points to draw deformated beam in order to avoid unnecessary reallocations.
+    deformed = QPolygonF(); deformed.reserve(deformed_points_count);
+    axial = QPolygonF(); axial.reserve(deformed_points_count);
+    shear= QPolygonF(); shear.reserve(deformed_points_count);
+    moment = QPolygonF(); moment.reserve(deformed_points_count);
+
+    // Update topology of the model.
+    first_node.add_beam(this);
+    second_node.add_beam(this);
     truss.add_beam(*this);
 }
 
@@ -117,14 +117,6 @@ Beam::    Beam(Node &a_node, Node &another_node, Truss &a_truss, Section &a_sect
 Node &Beam::first() const { return first_node; }
 Node &Beam::second() const { return second_node; }
 
-inline qreal Beam::length() const {
-    return stored_length;
-}
-
-inline qreal Beam::length2() const {
-    QPointF d = second().pos()-first().pos();
-    return (d.x()*d.x() + d.y()*d.y());
-}
 //void Beam::set_section(Section &a_section) {
 //    s = &a_section;
 //    stiffness_computed=false; // so the next time stiffness() will be invoked it will be recomputed
@@ -173,7 +165,7 @@ Matrix<qreal, 6, 1> &Beam::member_end_forces() {
                 first().u(), first().v(), first().fi(),
                 second().u(), second().v(), second().fi();
         local_displacements = transformation().transpose() * global_displacements;
-        mef = stiffness() * local_displacements;
+        mef = transformation()*(stiffness() * local_displacements) ;
         member_end_forces_computed = true;
         //std::cout<<"Mef:"<<mef<<" gf:"<<gf<<std::endl;
     }
@@ -190,53 +182,49 @@ void Beam::set_load(qreal an_amount) {
 }
 
 void Beam::compute_stiffness() {
-    // Geometric
-    QPointF d= first().pos()-second().pos();
-    qreal dx = d.x();
-    qreal dy = d.y();
-    qreal l2 = length2();
-    qreal l = sqrt(l2);
-    qreal l3 = l * l2;
-    qreal ca = dx / l; // Cos(alpha) also transformation().m21 or m12
-    qreal sa = dy / l; // Sin(alpha)
+    // length, lentgh2, sine and cosine directors have been compuetued during beam creation.
+    qreal l=length();
+    qreal l2=length2();
+    qreal l3=l*l2;
 
     // Material
     qreal E=material.young_modulus();
-    qreal nu = material.poisson_ratio();
+    //1qreal nu = material.poisson_ratio();
     qreal alfa = material.thermal_expansion_coefficient();
-    qreal G = E / (2.0*(1+nu));
+    //qreal G = E / (2.0*(1+nu));
 
     // Section
     qreal A=section.area();
     qreal J=section.moment_of_inertia();
     qreal h=section.height();
-    qreal fi = section.shear_factor();
+    //qreal fi = section.shear_factor();
 
     // Axial deformability
     qreal axial = E*A/l;
     // Flexional and shear deformability
-    qreal flex = 12.0* E* J / (l3 * (1+fi));
-    qreal shear = (4+fi) * E * J / (l * (1+fi));
-    qreal fl_sh = 6*E*J/(l2*(1+fi));
-    qreal sh_fl = (2-fi)*E*J/(l*(1+fi));
+    // Temporary commenting out influence of shear deformability
+    qreal flex = 12.0* E* J / (l3); // (l3 * (1+fi));
+    qreal shear = 4*E*J/l; //  (4+fi) * E * J / (l * (1+fi));
+    qreal fl_sh = 6*E*J/l2; // 6*E*J/(l2*(1+fi));
+    qreal sh_fl = 2*E*J/l; //(2-fi)*E*J/(l*(1+fi));
 
     local_st <<
             axial,  0.0,    0.0,    -axial, 0.0,    0.0,
-            0.0,    flex,   fl_sh,  0.0,    -flex,  fl_sh,
-            0.0,    fl_sh,  shear,  0.0,    -fl_sh, sh_fl,
+            0.0,    flex,   -fl_sh,  0.0,    -flex,  -fl_sh,
+            0.0,    -fl_sh,  shear,  0.0,    fl_sh, sh_fl,
             -axial, 0.0,    0.0,    axial,  0.0,    0.0,
-            0.0,    -flex,  -fl_sh, 0.0,    flex,   -fl_sh,
-            0.0,    fl_sh,  sh_fl,  0.0,    -fl_sh, shear;
+            0.0,    -flex,  fl_sh, 0.0,    flex,   -fl_sh,
+            0.0,    -fl_sh,  sh_fl,  0.0,    -fl_sh, shear;
 
     assert(local_st==local_st.transpose());
 
     // Transforming stiffness matrix from local coordinates into global one
     tr <<
-            ca, -sa, 0.0, 0.0, 0.0, 0.0,
-            sa, ca, 0.0, 0.0, 0.0, 0.0,
+            cosa, -sina, 0.0, 0.0, 0.0, 0.0,
+            sina, cosa, 0.0, 0.0, 0.0, 0.0,
             0.0, 0.0, 1.0, 0.0, 0.0, 0.0,
-            0.0, 0.0, 0.0, ca, -sa, 0.0,
-            0.0, 0.0, 0.0, sa, ca, 0.0,
+            0.0, 0.0, 0.0, cosa, -sina, 0.0,
+            0.0, 0.0, 0.0, sina, cosa, 0.0,
             0.0, 0.0, 0.0, 0.0, 0.0, 1.0;
 
     assert (tr==tr.transpose());
@@ -248,33 +236,37 @@ void Beam::compute_stiffness() {
     f.setZero(); /// Nodal loads initialization
     // Loads
     qreal px = 0.0; /// Constant axial distribuited load
-    qreal py1 = constant_load(); /// Transversal linear load: value on first vertex
-    qreal py2 = constant_load(); /// Transversal linear load: value on second vertex
+    qreal py1 = -constant_load(); /// Transversal linear load: value on first vertex
+    qreal py2 = -constant_load(); /// Transversal linear load: value on second vertex
     qreal utd = 0.0; /// Upper thermal delta
     qreal ltd = 0.0; /// Lower thermal delta
 
     qreal weight = section.area() * material.weight(); /// Self weight
     /// Updating loads with self weight
-    px -= weight*sa;
-    py1 -= weight*ca;
-    py2 -= weight*ca;
+    px -= weight*sina;
+    py1 -= weight*cosa;
+    py2 -= weight*cosa;
 
     /// Nodal forces corresponding to distributed loads
     qreal fh = px * length()/2.0;
     qreal pp = py1, qq = py2 -py1;
 
     /// To compute shear deformation of distributed loads
-    qreal aa = length() / (12.0 * E * J);
-    qreal bb = section.shear_factor() / (length()* G * A);
-    qreal cc = bb / (aa+bb);
+    //qreal aa = length() / (12.0 * E * J);
+    //qreal bb = section.shear_factor() / (length()* G * A);
+    //qreal cc = bb / (aa+bb);
 
     f(0) += fh; /// Horizontal force on first node
-    f(1) += (0.5 * pp + 0.15*qq*(1.0+cc/9.0))*length(); /// Vertical force on first node
-    f(2) += (pp/12.0 + qq*(1.0+cc/4.0)/30.0)*pow(length(),2); /// Moment on first node
+    f(1) += (pp*0.5+ 0.15*qq)*length();
+    // f(1) += (0.5 * pp + 0.15*qq*(1.0+cc/9.0))*length(); /// Vertical force on first node
+    f(2) +=  (pp/12.0 + qq/30.0)*length2() ;
+    //(pp/12.0 + qq*(1.0+cc/4.0)/30.0)*length2(); /// Moment on first node
 
     f(3) += fh; /// Horizontal force on second node
-    f(4) += (0.5*pp + 0.35*qq*(1.0-cc/21.0))*length(); /// Vertical force on second node
-    f(5) += - (pp/12.0 + qq*(1.0-cc/6.0)/20.0)*pow(length(),2); /// Moment on second node
+    f(4) += (pp/2.0+0.35*qq)*length();
+    //(0.5*pp + 0.35*qq*(1.0-cc/21.0))*length(); /// Vertical force on second node
+    f(5) += (-pp/12.0 -qq/20.0)*length2();
+    //- (pp/12.0 + qq*(1.0-cc/6.0)/20.0)*pow(length(),2); /// Moment on second node
 
     // Nodal forces corresponding  to thermal changes
     qreal atd = alfa * E * A * (utd+ltd)/2; // Average thermal delta
@@ -289,9 +281,10 @@ void Beam::compute_stiffness() {
     stiffness_computed = true;
 }
 
-qreal Beam::maximum_deflection() {
-    return max_deflection;
-}
+qreal Beam::maximum_deflection()  const { return max_deflection; }
+qreal Beam::maximum_axial()  const { return max_axial; }
+qreal Beam::maximum_shear()  const { return max_shear; }
+qreal Beam::maximum_moment()  const { return max_moment; }
 
 QRectF Beam::boundingRect() const
 {
@@ -313,6 +306,7 @@ void Beam::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
     painter->drawLine(QPointF(0,0),QPointF(length(),0));
 
     // TODO: Draw axial stress, shear stress and moment; better make them subitems to be drawn
+    //painter->drawPolyline(moment);
 
     // Draw deformated beam.
     painter->setPen(QPen(QColor(0, 0, 255, 128),line_width));
@@ -329,30 +323,60 @@ void Beam::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 
 void Beam::compute_deformed() {
     deformed.clear();
+    axial.clear();
+    shear.clear();
+    moment.clear();
+
     qreal step=1.0/deformed_points_count; // Beware that 1 is NOT 1.0. If you write it 1/steps, step will be exactly zero.
-    qreal csi=0;
     QPointF step_vector = QPointF(length(),0.0) / deformed_points_count;
     QPointF current(0,0);
+    QPointF current_axial(0,0);
+    QPointF current_shear(0,0);
+    QPointF current_moment(0,0);
     max_deflection = 0.0;
+    max_axial = 0.0;
+    max_shear = 0.0;
+    max_moment = 0.0;
+    qreal weight = section.area()*material.weight();
+
+    qreal px =  member_end_forces()[0] - weight * sina;
+    qreal py1 = member_end_forces()[1] - weight * cosa;
+    qreal py2 = member_end_forces()[2] - weight * cosa;
+
+    qreal csi=0;
     for (int i=0; i<=deformed_points_count; ++i) {
-        //QPointF delta(u(csi)*ampl,v(csi)*ampl);
-        qreal ui = u(csi), vi=v(csi);
-        QPointF delta(ui,vi);
-        max_deflection = fmax(fabs(vi),max_deflection);
+        QPointF delta(u(csi),v(csi));
+        qreal py = py1 + (py2-py1)*csi;
         deformed << current+delta;
+        axial << QPointF(csi, -fixed_end_forces()[0] - px * current.x());
+        shear << QPointF(csi, -fixed_end_forces()[1] - (py1+py)*current.x()/2.0 );
+        qreal x2 = current.x()*current.x(); // pow(current.x() , 2.0);
+        moment << QPointF(csi, -fixed_end_forces()[2] + fixed_end_forces()[1]*current.x() +
+                          py1 * x2/2.0 + (py+py1)*x2/6.0);
+        max_deflection = fmax(fabs(delta.y()),max_deflection);
+        max_axial = fmax(fabs(axial.last().y()),max_axial);
+        max_shear = fmax(fabs(shear.last().y()),max_shear);
+        max_moment = fmax(fabs(moment.last().y()),max_moment);
         csi +=step;
         current+=step_vector;
     }
-    std::cout<<*this<<" max deflection "<<max_deflection<<std::endl;
+    /// Close axial, shear and moment plot by re-adding the first point.
+    axial<<axial.first();
+    shear<<shear.first();
+    moment<<moment.first();
+    //std::cout<<*this<<" max deflection "<<max_deflection<<std::endl;
 }
 
-void Beam::update_scale(qreal a_scale) {
-    scaled_deformed.clear();
-    scaled_deformed.reserve(deformed_points_count);
-    foreach (QPointF point, deformed) {
-        point.setY(point.y()*a_scale);
-        scaled_deformed<< point;
-    }
+void Beam::update_plots() {
+    scaled_deformed.clear(); scaled_deformed.reserve(deformed_points_count);
+    scaled_axial.clear(); scaled_axial.reserve(deformed_points_count);
+    scaled_shear.clear(); scaled_shear.reserve(deformed_points_count);
+    scaled_moment.clear(); scaled_moment.reserve(deformed_points_count);
+
+    foreach (QPointF point, deformed)  scaled_deformed<< QPointF(point.x(), point.y()*truss.deformation_scale);
+    foreach (QPointF point, axial) scaled_axial<< QPointF(point.x(), point.y()*truss.axial_scale);
+    foreach (QPointF point, shear) scaled_shear<< QPointF(point.x(), point.y()*truss.shear_scale);
+    foreach (QPointF point, shear) scaled_shear<< QPointF(point.x(), point.y()*truss.moment_scale);
 }
 
 void Beam::mousePressEvent(QGraphicsSceneMouseEvent *event)

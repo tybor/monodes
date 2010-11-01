@@ -51,12 +51,13 @@ Truss::Truss()
 void Truss::add_node(Node &a_node) {
     a_node.setParentItem(this); // a_node will be a child item of current truss, so there's no need to add it.
     //std::cout<<"Adding node"<<a_node<<"\n"<<std::flush;
+    assert(!nodes().contains(&a_node));
     nodes_list.append(&a_node);
     //a_node.scale(bearing_size);
 }
 
 void Truss::add_beam(Beam &a_beam) {
-    /// TODO: shall nodes of a_beam be added also?
+    assert(!beams().contains(&a_beam));
     beams_list.append(&a_beam);
     longest = fmax(a_beam.length(), longest);
     shortest = fmin(a_beam.length(), shortest);
@@ -86,29 +87,40 @@ void Truss::paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *)
 }
 
 void Truss::update_scales() {
-    // Updates node-scale
-    // Update load-scale
-    qreal highest_load=0.0;
-    foreach (Beam *a_beam, beams()) highest_load = fmax(highest_load, fabs(a_beam->constant_load()));
-    load_scale= longest / highest_load/2.0; /// The highest load will be high the half of the longest beam.
-    qreal s = fmax( /* the radius of the nodes will be the biggest of */
-            2.0*highest /* two times the highest beam */,
-            longest/20.0 /* 1/20 of longest beam. */ );
-    foreach (Node *n, nodes()) n->setScale(s);
-
-    // Update deformation-scale
+    // Find the biggest deformation, load, axial, shear and momet
     qreal max_deflection = 0.0;
+    qreal highest_load=0.0;
+    qreal highest_axial=0.0;
+    qreal highest_shear=0.0;
+    qreal highest_moment=0.0;
     foreach (Beam *a_beam, beams()) {
         max_deflection = fmax(fabs(a_beam->maximum_deflection()), max_deflection);
-        assert(max_deflection>0.0);
+        highest_load = fmax(highest_load, fabs(a_beam->constant_load()));
+        highest_axial = fmax(fabs(a_beam->maximum_axial()), highest_axial);
+        highest_shear = fmax(fabs(a_beam->maximum_shear()), highest_shear); /// For example highest_shear = a_beam.maximum_shear.abs.max(highest_shear) -- in Eiffel
+        highest_axial = fmax(fabs(a_beam->maximum_axial()), highest_axial);
     }
-    // Maximum deflection will be scaled to be as big as the smallest beam.
+    // Updating load scale: highest load will be high the half of the longest beam.
+    load_scale= longest / highest_load/2.0;
+    // Updates node-scale
+    qreal node_scale = fmax( /* the radius of the nodes will be the biggest of */
+            2.0*highest /* two times the highest beam */,
+            longest/20.0 /* 1/20 of longest beam. */ );
+    foreach (Node *n, nodes()) n->setScale(node_scale);
+
+    // Maximum deflection, will be scaled to be as big as the smallest beam.
     if (max_deflection<1e-20) deformation_scale = 1.0;
     else deformation_scale = shortest / max_deflection;
-    std::cout<<"deformation scale = "<<shortest<<" / "<<max_deflection<<" = "<<deformation_scale<<std::endl;
-    assert (deformation_scale < std::numeric_limits<qreal>::infinity());
-    assert (deformation_scale>0.0);
-    foreach (Beam *a_beam, beams()) {a_beam->update_scale(deformation_scale);};
+    //std::cout<<"deformation scale = "<<shortest<<" / "<<max_deflection<<" = "<<deformation_scale<<std::endl;
+
+    if (highest_axial<1e-20) axial_scale = 1.0; // Reasonable default for almost zero
+    else axial_scale = shortest / highest_axial; // Maximum axial will be scaled to be as big as the smallest beam.
+    if (highest_shear<1e-20) shear_scale = 1.0; // Reasonable default for almost zero
+    else shear_scale = shortest / highest_shear; // Maximum shear will be scaled to be as big as the smallest beam.
+    if (highest_moment<1e-20) moment_scale = 1.0; // Reasonable default for almost zero
+    else moment_scale = shortest / highest_moment; // Maximum moment will be scaled to be as big as the smallest beam.
+
+    foreach (Beam *a_beam, beams()) a_beam->update_plots();
     // Update bearing-reaction-scale
 }
 
@@ -169,10 +181,10 @@ void Truss::solve() {
     enumerate_dofs();
 
     // TODO: move the matrices into a linearsystem!
-    Matrix<qreal, Dynamic, Dynamic> stiffness(dofs,dofs);
+    stiffness = Matrix<qreal, Dynamic, Dynamic>(dofs,dofs);
     stiffness.setZero(); // Why, oh WHY C++ DOES NOT INITIALIZE objects??????? Without this command the following assertion that most people would take for granted will miserably fail.
     assert (stiffness.isZero());
-    Matrix<qreal, Dynamic, 1> loads(dofs);
+    loads = Matrix<qreal, Dynamic, 1>(dofs);
     loads.setZero();
     assert(loads.isZero());
     // Sum all the stiffness at the proper degree of freedom
@@ -202,20 +214,18 @@ void Truss::solve() {
         }
     }
 
-//#ifdef DEBUG
-//    std::cout<<"(st- st^t).max = "<<(stiffness - stiffness.transpose()).maxCoeff()<<std::endl
-//            <<"Stiffness:"<<std::endl<<stiffness<<std::endl
-//            <<"Loads: "<<loads<<std::flush;
-//    assert(/* Sometime the strictly symmetrical assertion, stiffness == stiffness.transpose() will fail, */
-//            /* stiffness shall be symmetrical, accounting for numerical approximations */
-//            stiffness.isApprox(stiffness.transpose()));
-//#endif
+    std::cout<<"(st- st^t).max = "<<(stiffness - stiffness.transpose()).maxCoeff()<<std::endl
+            <<"Stiffness:"<<std::endl<<stiffness<<std::endl
+            <<"Loads: "<<loads<<std::endl;
+    assert(/* Sometime the strictly symmetrical assertion, stiffness == stiffness.transpose() will fail, */
+            /* stiffness shall be symmetrical, accounting for numerical approximations */
+            stiffness.isApprox(stiffness.transpose()));
 
     // TODO: We shall compute it in a separate thread!
-    Matrix<qreal, Dynamic, Dynamic> displacements (stiffness.rows(), loads.cols());
+    displacements = Matrix<qreal, Dynamic, Dynamic>(stiffness.rows(), loads.cols());
     stiffness.lu().solve(loads, &displacements);
 //#ifdef DEBUG
-//    std::cout<<"Displacement found:"<<displacements<<std::endl;
+    std::cout<<"Displacements: "<<std::endl<<displacements<<std::endl;
 //#endif
     prepareGeometryChange(); // Before updating node displacements
     /// Updates all node deformations

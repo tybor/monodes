@@ -7,7 +7,9 @@
 QT       += core gui
 
 TARGET = monodes
-TEMPLATE = app
+TEMPLATE = app subdirs
+
+SUBDIRS = tests
 
 ## C99 compatibility is required to use isfinite
 CFLAGS += -std=c99

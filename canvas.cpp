@@ -111,7 +111,6 @@ void Canvas::dialog_closed(int res) {
             t->add_node(*right);
             Beam *b = new Beam(*left,*right,*t,*section,*material);
             b->set_load(dialog.loads[span]->value());
-            t->add_beam(*b);
             left = right; // The left node of the next span is the right of current
         }
         zoom_to_fit();
