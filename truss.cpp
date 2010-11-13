@@ -42,6 +42,8 @@ Truss::Truss()
     shortest = std::numeric_limits<qreal>::infinity();
     highest = 0.0;
     deformation_scale=1.0;
+    axial_scale = 1.0;
+
     strongest_beam = 0.0;
     load_scale = 1.0;
     immediate_solving = false;
@@ -97,8 +99,8 @@ void Truss::update_scales() {
         max_deflection = fmax(fabs(a_beam->maximum_deflection()), max_deflection);
         highest_load = fmax(highest_load, fabs(a_beam->constant_load()));
         highest_axial = fmax(fabs(a_beam->maximum_axial()), highest_axial);
-        highest_shear = fmax(fabs(a_beam->maximum_shear()), highest_shear); /// For example highest_shear = a_beam.maximum_shear.abs.max(highest_shear) -- in Eiffel
-        highest_axial = fmax(fabs(a_beam->maximum_axial()), highest_axial);
+        highest_shear = fmax(fabs(a_beam->maximum_shear()), highest_shear);
+        highest_moment= fmax(fabs(a_beam->maximum_moment()), highest_moment);
     }
     // Updating load scale: highest load will be high the half of the longest beam.
     load_scale= longest / highest_load/2.0;
@@ -113,12 +115,14 @@ void Truss::update_scales() {
     else deformation_scale = shortest / max_deflection;
     //std::cout<<"deformation scale = "<<shortest<<" / "<<max_deflection<<" = "<<deformation_scale<<std::endl;
 
+    std::cout<<QString("Truss highest: axial %1 shear %2 moment %3")
+            .arg(highest_axial).arg(highest_shear).arg(highest_moment).toStdString()<<std::endl;
     if (highest_axial<1e-20) axial_scale = 1.0; // Reasonable default for almost zero
-    else axial_scale = shortest / highest_axial; // Maximum axial will be scaled to be as big as the smallest beam.
+    else axial_scale = longest / highest_axial; // Maximum axial will be scaled to be as big as the longest beam.
     if (highest_shear<1e-20) shear_scale = 1.0; // Reasonable default for almost zero
-    else shear_scale = shortest / highest_shear; // Maximum shear will be scaled to be as big as the smallest beam.
+    else shear_scale = longest / highest_shear; // Maximum shear will be scaled to be as big as the longest beam.
     if (highest_moment<1e-20) moment_scale = 1.0; // Reasonable default for almost zero
-    else moment_scale = shortest / highest_moment; // Maximum moment will be scaled to be as big as the smallest beam.
+    else moment_scale = longest / highest_moment; // Maximum moment will be scaled to be as big as the longest beam.
 
     foreach (Beam *a_beam, beams()) a_beam->update_plots();
     // Update bearing-reaction-scale

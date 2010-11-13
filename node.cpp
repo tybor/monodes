@@ -121,7 +121,7 @@ void Node::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 }
 
 void Node::hoverEnterEvent(QGraphicsSceneHoverEvent *) {
-    QString msg = QString("Entering node  (%1,%2) u=%3, v=%4, fi=%5 \n"
+    QString msg = QString("Entering node  (%1,%2) u=%3, v=%4, fi=%5 "
                           "N=%6 V=%7 M=%8").arg(pos().x()).arg(pos().y())
             .arg(u()).arg(v()).arg(fi())
             .arg(horizonal).arg(vertical).arg(moment);
@@ -130,7 +130,7 @@ void Node::hoverEnterEvent(QGraphicsSceneHoverEvent *) {
 }
 
 void Node::hoverMoveEvent ( QGraphicsSceneHoverEvent *) {
-    QString msg = QString("Node  (%1,%2) u=%3, v=%4, fi=%5 \n"
+    QString msg = QString("Node  (%1,%2) u=%3, v=%4, fi=%5 "
                           "N=%6 V=%7 M=%8").arg(pos().x()).arg(pos().y())
             .arg(u()).arg(v()).arg(fi())
             .arg(horizonal).arg(vertical).arg(moment);

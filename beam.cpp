@@ -189,7 +189,7 @@ void Beam::compute_stiffness() {
 
     // Material
     qreal E=material.young_modulus();
-    //1qreal nu = material.poisson_ratio();
+    //qreal nu = material.poisson_ratio();
     qreal alfa = material.thermal_expansion_coefficient();
     //qreal G = E / (2.0*(1+nu));
 
@@ -236,8 +236,8 @@ void Beam::compute_stiffness() {
     f.setZero(); /// Nodal loads initialization
     // Loads
     qreal px = 0.0; /// Constant axial distribuited load
-    qreal py1 = -constant_load(); /// Transversal linear load: value on first vertex
-    qreal py2 = -constant_load(); /// Transversal linear load: value on second vertex
+    qreal py1 = constant_load(); /// Transversal linear load: value on first vertex
+    qreal py2 = constant_load(); /// Transversal linear load: value on second vertex
     qreal utd = 0.0; /// Upper thermal delta
     qreal ltd = 0.0; /// Lower thermal delta
 
@@ -312,6 +312,9 @@ void Beam::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
     painter->setPen(QPen(QColor(0, 0, 255, 128),line_width));
     //std::cout<<"Deformation scale "<<truss.deformation_scale<<std::endl;
     painter->drawPolyline(scaled_deformed);
+    painter->setPen(QPen(QColor(0, 255, 0, 128),line_width/2));
+    painter->setBrush(QBrush(QColor(64, 255, 64, 128))); // Light green fill
+    painter->drawConvexPolygon(scaled_moment);
 
 //#ifdef DEBUG
     // Draw boundingRect with a thin green line
@@ -319,6 +322,7 @@ void Beam::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
     painter->setBrush(Qt::NoBrush);
     painter->drawRect(boundingRect());
 //#endif
+
 }
 
 void Beam::compute_deformed() {
@@ -339,35 +343,41 @@ void Beam::compute_deformed() {
     max_moment = 0.0;
     qreal weight = section.area()*material.weight();
 
-    qreal px =  member_end_forces()[0] - weight * sina;
-    qreal py1 = member_end_forces()[1] - weight * cosa;
-    qreal py2 = member_end_forces()[2] - weight * cosa;
-
+    qreal px =  /* horizontal element load, currently */  - weight * sina;
+    qreal py = /* vertical load at the first node, currently */ -constant_load()  - weight * cosa;
     qreal csi=0;
+
     for (int i=0; i<=deformed_points_count; ++i) {
         QPointF delta(u(csi),v(csi));
-        qreal py = py1 + (py2-py1)*csi;
         deformed << current+delta;
-        axial << QPointF(csi, -fixed_end_forces()[0] - px * current.x());
-        shear << QPointF(csi, -fixed_end_forces()[1] - (py1+py)*current.x()/2.0 );
-        qreal x2 = current.x()*current.x(); // pow(current.x() , 2.0);
-        moment << QPointF(csi, -fixed_end_forces()[2] + fixed_end_forces()[1]*current.x() +
-                          py1 * x2/2.0 + (py+py1)*x2/6.0);
+        qreal x_i = current.x();
+        qreal x2 = x_i*x_i; // i.e. x²;
+
+        qreal n_i = -member_end_forces()[0] - px * x_i;
+        qreal v_i = -member_end_forces()[1] - py*x_i;
+        qreal m_i = -member_end_forces()[2] - member_end_forces()[1] *x_i - py * x2/2.0;
+        std::cout<<QString("M(%1)=%2 ").arg(x_i).arg(m_i).toStdString();
+        axial << QPointF(x_i, n_i);
+        shear << QPointF(x_i, v_i);
+        moment << QPointF(x_i, m_i);
         max_deflection = fmax(fabs(delta.y()),max_deflection);
-        max_axial = fmax(fabs(axial.last().y()),max_axial);
-        max_shear = fmax(fabs(shear.last().y()),max_shear);
-        max_moment = fmax(fabs(moment.last().y()),max_moment);
+        max_axial = fmax(fabs(n_i),max_axial);
+        max_shear = fmax(fabs(v_i),max_shear);
+        max_moment = fmax(fabs(m_i),max_moment);
         csi +=step;
         current+=step_vector;
     }
-    /// Close axial, shear and moment plot by re-adding the first point.
-    axial<<axial.first();
-    shear<<shear.first();
-    moment<<moment.first();
+    std::cout<<QString("Beam highest: axial %1 shear %2 moment %3")
+            .arg(maximum_axial()).arg(maximum_shear()).arg(maximum_moment()).toStdString()
+            <<std::endl;
     //std::cout<<*this<<" max deflection "<<max_deflection<<std::endl;
 }
 
 void Beam::update_plots() {
+    std::cout<<
+            QString("Updating plots; scales: axial %1, shear %2, moment %3")
+            .arg(truss.axial_scale).arg(truss.shear_scale).arg(truss.moment_scale)
+            .toStdString()<<std::endl;
     scaled_deformed.clear(); scaled_deformed.reserve(deformed_points_count);
     scaled_axial.clear(); scaled_axial.reserve(deformed_points_count);
     scaled_shear.clear(); scaled_shear.reserve(deformed_points_count);
@@ -376,7 +386,14 @@ void Beam::update_plots() {
     foreach (QPointF point, deformed)  scaled_deformed<< QPointF(point.x(), point.y()*truss.deformation_scale);
     foreach (QPointF point, axial) scaled_axial<< QPointF(point.x(), point.y()*truss.axial_scale);
     foreach (QPointF point, shear) scaled_shear<< QPointF(point.x(), point.y()*truss.shear_scale);
-    foreach (QPointF point, shear) scaled_shear<< QPointF(point.x(), point.y()*truss.moment_scale);
+    foreach (QPointF point, moment) scaled_moment<< QPointF(point.x(), point.y()*truss.moment_scale);
+    /// Close the diagrams
+    scaled_axial<<QPointF(scaled_axial.last().x(),0.0)<<QPointF(0.0, 0.0);
+    scaled_shear<<QPointF(scaled_shear.last().x(),0.0)<<QPointF(0.0, 0.0);
+    scaled_moment<<QPointF(scaled_moment.last().x(),0.0)<<QPointF(0.0, 0.0);
+
+    foreach (QPointF p, scaled_moment) std::cout<<QString("(%1,%2),").arg(p.x()).arg(p.y()).toStdString();
+    std::cout<<std::endl;
 }
 
 void Beam::mousePressEvent(QGraphicsSceneMouseEvent *event)
