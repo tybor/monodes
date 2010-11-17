@@ -19,6 +19,7 @@
 
 #include <stdio.h>
 #include <iostream>
+#include <iomanip> // to get std::setprecision
 #include <assert.h>
 #include <math.h>
 
@@ -164,10 +165,18 @@ Matrix<qreal, 6, 1> &Beam::member_end_forces() {
         global_displacements <<
                 first().u(), first().v(), first().fi(),
                 second().u(), second().v(), second().fi();
+        std::cout<<"Global displacements: "<<global_displacements<<std::endl;
         local_displacements = transformation().transpose() * global_displacements;
-        mef = transformation()*(stiffness() * local_displacements) ;
+        std::cout<<"Local displacements: "<<local_displacements<<std::endl;
+        // Men, does operator* have higher precedence that a function call???
+        mef.setZero();
+        assert(mef.isZero());
+        mef = local_stiffness() * global_displacements - f;
         member_end_forces_computed = true;
-        //std::cout<<"Mef:"<<mef<<" gf:"<<gf<<std::endl;
+        std::cout<<std::setprecision(10)<<
+                "local st:"<<std::endl<<
+                local_stiffness()<<std::endl<<"Mef:"<<std::endl<<
+                mef<<std::endl;
     }
     return mef;
 }
@@ -210,11 +219,11 @@ void Beam::compute_stiffness() {
 
     local_st <<
             axial,  0.0,    0.0,    -axial, 0.0,    0.0,
-            0.0,    flex,   -fl_sh,  0.0,    -flex,  -fl_sh,
-            0.0,    -fl_sh,  shear,  0.0,    fl_sh, sh_fl,
+            0.0,    flex,   fl_sh,  0.0, -flex,  fl_sh,
+            0.0,    fl_sh,  shear,  0.0, -fl_sh, sh_fl,
             -axial, 0.0,    0.0,    axial,  0.0,    0.0,
-            0.0,    -flex,  fl_sh, 0.0,    flex,   -fl_sh,
-            0.0,    -fl_sh,  sh_fl,  0.0,    -fl_sh, shear;
+            0.0,    -flex,  -fl_sh, 0.0,    flex,   -fl_sh,
+            0.0,    fl_sh,  sh_fl,  0.0,    -fl_sh, shear;
 
     assert(local_st==local_st.transpose());
 
@@ -227,12 +236,12 @@ void Beam::compute_stiffness() {
             0.0, 0.0, 0.0, sina, cosa, 0.0,
             0.0, 0.0, 0.0, 0.0, 0.0, 1.0;
 
-    assert (tr==tr.transpose());
+    //std::cout<<"tr: "<<tr<<std::endl;
+    assert (/*tr.is_antisymmetric*/ (tr-tr.transpose()).isZero());
     st = (tr * local_st)*(tr.transpose());
     assert (st == st.transpose());
 
-    // Initializing nodal forces vector
-    f = Matrix<qreal,6,1>(6,1);
+    // Initializing f, nodal forces vector in local coordinates
     f.setZero(); /// Nodal loads initialization
     // Loads
     qreal px = 0.0; /// Constant axial distribuited load
@@ -315,6 +324,9 @@ void Beam::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
     painter->setPen(QPen(QColor(0, 255, 0, 128),line_width/2));
     painter->setBrush(QBrush(QColor(64, 255, 64, 128))); // Light green fill
     painter->drawConvexPolygon(scaled_moment);
+    painter->setPen(QPen(QColor(255, 0, 0, 128),line_width/2)); /// Red shear
+    painter->setBrush(QBrush(QColor(255, 64, 64, 128))); // Light red shear filling
+    painter->drawConvexPolygon(scaled_shear);
 
 //#ifdef DEBUG
     // Draw boundingRect with a thin green line
@@ -344,7 +356,7 @@ void Beam::compute_deformed() {
     qreal weight = section.area()*material.weight();
 
     qreal px =  /* horizontal element load, currently */  - weight * sina;
-    qreal py = /* vertical load at the first node, currently */ -constant_load()  - weight * cosa;
+    qreal py = /* vertical load at the first node, currently */ constant_load()  - weight * cosa;
     qreal csi=0;
 
     for (int i=0; i<=deformed_points_count; ++i) {
