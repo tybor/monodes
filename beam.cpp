@@ -171,7 +171,7 @@ Matrix<qreal, 6, 1> &Beam::member_end_forces() {
         // Men, does operator* have higher precedence that a function call???
         mef.setZero();
         assert(mef.isZero());
-        mef = local_stiffness() * global_displacements - f;
+        mef = local_stiffness() * local_displacements - f;
         member_end_forces_computed = true;
         std::cout<<std::setprecision(10)<<
                 "local st:"<<std::endl<<
@@ -319,13 +319,12 @@ void Beam::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 
     // Draw deformated beam.
     painter->setPen(QPen(QColor(0, 0, 255, 128),line_width));
-    //std::cout<<"Deformation scale "<<truss.deformation_scale<<std::endl;
     painter->drawPolyline(scaled_deformed);
-    painter->setPen(QPen(QColor(0, 255, 0, 128),line_width/2));
+    painter->setPen(QPen(QColor(0, 255, 0, 255),line_width/2));
     painter->setBrush(QBrush(QColor(64, 255, 64, 128))); // Light green fill
     painter->drawConvexPolygon(scaled_moment);
-    painter->setPen(QPen(QColor(255, 0, 0, 128),line_width/2)); /// Red shear
-    painter->setBrush(QBrush(QColor(255, 64, 64, 128))); // Light red shear filling
+    painter->setPen(QPen(QColor(255, 128, 0, 255),line_width/2)); /// Orange shear
+    painter->setBrush(QBrush(QColor(255, 128, 64, 128))); // Light orange shear filling
     painter->drawConvexPolygon(scaled_shear);
 
 //#ifdef DEBUG
@@ -360,18 +359,20 @@ void Beam::compute_deformed() {
     qreal csi=0;
 
     for (int i=0; i<=deformed_points_count; ++i) {
-        QPointF delta(u(csi),v(csi));
+        /// TODO: -v shall be v when we will separate view and model.
+        QPointF delta(u(csi),-v(csi));
         deformed << current+delta;
         qreal x_i = current.x();
         qreal x2 = x_i*x_i; // i.e. x²;
 
         qreal n_i = -member_end_forces()[0] - px * x_i;
         qreal v_i = -member_end_forces()[1] - py*x_i;
-        qreal m_i = -member_end_forces()[2] - member_end_forces()[1] *x_i - py * x2/2.0;
+        qreal m_i = -member_end_forces()[2] + member_end_forces()[1] *x_i + py * x2/2.0;
         std::cout<<QString("M(%1)=%2 ").arg(x_i).arg(m_i).toStdString();
-        axial << QPointF(x_i, n_i);
-        shear << QPointF(x_i, v_i);
-        moment << QPointF(x_i, m_i);
+        /// TODO remove the minus from -n_i, -v_i, -m_i when separating view and model
+        axial << QPointF(x_i, -n_i);
+        shear << QPointF(x_i, -v_i);
+        moment << QPointF(x_i, -m_i);
         max_deflection = fmax(fabs(delta.y()),max_deflection);
         max_axial = fmax(fabs(n_i),max_axial);
         max_shear = fmax(fabs(v_i),max_shear);
@@ -386,10 +387,10 @@ void Beam::compute_deformed() {
 }
 
 void Beam::update_plots() {
-    std::cout<<
-            QString("Updating plots; scales: axial %1, shear %2, moment %3")
-            .arg(truss.axial_scale).arg(truss.shear_scale).arg(truss.moment_scale)
-            .toStdString()<<std::endl;
+//    std::cout<<
+//            QString("Updating plots; scales: axial %1, shear %2, moment %3")
+//            .arg(truss.axial_scale).arg(truss.shear_scale).arg(truss.moment_scale)
+//            .toStdString()<<std::endl;
     scaled_deformed.clear(); scaled_deformed.reserve(deformed_points_count);
     scaled_axial.clear(); scaled_axial.reserve(deformed_points_count);
     scaled_shear.clear(); scaled_shear.reserve(deformed_points_count);
@@ -404,8 +405,8 @@ void Beam::update_plots() {
     scaled_shear<<QPointF(scaled_shear.last().x(),0.0)<<QPointF(0.0, 0.0);
     scaled_moment<<QPointF(scaled_moment.last().x(),0.0)<<QPointF(0.0, 0.0);
 
-    foreach (QPointF p, scaled_moment) std::cout<<QString("(%1,%2),").arg(p.x()).arg(p.y()).toStdString();
-    std::cout<<std::endl;
+//    foreach (QPointF p, scaled_moment) std::cout<<QString("(%1,%2),").arg(p.x()).arg(p.y()).toStdString();
+//    std::cout<<std::endl;
 }
 
 void Beam::mousePressEvent(QGraphicsSceneMouseEvent *event)

@@ -1,4 +1,7 @@
+Reimplement in LibertyEiffel
+
 Turn Nodes and Beams objects into proxy to the data contained in the global matrices of Truss (Flyweight patter http://en.wikipedia.org/wiki/Flyweight_pattern ); i.e. Truss contains all the matrices/array usually required to solve a static linear system while Nodes and Beams will hold only topological data (which beams are connected to Node n?), a reference to its truss and an index.
 
 Currently View and Model are melt together. This is not good at all. Separate them into Model (Node, Beam and Truss) and View (NodeRenderer, BeamRenderer and TrussRenderer).
 
+In fact view uses monitor coordinates with y growing downwards while the model needs the second coordinate growing upward, since the cross product x^y shall point outside the screen, representing counterclockwise rotations as positive.

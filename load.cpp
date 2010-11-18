@@ -1,6 +1,7 @@
 #include "load.h"
 #include "beam.h"
 #include "truss.h"
+#include <math.h>
 
 Load::Load(Beam &a_parent_beam, qreal a_constant_load) :
         beam(a_parent_beam)
@@ -18,13 +19,14 @@ void Load::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
     //    we always draw the beam from (0,0) to (length,0) and then rototranslate it
     //    to its actual position we can continue draw this horizontally
 
-    qreal actual_height = amount * beam.truss.load_scale;
+    /// Todo: remove the current assumption that everything is a deadload
+    qreal actual_height = fabs(amount) * beam.truss.load_scale;
     load_rect = QRectF (0.0, -actual_height, beam.length(), actual_height);
     painter->translate(0.0, -beam.section.height()*2); // Leave a little gap between load and beam
     painter->setPen(QPen(Qt::red));
     painter->setBrush(QBrush(QColor(255,96,96,128))); // Half-transparent orange
-    QString label = QString("%1 kg/m").arg(amount);
-    /* Pick the size that fits the load rectangle better */
+    QString label = QString("%1 kg/m").arg(fabs(amount));
+    /* Pick the font size that fits the load rectangle better */
     QFont font;
     QRectF text_rect = painter->boundingRect(load_rect,label); // The size the label would occupy in the load rectangle.
     qreal new_size = font.pointSizeF() * fmin(
