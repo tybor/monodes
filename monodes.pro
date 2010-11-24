@@ -59,8 +59,10 @@ FORMS    += \
 CONFIG += mobility
 MOBILITY = 
 
-CONFIG += link_pkgconfig
+CONFIG += link_pkgconfig 
 PKGCONFIG += eigen2
+
+CONFIG += static
 
 symbian {
     TARGET.UID3 = 0xe0bb5b77

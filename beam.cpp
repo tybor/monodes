@@ -291,9 +291,11 @@ void Beam::compute_stiffness() {
 }
 
 qreal Beam::maximum_deflection()  const { return max_deflection; }
+qreal Beam::maximum_deflection_cohordinate()  const { return max_deflection_cohordinate; }
 qreal Beam::maximum_axial()  const { return max_axial; }
 qreal Beam::maximum_shear()  const { return max_shear; }
 qreal Beam::maximum_moment()  const { return max_moment; }
+qreal Beam::zero_shear_cohordinate() const { return zero_shear; }
 
 QRectF Beam::boundingRect() const
 {
@@ -306,34 +308,40 @@ QRectF Beam::boundingRect() const
     return result.normalized();
 }
 
-void Beam::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
+void Beam::paint(QPainter *p, const QStyleOptionGraphicsItem *, QWidget *)
 {
     /// std::cout<<" painting beam"<<std::endl<<std::flush;
     qreal line_width = section.height();
     // A beam is simply a line
-    painter->setPen(QPen(Qt::black, line_width));
-    painter->drawLine(QPointF(0,0),QPointF(length(),0));
-
-    // TODO: Draw axial stress, shear stress and moment; better make them subitems to be drawn
-    //painter->drawPolyline(moment);
+    p->setPen(QPen(Qt::black, line_width));
+    p->drawLine(QPointF(0,0),QPointF(length(),0));
 
     // Draw deformated beam.
-    painter->setPen(QPen(QColor(0, 0, 255, 128),line_width));
-    painter->drawPolyline(scaled_deformed);
-    painter->setPen(QPen(QColor(0, 255, 0, 255),line_width/2));
-    painter->setBrush(QBrush(QColor(64, 255, 64, 128))); // Light green fill
-    painter->drawConvexPolygon(scaled_moment);
-    painter->setPen(QPen(QColor(255, 128, 0, 255),line_width/2)); /// Orange shear
-    painter->setBrush(QBrush(QColor(255, 128, 64, 128))); // Light orange shear filling
-    painter->drawConvexPolygon(scaled_shear);
+    p->setPen(QPen(QColor(0, 0, 255, 128),line_width));
+    p->drawPolyline(scaled_deformed);
+    // TODO: Write max deformation
+    p->setPen(QPen(QColor(0, 255, 0, 255),line_width/2));
+
+    // TODO: plot internal actions as subitems
+    // Drawing moment plot
+    p->setBrush(QBrush(QColor(64, 255, 64, 128))); // Light green fill
+    p->drawConvexPolygon(scaled_moment);
+    // Draw left, right and maximum in-span moment
+    QRectF moment_labels_rect(scaled_moment.first(),QSizeF(length(),maximum_moment()));
+    p->drawText(moment_labels_rect, Qt::AlignLeft, QString("%1").arg(moment.first().y()));
+    p->drawText(moment_labels_rect, Qt::AlignRight, QString("%1").arg(moment.last().y()));
+
+    // Drawing shear plot.
+    p->setPen(QPen(QColor(255, 128, 0, 255),line_width/2)); /// Orange shear
+    p->setBrush(QBrush(QColor(255, 128, 64, 128))); // Light orange shear filling
+    p->drawConvexPolygon(scaled_shear);
 
 //#ifdef DEBUG
     // Draw boundingRect with a thin green line
-    painter->setPen(QPen(Qt::green, 3, Qt::DotLine));
-    painter->setBrush(Qt::NoBrush);
-    painter->drawRect(boundingRect());
+    p->setPen(QPen(Qt::green, 3, Qt::DotLine));
+    p->setBrush(Qt::NoBrush);
+    p->drawRect(boundingRect());
 //#endif
-
 }
 
 void Beam::compute_deformed() {
@@ -349,15 +357,25 @@ void Beam::compute_deformed() {
     QPointF current_shear(0,0);
     QPointF current_moment(0,0);
     max_deflection = 0.0;
+    max_deflection_cohordinate = 0.0;
     max_axial = 0.0;
     max_shear = 0.0;
-    max_moment = 0.0;
-    qreal weight = section.area()*material.weight();
 
+    // Self-weight
+    qreal weight = section.area()*material.weight();
     qreal px =  /* horizontal element load, currently */  - weight * sina;
     qreal py = /* vertical load at the first node, currently */ constant_load()  - weight * cosa;
-    qreal csi=0;
 
+    // With constant shear, moment is linear and has no stationary points
+    if (member_end_forces()[1]!=member_end_forces()[4]){
+        qreal Va = member_end_forces()[1];
+        qreal Vb = member_end_forces()[4];
+        zero_shear =  Va/(Va-Vb)*length();
+    }
+    max_moment = -member_end_forces()[2] + member_end_forces()[1] *zero_shear + py * zero_shear*zero_shear/2.0;
+
+
+    qreal csi=0;
     for (int i=0; i<=deformed_points_count; ++i) {
         /// TODO: -v shall be v when we will separate view and model.
         QPointF delta(u(csi),-v(csi));

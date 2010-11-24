@@ -82,9 +82,11 @@ public:
     void update_plots(); /// Update the polygons for scaled deformed, axial,shear and moment
 
     qreal maximum_deflection() const;
+    qreal maximum_deflection_cohordinate() const;
     qreal maximum_axial() const;
     qreal maximum_shear() const;
     qreal maximum_moment() const;
+    qreal zero_shear_cohordinate() const;
 
     QRectF boundingRect() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
@@ -102,9 +104,15 @@ private:
     qreal stored_length2;
     qreal cosa,sina; // Cosine and sin directors
     qreal max_deflection;
+    qreal max_deflection_cohordinate;
     qreal max_axial;
     qreal max_shear;
     qreal max_moment;
+    qreal zero_shear;
+    QHash<qreal,qreal> interesting_shear_values;
+    QHash<qreal,qreal> interesting_moment_values;
+    QHash<qreal,qreal> interesting_deflection_values;
+
     // Currently sticking to one, uniform load orthogonal to the beam
     Load *load;
     /// TODO: refine load into QList<Load*> loads;
