@@ -52,8 +52,6 @@ public:
     void add_node (Node &a_node);
     void add_beam (Beam &a_beam);
     unsigned int support_conditions_count() const; // The number of support conditions of all nodes
-    //qreal longest_beam; /// The lenght of the longest beam, used to determinate the drawing size of bearings
-    //qreal highest_load; /// The maximum distributed load
 
     Material *material; ///< The one material currently supported
     Section *section; ///< The one section currently supported
@@ -68,12 +66,13 @@ public:
 
    QRectF boundingRect() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
-    void update_scales(); ///< Updates the scale used to draw nodes, deformed beams, loads, bearing reactions.
+    void update_scales(); ///< Updates the scale used to draw nodes, deformed beams, loads, bearing reactions. Also set actions_font
     qreal load_scale; /// The scale applied to loads
     qreal deformation_scale; /// Scale applied to displacement of the beam.
     qreal axial_scale; /// The scale applied to axial internal forces
     qreal shear_scale; /// The scale applied to shear internal forces
     qreal moment_scale; /// The scale applied to moment internal forces
+    QFont actions_font;
 
     QList<Node *> nodes_list;
     QList<Beam *> beams_list;

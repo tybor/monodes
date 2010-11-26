@@ -322,19 +322,52 @@ void Beam::paint(QPainter *p, const QStyleOptionGraphicsItem *, QWidget *)
     // TODO: Write max deformation
     p->setPen(QPen(QColor(0, 255, 0, 255),line_width/2));
 
-    // TODO: plot internal actions as subitems
+    // Plotting internal actions
+    // TODO: make internal actions plots subitems of Beam
+    QString left_moment,max_moment,right_moment, left_shear,right_shear;
+    const int label_chars = 5; // TODO Avoid using it
+
+    std::cout<<"Moment: ";
+    foreach (QPointF p, moment) std::cout<<QString("(%1,%2),").arg(p.x()).arg(p.y()).toStdString();
+    std::cout<<std::endl;
+
+    std::cout<<"Shear: ";
+    foreach (QPointF p, shear) std::cout<<QString("(%1,%2),").arg(p.x()).arg(p.y()).toStdString();
+    std::cout<<std::endl;
+
+    left_moment = QString("%1").arg(moment.first().y(),label_chars) ;
+    max_moment = QString("%1").arg(maximum_moment(),label_chars);
+    right_moment = QString("%1").arg(moment.last().y(),label_chars);
+    left_shear =QString("%1").arg(shear.first().y(),label_chars) ;
+    right_shear = QString("%1").arg(shear.last().y(),label_chars);
+
+    // Find the font size that makes all labels occupy at most 1/3 of the beam length
+    QFont font; qreal label_size = length()/3;
+    QRectF moment_rect(scaled_moment.boundingRect());
+    QRectF shear_rect(scaled_shear.boundingRect());
+    font.setPointSizeF( font.pointSizeF() * fmin(
+            label_size / p->boundingRect(moment_rect,left_moment).width(), fmin(
+                    label_size / p->boundingRect(moment_rect,right_moment).width(), fmin(
+                            label_size / p->boundingRect(moment_rect,max_moment).width(), fmin(
+                                    label_size / p->boundingRect(moment_rect,left_shear).width(),
+                                    label_size / p->boundingRect(moment_rect,right_shear).width())))));
+    p->setFont(font);
+
     // Drawing moment plot
     p->setBrush(QBrush(QColor(64, 255, 64, 128))); // Light green fill
     p->drawConvexPolygon(scaled_moment);
     // Draw left, right and maximum in-span moment
-    QRectF moment_labels_rect(scaled_moment.first(),QSizeF(length(),maximum_moment()));
-    p->drawText(moment_labels_rect, Qt::AlignLeft, QString("%1").arg(moment.first().y()));
-    p->drawText(moment_labels_rect, Qt::AlignRight, QString("%1").arg(moment.last().y()));
+    p->drawText(moment_rect, Qt::AlignBottom+Qt::AlignLeft, left_moment);
+    p->drawText(moment_rect, Qt::AlignBottom+Qt::AlignRight, right_moment);
+    p->drawText(moment_rect, Qt::AlignBottom+Qt::AlignCenter, max_moment);
 
     // Drawing shear plot.
     p->setPen(QPen(QColor(255, 128, 0, 255),line_width/2)); /// Orange shear
     p->setBrush(QBrush(QColor(255, 128, 64, 128))); // Light orange shear filling
     p->drawConvexPolygon(scaled_shear);
+    // Draw extreme shear values
+    p->drawText(shear_rect, Qt::AlignLeft, left_shear);
+    p->drawText(shear_rect, Qt::AlignRight, right_shear);
 
 //#ifdef DEBUG
     // Draw boundingRect with a thin green line
@@ -342,6 +375,8 @@ void Beam::paint(QPainter *p, const QStyleOptionGraphicsItem *, QWidget *)
     p->setBrush(Qt::NoBrush);
     p->drawRect(boundingRect());
 //#endif
+
+
 }
 
 void Beam::compute_deformed() {

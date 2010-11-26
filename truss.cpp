@@ -126,6 +126,8 @@ void Truss::update_scales() {
 
     foreach (Beam *a_beam, beams()) a_beam->update_plots();
     // Update bearing-reaction-scale
+
+    actions_font.setPointSizeF(fmax(shortest/5,longest/10));
 }
 
 unsigned int Truss::support_conditions_count() const {
