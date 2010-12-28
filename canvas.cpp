@@ -39,10 +39,9 @@
 #include <iostream>
 
 Canvas::Canvas() {
-    QGraphicsScene *scene = new QGraphicsScene(this);
-    scene->setItemIndexMethod(QGraphicsScene::NoIndex);
+    setScene(new QGraphicsScene(this));
+    scene()->setItemIndexMethod(QGraphicsScene::NoIndex);
 
-    setScene(scene);
     setCacheMode(CacheBackground);
     setViewportUpdateMode(BoundingRectViewportUpdate);
     setRenderHint(QPainter::Antialiasing);
@@ -81,6 +80,9 @@ Canvas::Canvas() {
 void Canvas::dialog_closed(int res) {
     if (res) {
         //std::cout<<"Dialog closed\n";
+        // Remove eventual old items from the scene
+        foreach (QGraphicsItem *item, scene()->items()) scene()->removeItem(item);
+        // TODO: this may be ineffeficient, perhaps its better to throw away the old scene and get a new one
         t = new Truss();
         scene()->addItem(t);
 #   if defined(Q_WS_S60)
@@ -154,18 +156,18 @@ void Canvas::zoom_out(){
 void Canvas::keyPressEvent(QKeyEvent *event)
 {
     switch (event->key()) {
-//    case Qt::Key_Up:
-//        centerNode->moveBy(0, -20);
-//        break;
-//    case Qt::Key_Down:
-//        centerNode->moveBy(0, 20);
-//        break;
-//    case Qt::Key_Left:
-//        centerNode->moveBy(-20, 0);
-//        break;
-//    case Qt::Key_Right:
-//        centerNode->moveBy(20, 0);
-//        break;
+    case Qt::Key_Up:
+        translate(0,-20);
+        break;
+    case Qt::Key_Down:
+        translate(0,20);
+        break;
+    case Qt::Key_Left:
+        translate(-20,0);
+        break;
+    case Qt::Key_Right:
+        translate(20,0);
+        break;
     case Qt::Key_Plus:
         scale(1.2,1.2);
         break;
@@ -187,7 +189,7 @@ void Canvas::keyPressEvent(QKeyEvent *event)
 
 void Canvas::wheelEvent(QWheelEvent *event)
 {
-    qreal s = pow((double)2, -event->delta() / 240.0);
+    qreal s = pow(2.0, -event->delta() / 240.0);
     scale(s,s);
 }
 
@@ -196,4 +198,8 @@ void Canvas::resizeEvent (QResizeEvent *) {
         if (! (t->beams().empty()))
             fitInView(t,Qt::KeepAspectRatio);
 
+}
+
+void Canvas::mouseDoubleClickEvent ( QMouseEvent * event ) {
+    dialog.show();
 }

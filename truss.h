@@ -67,6 +67,7 @@ public:
    QRectF boundingRect() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
     void update_scales(); ///< Updates the scale used to draw nodes, deformed beams, loads, bearing reactions. Also set actions_font
+    qreal action_scale; /// The scale applied to concentrated actions and node reactions.
     qreal load_scale; /// The scale applied to loads
     qreal deformation_scale; /// Scale applied to displacement of the beam.
     qreal axial_scale; /// The scale applied to axial internal forces

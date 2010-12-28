@@ -71,7 +71,7 @@ public:
 
     QPointF displacement(); ///< Displacement of the deformed node.
 
-    qreal vertical, horizonal, moment; /// Bearing reactions.
+    qreal vertical, horizontal, moment; /// Bearing reactions.
     // Constrains
     enum Constrain constrain() const;
     void set_constrain(enum Constrain a_constrain);

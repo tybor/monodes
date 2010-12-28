@@ -51,8 +51,9 @@ Node::Node (qreal an_x, qreal an_y, enum Constrain a_constrain)
     dof_x = 0; dof_y=0; dof_tetha=0;
     my_constrain = a_constrain;
     vertical = 0.0;
-    horizonal = 0.0;
+    horizontal = 0.0;
     moment = 0.0;
+    reactions = new Reactions(*this);
     setAcceptHoverEvents (true);
 #ifdef DEBUG
     std::cout<<"New node "<<*this<<std::endl<<std::flush;
@@ -124,7 +125,7 @@ void Node::hoverEnterEvent(QGraphicsSceneHoverEvent *) {
     QString msg = QString("Entering node  (%1,%2) u=%3, v=%4, fi=%5 "
                           "N=%6 V=%7 M=%8").arg(pos().x()).arg(pos().y())
             .arg(u()).arg(v()).arg(fi())
-            .arg(horizonal).arg(vertical).arg(moment);
+            .arg(horizontal).arg(vertical).arg(moment);
     std::cout<<msg.toStdString()<<std::endl;
     setToolTip(msg);
 }
@@ -133,7 +134,7 @@ void Node::hoverMoveEvent ( QGraphicsSceneHoverEvent *) {
     QString msg = QString("Node  (%1,%2) u=%3, v=%4, fi=%5 "
                           "N=%6 V=%7 M=%8").arg(pos().x()).arg(pos().y())
             .arg(u()).arg(v()).arg(fi())
-            .arg(horizonal).arg(vertical).arg(moment);
+            .arg(horizontal).arg(vertical).arg(moment);
     std::cout<<msg.toStdString()<<std::endl;
     setToolTip(msg);
 }
@@ -232,22 +233,20 @@ void Node::set_constrain(enum Constrain a_constrain) {
 }
 
 void Node::update_reactions() {
-    horizonal = 0.0; vertical=0.0; moment=0.0;
+    horizontal = 0.0; vertical=0.0; moment=0.0;
     /// Add the reaction of each connected beam
     foreach (Beam *b, beams()) {
         Matrix<qreal,6,1> gmef /*global_member_end_forces */=  b->transformation()*b->member_end_forces();
         if (this == &b->first()) {
-            horizonal -= gmef [0];
+            horizontal -= gmef [0];
             vertical -= gmef [1];
             moment -= gmef [2];
         } else if (this == &b->second()) {
-            horizonal -= gmef [3];
+            horizontal -= gmef [3];
             vertical -= gmef [4];
             moment -= gmef [5];
         };
     }
-    /// TODO: remove eventual old reactions.
-    reactions = new Reactions(*this);
 }
 
 std::ostream &operator<<(std::ostream &s, Node &a_node) {
@@ -256,7 +255,7 @@ std::ostream &operator<<(std::ostream &s, Node &a_node) {
             <<" y:"<<a_node.dof_y
             <<" tetha:"<<a_node.dof_tetha
             <<" u:"<<a_node.u()<<" v:"<<a_node.v()<<" fi:"<<a_node.fi();
-    if (a_node.horizonal!=0.0) s<<" H: "<<a_node.horizonal;
+    if (a_node.horizontal!=0.0) s<<" H: "<<a_node.horizontal;
     if (a_node.vertical!=0.0) s<<" V: "<<a_node.vertical;
     if (a_node.moment!=0.0) s<<" M: "<<a_node.moment;
     s<<") ";

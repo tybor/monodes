@@ -89,12 +89,13 @@ void Truss::paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *)
 }
 
 void Truss::update_scales() {
-    // Find the biggest deformation, load, axial, shear and momet
+    // Find the biggest deformation, load, axial, shear, moment, action and reaction
     qreal max_deflection = 0.0;
     qreal highest_load=0.0;
     qreal highest_axial=0.0;
     qreal highest_shear=0.0;
     qreal highest_moment=0.0;
+    qreal highest_action=0.0;
     foreach (Beam *a_beam, beams()) {
         max_deflection = fmax(fabs(a_beam->maximum_deflection()), max_deflection);
         highest_load = fmax(highest_load, fabs(a_beam->constant_load()));
@@ -102,13 +103,19 @@ void Truss::update_scales() {
         highest_shear = fmax(fabs(a_beam->maximum_shear()), highest_shear);
         highest_moment= fmax(fabs(a_beam->maximum_moment()), highest_moment);
     }
+
     // Updating load scale: highest load will be high the half of the longest beam.
     load_scale= longest / highest_load/2.0;
-    // Updates node-scale
+    // Updates node-scale and finding the highest reaction
     qreal node_scale = fmax( /* the radius of the nodes will be the biggest of */
             2.0*highest /* two times the highest beam */,
             longest/20.0 /* 1/20 of longest beam. */ );
-    foreach (Node *n, nodes()) n->setScale(node_scale);
+    foreach (Node *n, nodes()) {
+        n->setScale(node_scale);
+        highest_action = fmax(highest_action, fmax(n->horizontal,n->vertical));
+    }
+    // The highest reaction will be drawn a little larger than the highest load, i.e. 60% of the longest beam
+    action_scale = 0.6 * longest / highest_action;
 
     // Maximum deflection, will be scaled to be as big as the smallest beam.
     if (max_deflection<1e-20) deformation_scale = 1.0;
@@ -208,21 +215,15 @@ void Truss::solve() {
                 loads(dof1) += nodal_forces[i];
                 for (int j=0; j<6; ++j) {
                     int dof2=dofs[j];
-                    if (dof2>=0) {
-//#ifdef DEBUG
-//                        std::cout<<"stiffness("<<dof1<<","<<dof2<<") += beam_stiffness("<<i<<","<<j<<") "
-//                                <<beam_stiffness(i,j)<<";"<<std::endl<<std::flush;
-//#endif
-                        stiffness(dof1,dof2) += beam_stiffness(i,j);
-                    }
+                    if (dof2>=0) stiffness(dof1,dof2) += beam_stiffness(i,j);
                 }
             }
         }
     }
 
-    std::cout<<"(st- st^t).max = "<<(stiffness - stiffness.transpose()).maxCoeff()<<std::endl
-            <<"Stiffness:"<<std::endl<<stiffness<<std::endl
-            <<"Loads: "<<loads<<std::endl;
+//    std::cout<<"(st- st^t).max = "<<(stiffness - stiffness.transpose()).maxCoeff()<<std::endl
+//            <<"Stiffness:"<<std::endl<<stiffness<<std::endl
+//            <<"Loads: "<<loads<<std::endl;
     assert(/* Sometime the strictly symmetrical assertion, stiffness == stiffness.transpose() will fail, */
             /* stiffness shall be symmetrical, accounting for numerical approximations */
             stiffness.isApprox(stiffness.transpose()));
@@ -231,7 +232,7 @@ void Truss::solve() {
     displacements = Matrix<qreal, Dynamic, Dynamic>(stiffness.rows(), loads.cols());
     stiffness.lu().solve(loads, &displacements);
 //#ifdef DEBUG
-    std::cout<<"Displacements: "<<std::endl<<displacements<<std::endl;
+//    std::cout<<"Displacements: "<<std::endl<<displacements<<std::endl;
 //#endif
     prepareGeometryChange(); // Before updating node displacements
     /// Updates all node deformations
@@ -239,18 +240,9 @@ void Truss::solve() {
         if (n->dof_x >= 0) n->set_u(displacements[n->dof_x]);
         if (n->dof_y >= 0) n->set_v(displacements[n->dof_y]);
         if (n->dof_tetha >= 0) n->set_fi(displacements[n->dof_tetha]);
-//#   ifdef DEBUG
-//        std::cout<<*n<<std::endl;
-//#   endif
     }
-    foreach (Beam *b, beams()) {
-        b->compute_deformed();
-        //std::cout<<*b<<" stresses: "<<b->member_end_forces()<<std::endl;
-    }
-    foreach (Node *n, nodes()) {
-        n->update_reactions();
-        //std::cout<<*n<<std::endl;
-    }
+    foreach (Beam *b, beams()) b->compute_deformed();
+    foreach (Node *n, nodes()) n->update_reactions();
     update_scales(); /// used for drawing
 
 }

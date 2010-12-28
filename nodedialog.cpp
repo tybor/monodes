@@ -29,7 +29,7 @@ NodeDialog::NodeDialog(Node &a_node, QWidget *parent) :
 {
     setupUi(this);
     /// TODO: Reactions:
-    h_value->setText(QString("%1").arg(a_node.horizonal));
+    h_value->setText(QString("%1").arg(a_node.horizontal));
     n_value->setText(QString("%1").arg(a_node.vertical));
     m_value->setText(QString("%1").arg(a_node.moment));
     /// Displacements

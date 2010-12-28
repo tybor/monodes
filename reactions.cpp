@@ -23,6 +23,7 @@
 #include "reactions.h"
 #include "node.h"
 #include "nodedialog.h"
+#include "truss.h"
 
 Reactions::Reactions(Node &parent) :
         node(parent)
@@ -31,14 +32,19 @@ Reactions::Reactions(Node &parent) :
 }
 
 void Reactions::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
+    /// TODO: Currently drawing only the horizontal reaction
     // Drawing a little below the node
     painter->translate(0.0, node.boundingRect().bottom()*1.2);
     // Drawing a vertical arrow
     painter->setPen(heavy);
-    painter->drawLine(0.0, 0.0, 0.0, 4.0*bigger);
+    Truss *truss = reinterpret_cast<Truss*>(node.parentItem()); /// This won't be necessary in Eiffel since parent_object would be redefined as TRUSS.
+    assert (truss!=NULL);
+    qreal l =node.vertical*truss->action_scale, w = l/8;
+    std::cout<<"freccia "<<l<<"x"<<w<<" scala "<<truss->action_scale<<std::endl;
+    painter->drawLine(0.0, 0.0, 0.0, l);
     //painter->setPen(QPen(QColor(Qt::red)));
-    painter->drawLine(QPointF(), QPointF(-bigger/2, 2*bigger));
-    painter->drawLine(QPointF(), QPointF(bigger/2, 2*bigger));
+    painter->drawLine(QPointF(), QPointF(-w, w));
+    painter->drawLine(QPointF(), QPointF( w, w));
     // Please note that those lines should be drawed providing QPointF objects; if you pass their actual coordinates they get casted into integers and you won't get what you intend.
 
     // Draw reaction

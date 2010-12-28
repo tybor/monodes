@@ -165,18 +165,18 @@ Matrix<qreal, 6, 1> &Beam::member_end_forces() {
         global_displacements <<
                 first().u(), first().v(), first().fi(),
                 second().u(), second().v(), second().fi();
-        std::cout<<"Global displacements: "<<global_displacements<<std::endl;
+        //std::cout<<"Global displacements: "<<global_displacements<<std::endl;
         local_displacements = transformation().transpose() * global_displacements;
-        std::cout<<"Local displacements: "<<local_displacements<<std::endl;
+        //std::cout<<"Local displacements: "<<local_displacements<<std::endl;
         // Men, does operator* have higher precedence that a function call???
         mef.setZero();
         assert(mef.isZero());
         mef = local_stiffness() * local_displacements - f;
         member_end_forces_computed = true;
-        std::cout<<std::setprecision(10)<<
-                "local st:"<<std::endl<<
-                local_stiffness()<<std::endl<<"Mef:"<<std::endl<<
-                mef<<std::endl;
+//        std::cout<<std::setprecision(10)<<
+//                "local st:"<<std::endl<<
+//                local_stiffness()<<std::endl<<"Mef:"<<std::endl<<
+//                mef<<std::endl;
     }
     return mef;
 }
@@ -327,15 +327,16 @@ void Beam::paint(QPainter *p, const QStyleOptionGraphicsItem *, QWidget *)
     QString left_moment,max_moment,right_moment, left_shear,right_shear;
     const int label_chars = 5; // TODO Avoid using it
 
-    std::cout<<"Moment: ";
-    foreach (QPointF p, moment) std::cout<<QString("(%1,%2),").arg(p.x()).arg(p.y()).toStdString();
-    std::cout<<std::endl;
+//    std::cout<<"Moment: ";
+//    foreach (QPointF p, moment) std::cout<<QString("(%1,%2),").arg(p.x()).arg(p.y()).toStdString();
+//    std::cout<<std::endl;
 
-    std::cout<<"Shear: ";
-    foreach (QPointF p, shear) std::cout<<QString("(%1,%2),").arg(p.x()).arg(p.y()).toStdString();
-    std::cout<<std::endl;
+//    std::cout<<"Shear: ";
+//    foreach (QPointF p, shear) std::cout<<QString("(%1,%2),").arg(p.x()).arg(p.y()).toStdString();
+//    std::cout<<std::endl;
 
     left_moment = QString("%1").arg(moment.first().y(),label_chars) ;
+    // NEXT IS WRONG!!!!
     max_moment = QString("%1").arg(maximum_moment(),label_chars);
     right_moment = QString("%1").arg(moment.last().y(),label_chars);
     left_shear =QString("%1").arg(shear.first().y(),label_chars) ;
@@ -345,18 +346,23 @@ void Beam::paint(QPainter *p, const QStyleOptionGraphicsItem *, QWidget *)
     QFont font; qreal label_size = length()/3;
     QRectF moment_rect(scaled_moment.boundingRect());
     QRectF shear_rect(scaled_shear.boundingRect());
-    font.setPointSizeF( font.pointSizeF() * fmin(
-            label_size / p->boundingRect(moment_rect,left_moment).width(), fmin(
-                    label_size / p->boundingRect(moment_rect,right_moment).width(), fmin(
-                            label_size / p->boundingRect(moment_rect,max_moment).width(), fmin(
-                                    label_size / p->boundingRect(moment_rect,left_shear).width(),
-                                    label_size / p->boundingRect(moment_rect,right_shear).width())))));
+    font.setPointSizeF( font.pointSizeF() *
+                        fmin(label_size / p->boundingRect(moment_rect,left_moment).width(),
+                             fmin(label_size / p->boundingRect(moment_rect,right_moment).width(),
+                                  fmin(label_size / p->boundingRect(moment_rect,max_moment).width(),
+                                       fmin(label_size / p->boundingRect(moment_rect,left_shear).width(),
+                                            label_size / p->boundingRect(moment_rect,right_shear).width())))));
     p->setFont(font);
 
     // Drawing moment plot
+//    std::cout<<"Scaled moment (scale "<<truss.moment_scale<<"):";
+//    foreach (QPointF p, scaled_moment) std::cout<<QString("(%1,%2),").arg(p.x()).arg(p.y()).toStdString();
+//    std::cout<<std::endl;
+    p->setPen(QPen(QColor(0, 255, 0, 255),line_width/2));
     p->setBrush(QBrush(QColor(64, 255, 64, 128))); // Light green fill
     p->drawConvexPolygon(scaled_moment);
     // Draw left, right and maximum in-span moment
+    p->setPen(QPen(QColor(0, 128, 0, 255),line_width/2)); // Dark green moment labels
     p->drawText(moment_rect, Qt::AlignBottom+Qt::AlignLeft, left_moment);
     p->drawText(moment_rect, Qt::AlignBottom+Qt::AlignRight, right_moment);
     p->drawText(moment_rect, Qt::AlignBottom+Qt::AlignCenter, max_moment);
@@ -366,17 +372,9 @@ void Beam::paint(QPainter *p, const QStyleOptionGraphicsItem *, QWidget *)
     p->setBrush(QBrush(QColor(255, 128, 64, 128))); // Light orange shear filling
     p->drawConvexPolygon(scaled_shear);
     // Draw extreme shear values
+    p->setPen(QPen(QColor(128, 64, 0, 255),line_width/2)); /// Dark orange shear values
     p->drawText(shear_rect, Qt::AlignLeft, left_shear);
     p->drawText(shear_rect, Qt::AlignRight, right_shear);
-
-//#ifdef DEBUG
-    // Draw boundingRect with a thin green line
-    p->setPen(QPen(Qt::green, 3, Qt::DotLine));
-    p->setBrush(Qt::NoBrush);
-    p->drawRect(boundingRect());
-//#endif
-
-
 }
 
 void Beam::compute_deformed() {
@@ -385,7 +383,7 @@ void Beam::compute_deformed() {
     shear.clear();
     moment.clear();
 
-    qreal step=1.0/deformed_points_count; // Beware that 1 is NOT 1.0. If you write it 1/steps, step will be exactly zero.
+    qreal step=1.0/deformed_points_count; // Beware that 1 is integer and 1.0 is real. So when you write "1/steps", step will be exactly zero because the computatin is done in integers while with 1.0 the compiler uses reals
     QPointF step_vector = QPointF(length(),0.0) / deformed_points_count;
     QPointF current(0,0);
     QPointF current_axial(0,0);
@@ -407,8 +405,8 @@ void Beam::compute_deformed() {
         qreal Vb = member_end_forces()[4];
         zero_shear =  Va/(Va-Vb)*length();
     }
-    max_moment = -member_end_forces()[2] + member_end_forces()[1] *zero_shear + py * zero_shear*zero_shear/2.0;
-
+    //max_moment = -member_end_forces()[2] + member_end_forces()[1] *zero_shear + py * zero_shear*zero_shear/2.0;
+    std::cout<<"M_max = M(x') = M("<<zero_shear<<") = "<<max_moment<<" x': T(x')=0"<<std::endl;
 
     qreal csi=0;
     for (int i=0; i<=deformed_points_count; ++i) {
@@ -421,7 +419,7 @@ void Beam::compute_deformed() {
         qreal n_i = -member_end_forces()[0] - px * x_i;
         qreal v_i = -member_end_forces()[1] - py*x_i;
         qreal m_i = -member_end_forces()[2] + member_end_forces()[1] *x_i + py * x2/2.0;
-        std::cout<<QString("M(%1)=%2 ").arg(x_i).arg(m_i).toStdString();
+        //std::cout<<QString("M(%1)=%2 ").arg(x_i).arg(m_i).toStdString();
         /// TODO remove the minus from -n_i, -v_i, -m_i when separating view and model
         axial << QPointF(x_i, -n_i);
         shear << QPointF(x_i, -v_i);
@@ -429,13 +427,14 @@ void Beam::compute_deformed() {
         max_deflection = fmax(fabs(delta.y()),max_deflection);
         max_axial = fmax(fabs(n_i),max_axial);
         max_shear = fmax(fabs(v_i),max_shear);
+        // this is clearly wrong!
         max_moment = fmax(fabs(m_i),max_moment);
         csi +=step;
         current+=step_vector;
     }
-    std::cout<<QString("Beam highest: axial %1 shear %2 moment %3")
-            .arg(maximum_axial()).arg(maximum_shear()).arg(maximum_moment()).toStdString()
-            <<std::endl;
+//    std::cout<<QString("Beam highest: axial %1 shear %2 moment %3")
+//            .arg(maximum_axial()).arg(maximum_shear()).arg(maximum_moment()).toStdString()
+//            <<std::endl;
     //std::cout<<*this<<" max deflection "<<max_deflection<<std::endl;
 }
 
@@ -452,7 +451,8 @@ void Beam::update_plots() {
     foreach (QPointF point, deformed)  scaled_deformed<< QPointF(point.x(), point.y()*truss.deformation_scale);
     foreach (QPointF point, axial) scaled_axial<< QPointF(point.x(), point.y()*truss.axial_scale);
     foreach (QPointF point, shear) scaled_shear<< QPointF(point.x(), point.y()*truss.shear_scale);
-    foreach (QPointF point, moment) scaled_moment<< QPointF(point.x(), point.y()*truss.moment_scale);
+    // TODO: check moment plotting convention
+    foreach (QPointF point, moment) scaled_moment<< QPointF(point.x(), -point.y()*truss.moment_scale);
     /// Close the diagrams
     scaled_axial<<QPointF(scaled_axial.last().x(),0.0)<<QPointF(0.0, 0.0);
     scaled_shear<<QPointF(scaled_shear.last().x(),0.0)<<QPointF(0.0, 0.0);
