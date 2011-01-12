@@ -9,7 +9,7 @@ QT       += core gui
 TARGET = monodes
 TEMPLATE = app subdirs
 
-SUBDIRS = tests
+##SUBDIRS = tests
 
 ## C99 compatibility is required to use isfinite
 CFLAGS += -std=c99
@@ -46,7 +46,12 @@ HEADERS  += \
     sectiondialog.h \
     truss.h \
     load.h \
-    reactions.h
+    reactions.h \
+    /usr/include/eigen2/Eigen/Core \
+    /usr/include/eigen2/Eigen/Array
+
+## Eigen2 matrix library takes the form of some headers
+
 
 FORMS    += \
     trussdialog.ui \

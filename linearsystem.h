@@ -22,13 +22,15 @@
 #define LINEARSYSTEM_H
 
 #include <QThread>
+#define EIGEN_DONT_ALIGN 1
+// I used to define EIGEN_DONT_VECTORIZE  and EIGEN_DISABLE_UNALIGNED_ARRAY_ASSERT
 #include <Eigen/Core>
 // import most common Eigen types
 USING_PART_OF_NAMESPACE_EIGEN
 using Eigen::Dynamic;
 // To avoid alignment issues. See http://eigen.tuxfamily.org/dox/UnalignedArrayAssert.html
-#define EIGEN_DONT_VECTORIZE 1
-#define EIGEN_DISABLE_UNALIGNED_ARRAY_ASSERT 1
+// #define EIGEN_DONT_VECTORIZE 1
+// #define EIGEN_DISABLE_UNALIGNED_ARRAY_ASSERT 1
 
 class LinearSystem : public QThread
         // A linear system running as a separate thread, specialized in solving the systems resulting from the

@@ -23,16 +23,16 @@
 
 #include <QtGui>
 
+// Avoiding any optimization that requires specific alignment of data to avoid building issues on symbian and windows. TODO: re-enable this on linux
+#define EIGEN_DONT_ALIGN 1
+// I used to define EIGEN_DONT_VECTORIZE  and EIGEN_DISABLE_UNALIGNED_ARRAY_ASSERT
+
 #include <Eigen/Core>
 #include <Eigen/Array>
 
 // import most common Eigen types
 USING_PART_OF_NAMESPACE_EIGEN
 using Eigen::Dynamic;
-// To avoid alignment issues. See http://eigen.tuxfamily.org/dox/UnalignedArrayAssert.html
-#define EIGEN_DONT_VECTORIZE 1
-#define EIGEN_DISABLE_UNALIGNED_ARRAY_ASSERT 1
-
 #include "node.h"
 #include "beam.h"
 #include "linearsystem.h"
