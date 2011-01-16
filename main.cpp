@@ -1,8 +1,11 @@
-#include <QtGui> //#include <QtGui/QApplication>
-#include "canvas.h"
 #include <stdio.h>
 #include <iostream>
 #include <assert.h>
+
+#include <QtGui>
+
+#include "commonmath.h"
+#include "canvas.h"
 #include "nodedialog.h"
 
 int main(int argc, char *argv[])

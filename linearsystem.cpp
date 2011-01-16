@@ -17,11 +17,10 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <Eigen/LU>
+#include "linearsystem.h"
 #include <assert.h>
 #include <stdio.h>
-
-#include "linearsystem.h"
+#include "commonmath.h"
 
 LinearSystem::LinearSystem (const Matrix<qreal, Dynamic, Dynamic> &a_stiffness,
                             const Matrix<qreal, Dynamic, Dynamic> &some_loads) {

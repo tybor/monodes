@@ -21,16 +21,9 @@
 #define BEAM_H
 
 #include <QtGui>
-// Avoiding any optimization that requires specific alignment of data to avoid building issues on symbian and windows. TODO: re-enable this on linux
-#define EIGEN_DONT_ALIGN 1
-// I used to define EIGEN_DONT_VECTORIZE  and EIGEN_DISABLE_UNALIGNED_ARRAY_ASSERT
 
-#include <Eigen/Core>
-#include <Eigen/Array> // To compare matrices
+#include "commonmath.h"
 
-// import most common Eigen types
-USING_PART_OF_NAMESPACE_EIGEN
-using Eigen::Dynamic;
 #include "section.h"
 #include "material.h"
 #include "load.h"

@@ -20,13 +20,9 @@
 #include <assert.h>
 #include <stdio.h>
 #include <iostream>
-#include <math.h>
 #include <limits>
 
-#include <Eigen/Core>
-#include <Eigen/Array>
-#include <Eigen/LU>
-
+#include "commonmath.h"
 #include "truss.h"
 #include "node.h"
 #include "beam.h"

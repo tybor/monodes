@@ -48,7 +48,8 @@ HEADERS  += \
     load.h \
     reactions.h \
     /usr/include/eigen2/Eigen/Core \
-    /usr/include/eigen2/Eigen/Array
+    /usr/include/eigen2/Eigen/Array \
+    commonmath.h
 
 ## Eigen2 matrix library takes the form of some headers
 

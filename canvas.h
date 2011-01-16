@@ -23,6 +23,9 @@
 
 //#include <QGraphicsView>
 #include <QtGui>
+#include <commonmath.h>
+#include <stdlib.h>
+
 #include "node.h"
 #include "beam.h"
 #include "truss.h"
