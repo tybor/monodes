@@ -24,8 +24,26 @@
 /// Shared access to all math related headers, mainly Eigen2 matrix library
 
 #include <cmath>
+#include <valarray>
 #include <cstdlib>
 #include <stdlib.h>
+
+#if defined (__SYMBIAN32__)
+// Defining some math functions that seems to be missing from Symbian.
+// Note: this is a horrible hack.
+namespace std {
+inline int abs(int &x) { return std::abs(x); }
+inline double abs(long double &x) {return std::abs((double) x); }
+inline double sqrt(long double &x) {return std::sqrt(x);}
+inline double exp(long double &x) {return std::exp(x);}
+inline double log(long double &x) {return std::log(x);}
+inline double sin(long double &x) {return std::sin(x);}
+inline double cos(long double &x) {return std::cos(x);}
+inline double atan(long double &x) {return std::atan(x);}
+inline double atan2(long double &x, long double &y) {return std::atan2(x,y);}
+inline double pow(long double &x, long double &y) {return std::pow(x,y);}
+};
+#endif
 
 // Avoiding any optimization that requires specific alignment of data to avoid building issues on symbian and windows. TODO: re-enable this on linux
 #define EIGEN_DONT_ALIGN 1

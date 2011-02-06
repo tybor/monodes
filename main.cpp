@@ -1,10 +1,11 @@
+#include "commonmath.h"
+
 #include <stdio.h>
 #include <iostream>
 #include <assert.h>
 
 #include <QtGui>
 
-#include "commonmath.h"
 #include "canvas.h"
 #include "nodedialog.h"
 

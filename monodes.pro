@@ -4,17 +4,14 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+#QT       += core gui
 
 TARGET = monodes
-TEMPLATE = app subdirs
+#TEMPLATE = app subdirs
 
-##SUBDIRS = tests
+#SUBDIRS = Eigen
 
-## C99 compatibility is required to use isfinite
-CFLAGS += -std=c99
-
-SOURCES += main.cpp\
+SOURCES = main.cpp\
     node.cpp \
     canvas.cpp \
     beam.cpp \
@@ -31,7 +28,7 @@ SOURCES += main.cpp\
     load.cpp \
     reactions.cpp
 
-HEADERS  += \
+HEADERS  = \
     node.h \
     canvas.h \
     beam.h \
@@ -47,14 +44,12 @@ HEADERS  += \
     truss.h \
     load.h \
     reactions.h \
-    /usr/include/eigen2/Eigen/Core \
-    /usr/include/eigen2/Eigen/Array \
     commonmath.h
 
 ## Eigen2 matrix library takes the form of some headers
+INCLUDEPATH += Eigen
 
-
-FORMS    += \
+FORMS = \
     trussdialog.ui \
     nodedialog.ui \
     beamdialog.ui \
@@ -65,17 +60,17 @@ FORMS    += \
 CONFIG += mobility
 MOBILITY = 
 
-CONFIG += link_pkgconfig 
-PKGCONFIG += eigen2
+#CONFIG += link_pkgconfig
+#PKGCONFIG += eigen2
 
-CONFIG += static
+#CONFIG += static
 
-symbian {
-    TARGET.UID3 = 0xe0bb5b77
-    # TARGET.CAPABILITY += 
-    TARGET.EPOCSTACKSIZE = 0x14000
-    TARGET.EPOCHEAPSIZE = 0x020000 0x800000
-}
+#symbian {
+#    TARGET.UID3 = 0xe0bb5b77
+#    # TARGET.CAPABILITY +=
+#    TARGET.EPOCSTACKSIZE = 0x14000
+#    TARGET.EPOCHEAPSIZE = 0x020000 0x800000
+#}
 
 RESOURCES += \
     images.qrc \

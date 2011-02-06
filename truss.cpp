@@ -27,8 +27,9 @@
 #include "node.h"
 #include "beam.h"
 
-// We need to use isfinite, so we
-#define _ISOC99_SOURCE 1
+// We need to use isfinite anymore, so
+//#define _ISOC99_SOURCE 1
+// can be commented out
 
 Truss::Truss()
 {
