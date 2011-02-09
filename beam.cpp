@@ -406,7 +406,7 @@ void Beam::compute_deformed() {
         zero_shear =  Va/(Va-Vb)*length();
     }
     //max_moment = -member_end_forces()[2] + member_end_forces()[1] *zero_shear + py * zero_shear*zero_shear/2.0;
-    std::cout<<"M_max = M(x') = M("<<zero_shear<<") = "<<max_moment<<" x': T(x')=0"<<std::endl;
+    std::cerr<<"M_max = M(x') = M("<<zero_shear<<") = "<<max_moment<<" x': T(x')=0"<<std::endl;
 
     qreal csi=0;
     for (int i=0; i<=deformed_points_count; ++i) {
@@ -462,19 +462,20 @@ void Beam::update_plots() {
 //    std::cout<<std::endl;
 }
 
-void Beam::mousePressEvent(QGraphicsSceneMouseEvent *event)
-{
-    // Present the user the precise location of the node which may be edited and a way to change its support conditions
-#ifdef DEBUG
-    std::cout<<"beam pressed at "
-            <<event->pos().x()<<","<<event->pos().y()
-            <<std::endl<<std::flush;
-#endif
-    QPointF pos = event->pos();
-    setToolTip(QString("Beam pressed at (%1,%2)").arg(pos.x()).arg(pos.y()));
-   // update();
-    //QGraphicsItem::mousePressEvent(event);
-}
+//void Beam::mousePressEvent(QGraphicsSceneMouseEvent *event)
+//{
+//    // Present the user the precise location of the node which may be edited and a way to change its support conditions
+//#ifdef DEBUG
+//    std::cout<<"beam pressed at "
+//            <<event->pos().x()<<","<<event->pos().y()
+//            <<std::endl<<std::flush;
+//#endif
+//    QPointF pos = event->pos();
+//    setToolTip(QString("Beam pressed at (%1,%2)").arg(pos.x()).arg(pos.y()));
+//   // update();
+//    //QGraphicsItem::mousePressEvent(event);
+//}
+
 void Beam::hoverMoveEvent ( QGraphicsSceneHoverEvent * event ) {
     QPointF pos = event->pos();
     // Find the neareast point of the beam
@@ -491,16 +492,17 @@ void Beam::hoverMoveEvent ( QGraphicsSceneHoverEvent * event ) {
     setToolTip(msg);
 }
 
-void Beam::mouseReleaseEvent(QGraphicsSceneMouseEvent *)
-{
-#ifdef DEBUG
-    std::cout<<"rilasciata asta"<<std::endl<<std::flush;
-#endif
-    BeamDialog dialog(*this);
-    /* unused int res = */ dialog.exec();
-    // to need to redraw so no need to update();
-    //QGraphicsItem::mouseReleaseEvent(event);
-}
+//void Beam::mouseReleaseEvent(QGraphicsSceneMouseEvent *)
+//{
+
+//#ifdef DEBUG
+//    std::cout<<"rilasciata asta"<<std::endl<<std::flush;
+//#endif
+//    BeamDialog dialog(*this);
+//    /* unused int res = */ dialog.exec();
+//    // to need to redraw so no need to update();
+//    //QGraphicsItem::mouseReleaseEvent(event);
+//}
 
 
 std::ostream &operator<<(std::ostream &s, Beam &a_beam) {

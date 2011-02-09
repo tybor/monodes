@@ -77,4 +77,6 @@ RESOURCES += \
     texts.qrc
 
 OTHER_FILES += \
-    README
+    README \
+    TODO \
+    LICENSE

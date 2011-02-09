@@ -40,7 +40,7 @@ void Reactions::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidg
     Truss *truss = reinterpret_cast<Truss*>(node.parentItem()); /// This won't be necessary in Eiffel since parent_object would be redefined as TRUSS.
     assert (truss!=NULL);
     qreal l =node.vertical*truss->action_scale, w = l/8;
-    std::cout<<"freccia "<<l<<"x"<<w<<" scala "<<truss->action_scale<<std::endl;
+    //std::cout<<"freccia "<<l<<"x"<<w<<" scala "<<truss->action_scale<<std::endl;
     painter->drawLine(0.0, 0.0, 0.0, l);
     //painter->setPen(QPen(QColor(Qt::red)));
     painter->drawLine(QPointF(), QPointF(-w, w));

@@ -84,9 +84,9 @@ public:
     QRectF boundingRect() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 protected:
-    void mousePressEvent(QGraphicsSceneMouseEvent *event);
+    //void mousePressEvent(QGraphicsSceneMouseEvent *event);
     void hoverMoveEvent ( QGraphicsSceneHoverEvent * event );
-    void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
+    //void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
 
 private:
     QPolygonF deformed, scaled_deformed;

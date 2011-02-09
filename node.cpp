@@ -55,9 +55,9 @@ Node::Node (qreal an_x, qreal an_y, enum Constrain a_constrain)
     moment = 0.0;
     reactions = new Reactions(*this);
     setAcceptHoverEvents (true);
-#ifdef DEBUG
-    std::cout<<"New node "<<*this<<std::endl<<std::flush;
-#endif
+//#ifdef DEBUG
+//    std::cout<<"New node "<<*this<<std::endl<<std::flush;
+//#endif
 }
 
 
@@ -113,10 +113,10 @@ void Node::mousePressEvent(QGraphicsSceneMouseEvent *)
 
 void Node::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
-#ifdef DEBUG
-    std::cout<<"rilasciato ("<<x()<<","<<y()<<")"
-            <<std::endl<<std::flush;
-#endif
+//#ifdef DEBUG
+//    std::cout<<"rilasciato ("<<x()<<","<<y()<<")"
+//            <<std::endl<<std::flush;
+//#endif
     update();
     QGraphicsItem::mouseReleaseEvent(event);
 }
@@ -126,7 +126,7 @@ void Node::hoverEnterEvent(QGraphicsSceneHoverEvent *) {
                           "N=%6 V=%7 M=%8").arg(pos().x()).arg(pos().y())
             .arg(u()).arg(v()).arg(fi())
             .arg(horizontal).arg(vertical).arg(moment);
-    std::cout<<msg.toStdString()<<std::endl;
+//    std::cout<<msg.toStdString()<<std::endl;
     setToolTip(msg);
 }
 
@@ -135,7 +135,7 @@ void Node::hoverMoveEvent ( QGraphicsSceneHoverEvent *) {
                           "N=%6 V=%7 M=%8").arg(pos().x()).arg(pos().y())
             .arg(u()).arg(v()).arg(fi())
             .arg(horizontal).arg(vertical).arg(moment);
-    std::cout<<msg.toStdString()<<std::endl;
+//    std::cout<<msg.toStdString()<<std::endl;
     setToolTip(msg);
 }
 

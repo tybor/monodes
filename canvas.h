@@ -50,6 +50,7 @@ protected:
     void keyPressEvent(QKeyEvent *event);
     void wheelEvent(QWheelEvent *event);
     void resizeEvent (QResizeEvent *event);
+    void mouseReleaseEvent(QMouseEvent *event);
     void mouseDoubleClickEvent ( QMouseEvent * event );
 
 

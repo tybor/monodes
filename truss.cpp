@@ -119,8 +119,8 @@ void Truss::update_scales() {
     else deformation_scale = shortest / max_deflection;
     //std::cout<<"deformation scale = "<<shortest<<" / "<<max_deflection<<" = "<<deformation_scale<<std::endl;
 
-    std::cout<<QString("Truss highest: axial %1 shear %2 moment %3")
-            .arg(highest_axial).arg(highest_shear).arg(highest_moment).toStdString()<<std::endl;
+//    std::cout<<QString("Truss highest: axial %1 shear %2 moment %3")
+//            .arg(highest_axial).arg(highest_shear).arg(highest_moment).toStdString()<<std::endl;
     if (highest_axial<1e-20) axial_scale = 1.0; // Reasonable default for almost zero
     else axial_scale = longest / highest_axial; // Maximum axial will be scaled to be as big as the longest beam.
     if (highest_shear<1e-20) shear_scale = 1.0; // Reasonable default for almost zero

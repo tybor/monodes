@@ -155,6 +155,7 @@ void Canvas::zoom_out(){
 
 void Canvas::keyPressEvent(QKeyEvent *event)
 {
+    std::cerr<<"Got key "<<event->key()<<std::endl;
     switch (event->key()) {
     case Qt::Key_Up:
         translate(0,-20);
@@ -168,9 +169,13 @@ void Canvas::keyPressEvent(QKeyEvent *event)
     case Qt::Key_Right:
         translate(20,0);
         break;
+    case Qt::Key_ZoomIn:
+    case Qt::Key_VolumeUp:
     case Qt::Key_Plus:
         scale(1.2,1.2);
         break;
+    case Qt::Key_ZoomOut:
+    case Qt::Key_VolumeDown:
     case Qt::Key_Minus:
         //qreal out(0.8);
         scale(0.8,0.8);
@@ -198,6 +203,13 @@ void Canvas::resizeEvent (QResizeEvent *) {
         if (! (t->beams().empty()))
             fitInView(t,Qt::KeepAspectRatio);
 
+}
+
+void Canvas::mouseReleaseEvent(QMouseEvent *event) {
+    QGraphicsItem *clicked = itemAt(event->pos());
+    if (clicked) {
+        fitInView(clicked, Qt::KeepAspectRatio);
+    }
 }
 
 void Canvas::mouseDoubleClickEvent ( QMouseEvent * event ) {
