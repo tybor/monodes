@@ -305,11 +305,19 @@ QRectF Beam::boundingRect() const
     // Accounting the load and some space between the beam and the load.
     result.adjust(0.0, -line_width, 0.0, +line_width);
     result.united(scaled_deformed.boundingRect());
+    // TODO: add when axial will be used result.united(scaled_axial.boundingRect());
+    result.united(scaled_shear.boundingRect());
+    result.united(scaled_moment.boundingRect());
     return result.normalized();
 }
 
 void Beam::paint(QPainter *p, const QStyleOptionGraphicsItem *, QWidget *)
 {
+    // Draw boundingRect with a thin green line
+    p->setPen(QPen(Qt::green, 3, Qt::DotLine));
+    p->setBrush(Qt::NoBrush);
+    p->drawRect(boundingRect());
+
     /// std::cout<<" painting beam"<<std::endl<<std::flush;
     qreal line_width = section.height();
     // A beam is simply a line

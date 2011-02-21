@@ -102,24 +102,24 @@ void Node::set_u(qreal anu) { node_u = anu; }
 void Node::set_v(qreal av) { node_v = av; }
 void Node::set_fi(qreal afi) { node_fi = afi; }
 
-void Node::mousePressEvent(QGraphicsSceneMouseEvent *)
-{
-    NodeDialog dialog(*this); // A dialog for current node
-    //dialog.show();
-    /* unused int res = */ dialog.exec();
-    update();
-    //QGraphicsItem::mousePressEvent(event);
-}
+//void Node::mousePressEvent(QGraphicsSceneMouseEvent *)
+//{
+//    NodeDialog dialog(*this); // A dialog for current node
+//    //dialog.show();
+//    /* unused int res = */ dialog.exec();
+//    update();
+//    //QGraphicsItem::mousePressEvent(event);
+//}
 
-void Node::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
-{
-//#ifdef DEBUG
-//    std::cout<<"rilasciato ("<<x()<<","<<y()<<")"
-//            <<std::endl<<std::flush;
-//#endif
-    update();
-    QGraphicsItem::mouseReleaseEvent(event);
-}
+//void Node::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
+//{
+////#ifdef DEBUG
+////    std::cout<<"rilasciato ("<<x()<<","<<y()<<")"
+////            <<std::endl<<std::flush;
+////#endif
+//    update();
+//    QGraphicsItem::mouseReleaseEvent(event);
+//}
 
 void Node::hoverEnterEvent(QGraphicsSceneHoverEvent *) {
     QString msg = QString("Entering node  (%1,%2) u=%3, v=%4, fi=%5 "
@@ -141,10 +141,9 @@ void Node::hoverMoveEvent ( QGraphicsSceneHoverEvent *) {
 
 QRectF Node::boundingRect() const
 {
-    QPainterPath path;
     static const qreal halfpen = smaller/8.0;
-    qreal low = bigger+halfpen;
-    qreal high = 2*low;
+    static const qreal low = bigger+halfpen;
+    static const qreal high = 2*low;
     return QRectF(-low,-low,high,high);
 }
 
@@ -152,8 +151,8 @@ QPainterPath Node::shape() const
 {
     QPainterPath path;
     static const qreal halfpen = smaller/8.0;
-    qreal low = bigger+halfpen;
-    qreal high = 2*low;
+    static const qreal low = bigger+halfpen;
+    static const qreal high = 2*low;
     path.addEllipse(-low,-low,high,high);
     return path;
 }
@@ -164,6 +163,11 @@ QPointF Node::displacement() {
 
 void Node::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 {
+    // Draw boundingRect with a thin green line
+    painter->setPen(QPen(Qt::green, 0.1, Qt::DotLine));
+    painter->setBrush(Qt::NoBrush);
+    painter->drawRect(boundingRect());
+
     switch (my_constrain) {
     case uncostrained: // nothing
         painter->setPen(light);

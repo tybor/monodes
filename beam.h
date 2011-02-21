@@ -39,6 +39,8 @@ qreal f6(qreal csi);
 class Node; // Forward declaration
 class Truss; // Forward declaration
 
+static const int deformed_points_count=32; /// Number of points in diagrams plots
+
 class Beam : public QGraphicsItem
 {
 public:
@@ -122,8 +124,6 @@ private:
 
     qreal u(qreal csi);
     qreal v(qreal csi);
-
-    static const int deformed_points_count=32; /// Number
 
 // no signals:
 

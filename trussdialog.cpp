@@ -58,6 +58,7 @@ TrussDialog::TrussDialog(QWidget *parent) :
     loads.append(load5);
 #if defined(Q_WS_S60)
     showMaximized();
+
 #endif
 
    update_spans(spans_count->value());

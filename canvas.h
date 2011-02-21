@@ -63,6 +63,7 @@ private:
     QPushButton *zoomin_button, *zoomout_button;
     QGraphicsAnchorLayout *zooms;
     QGraphicsProxyWidget *zoomin,*zoomout;
+    QPropertyAnimation animation;
 };
 
 #endif // CANVAS_H

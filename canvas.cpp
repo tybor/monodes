@@ -34,11 +34,16 @@
 #include <QFormLayout>
 #include <QDoubleSpinBox>
 
+#include <QPropertyAnimation> // To make the zooming animations
+ #include <QEasingCurve>
+
 #include <assert.h>
 #include <stdio.h>
 #include <iostream>
 
-Canvas::Canvas() {
+Canvas::Canvas() :
+    animation(this, "sceneRect") // the shown rectangle of this canvas will be animated
+{
     setScene(new QGraphicsScene(this));
     scene()->setItemIndexMethod(QGraphicsScene::NoIndex);
 
@@ -48,6 +53,9 @@ Canvas::Canvas() {
     setTransformationAnchor(AnchorUnderMouse);
     setResizeAnchor(AnchorViewCenter);
 
+    // We will animate the rectangle shown by thus canvas
+    animation.setDuration(3000);
+    animation.setEasingCurve(QEasingCurve::OutBack);
     // when the main dialog is closed update the canvas
     connect(&dialog, SIGNAL(finished(int)), this, SLOT(dialog_closed(int)));
 
@@ -207,9 +215,16 @@ void Canvas::resizeEvent (QResizeEvent *) {
 
 void Canvas::mouseReleaseEvent(QMouseEvent *event) {
     QGraphicsItem *clicked = itemAt(event->pos());
-    if (clicked) {
-        fitInView(clicked, Qt::KeepAspectRatio);
-    }
+    QGraphicsItem *focused ;
+    if (clicked) focused = clicked;
+    else /* no object at click point ; let's focus the entire truss */
+        focused = t;
+    animation.setStartValue(sceneRect()); // Start animation from current rectangle show
+    // The animation will end showing focused in a way similar
+    // to a call to fitInView(focused, Qt::KeepAspectRatio);
+    animation.setEndValue(focused->mapRectToScene(focused->boundingRect()));
+    animation.start();
+
 }
 
 void Canvas::mouseDoubleClickEvent ( QMouseEvent * event ) {
