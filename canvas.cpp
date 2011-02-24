@@ -42,7 +42,7 @@
 #include <iostream>
 
 Canvas::Canvas() :
-    animation(this, "sceneRect") // the shown rectangle of this canvas will be animated
+   animation(this, "transform") // the shown rectangle of this canvas will be animated
 {
     setScene(new QGraphicsScene(this));
     scene()->setItemIndexMethod(QGraphicsScene::NoIndex);
@@ -219,10 +219,14 @@ void Canvas::mouseReleaseEvent(QMouseEvent *event) {
     if (clicked) focused = clicked;
     else /* no object at click point ; let's focus the entire truss */
         focused = t;
-    animation.setStartValue(sceneRect()); // Start animation from current rectangle show
+    // Start animation from current rectangle show
+    animation.setStartValue(transform());
+    //animation.setStartValue(sceneRect());
     // The animation will end showing focused in a way similar
     // to a call to fitInView(focused, Qt::KeepAspectRatio);
-    animation.setEndValue(focused->mapRectToScene(focused->boundingRect()));
+    //animation.setEndValue(focused->mapRectToScene(focused->boundingRect()));
+    animation.setEndValue(focused->sceneTransform());
+                          //mapRectToScene(focused->boundingRect()));
     animation.start();
 
 }
