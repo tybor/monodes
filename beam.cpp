@@ -300,15 +300,12 @@ qreal Beam::zero_shear_cohordinate() const { return zero_shear; }
 QRectF Beam::boundingRect() const
 {
     qreal line_width = section.height();
-    //qreal load_scale = truss().load_scale;
-    QRectF result = QRectF(0,0, length(),0);
-    // Accounting the load and some space between the beam and the load.
-    result.adjust(0.0, -line_width, 0.0, +line_width);
-    result.united(scaled_deformed.boundingRect());
-    // TODO: add when axial will be used result.united(scaled_axial.boundingRect());
-    result.united(scaled_shear.boundingRect());
-    result.united(scaled_moment.boundingRect());
-    return result.normalized();
+    return (QRectF(0,-line_width, length(),+line_width) |
+            scaled_deformed.boundingRect() |
+            // TODO: add when axial will be used scaled_axial.boundingRect() |
+            scaled_shear.boundingRect() |
+            scaled_moment.boundingRect()
+            ).normalized();
 }
 
 void Beam::paint(QPainter *p, const QStyleOptionGraphicsItem *, QWidget *)
@@ -371,8 +368,17 @@ void Beam::paint(QPainter *p, const QStyleOptionGraphicsItem *, QWidget *)
     p->drawConvexPolygon(scaled_moment);
     // Draw left, right and maximum in-span moment
     p->setPen(QPen(QColor(0, 128, 0, 255),line_width/2)); // Dark green moment labels
-    p->drawText(moment_rect, Qt::AlignBottom+Qt::AlignLeft, left_moment);
-    p->drawText(moment_rect, Qt::AlignBottom+Qt::AlignRight, right_moment);
+    p->drawText(scaled_moment.first(), left_moment);
+    p->drawText(
+            // While the left moment may be naively drawn from the first point the last requires something more elaborate.
+            // In fact the label shall end at the last representative point of scaled_moment.
+            // Since scaled_moment is a closed polygon representing a plot, last item is at origin (0,0)
+            // and the previous has the same abscissa of the extreme of the beam.
+            // The actual last significative point is the 3rd counting from the end.
+            // I pick it by index and since QVector starts counting from 0 the index is the size minus two, not three.
+            FINISCIMI!!!!
+            QRectF( *(--(--(scaled_moment.end()))), QSizeF(w,h)
+              /* scaled_moment.at(scaled_moment.size()-2)*/, right_moment);
     p->drawText(moment_rect, Qt::AlignBottom+Qt::AlignCenter, max_moment);
 
     // Drawing shear plot.
