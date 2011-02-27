@@ -347,16 +347,19 @@ void Beam::paint(QPainter *p, const QStyleOptionGraphicsItem *, QWidget *)
     left_shear =QString("%1").arg(shear.first().y(),label_chars) ;
     right_shear = QString("%1").arg(shear.last().y(),label_chars);
 
-    // Find the font size that makes all labels occupy at most 1/3 of the beam length
-    QFont font; qreal label_size = length()/3;
+    QFont font;
+    // I used to find the font size that makes all labels occupy at most 1/3 of the beam length with the following
+    //     qreal label_size = length()/3;
     QRectF moment_rect(scaled_moment.boundingRect());
     QRectF shear_rect(scaled_shear.boundingRect());
-    font.setPointSizeF( font.pointSizeF() *
-                        fmin(label_size / p->boundingRect(moment_rect,left_moment).width(),
-                             fmin(label_size / p->boundingRect(moment_rect,right_moment).width(),
-                                  fmin(label_size / p->boundingRect(moment_rect,max_moment).width(),
-                                       fmin(label_size / p->boundingRect(moment_rect,left_shear).width(),
-                                            label_size / p->boundingRect(moment_rect,right_shear).width())))));
+    //    font.setPointSizeF( font.pointSizeF() *
+    //                        fmin(label_size / p->boundingRect(moment_rect,left_moment).width(),
+    //                             fmin(label_size / p->boundingRect(moment_rect,right_moment).width(),
+    //                                  fmin(label_size / p->boundingRect(moment_rect,max_moment).width(),
+    //                                       fmin(label_size / p->boundingRect(moment_rect,left_shear).width(),
+    //                                            label_size / p->boundingRect(moment_rect,right_shear).width())))));
+    // While correct it makes labels on shorter beams mostly unreadable. Lets try something simpler
+    font.setPointSizeF(truss.shortest/5);
     p->setFont(font);
 
     // Drawing moment plot
@@ -370,15 +373,23 @@ void Beam::paint(QPainter *p, const QStyleOptionGraphicsItem *, QWidget *)
     p->setPen(QPen(QColor(0, 128, 0, 255),line_width/2)); // Dark green moment labels
     p->drawText(scaled_moment.first(), left_moment);
     p->drawText(
-            // While the left moment may be naively drawn from the first point the last requires something more elaborate.
-            // In fact the label shall end at the last representative point of scaled_moment.
+            // While the left moment may be naively drawn from the first point the last may require something more elaborate.
+            // In fact we may want the label to end at the last representative point of scaled_moment.
             // Since scaled_moment is a closed polygon representing a plot, last item is at origin (0,0)
             // and the previous has the same abscissa of the extreme of the beam.
             // The actual last significative point is the 3rd counting from the end.
             // I pick it by index and since QVector starts counting from 0 the index is the size minus two, not three.
-            FINISCIMI!!!!
-            QRectF( *(--(--(scaled_moment.end()))), QSizeF(w,h)
-              /* scaled_moment.at(scaled_moment.size()-2)*/, right_moment);
+
+            // TO simplify things a little we may draw this label at the coordinates of the last "real" plot point, translating it a little more than a font height (i.e. doubling it).
+            scaled_moment.at(scaled_moment.size()-3) +
+            QPointF(-1.2*p->boundingRect(moment_rect,right_moment).width(), 0.0), right_moment);
+    /* we may check they are equivalent: assert (
+            (*(--(--(scaled_moment.end())))) == scaled_moment.at(scaled_moment.size()-2)
+            the first version uses iterator but it is horrible to read and way harder to understand, the second may be inefficient for purely linked list storarage but we know that vector are not implemented this way.
+             in Eiffel it may look as scaled_moment.end_iter.previous.previous.item = scaled_moment.at(scaled_moment.count - 2)
+             it may be actually wiser to inherit the shape or caching the actual useful values somewhere.
+            );
+            */
     p->drawText(moment_rect, Qt::AlignBottom+Qt::AlignCenter, max_moment);
 
     // Drawing shear plot.
