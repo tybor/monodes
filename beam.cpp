@@ -359,7 +359,7 @@ void Beam::paint(QPainter *p, const QStyleOptionGraphicsItem *, QWidget *)
     //                                       fmin(label_size / p->boundingRect(moment_rect,left_shear).width(),
     //                                            label_size / p->boundingRect(moment_rect,right_shear).width())))));
     // While correct it makes labels on shorter beams mostly unreadable. Lets try something simpler
-    font.setPointSizeF(truss.shortest/5);
+    font.setPointSizeF(truss.shortest/6);
     p->setFont(font);
 
     // Drawing moment plot
@@ -382,7 +382,7 @@ void Beam::paint(QPainter *p, const QStyleOptionGraphicsItem *, QWidget *)
 
             // TO simplify things a little we may draw this label at the coordinates of the last "real" plot point, translating it a little more than a font height (i.e. doubling it).
             scaled_moment.at(scaled_moment.size()-3) +
-            QPointF(-1.2*p->boundingRect(moment_rect,right_moment).width(), 0.0), right_moment);
+            QPointF(-p->boundingRect(moment_rect,right_moment).width(), 0.0), right_moment);
     /* we may check they are equivalent: assert (
             (*(--(--(scaled_moment.end())))) == scaled_moment.at(scaled_moment.size()-2)
             the first version uses iterator but it is horrible to read and way harder to understand, the second may be inefficient for purely linked list storarage but we know that vector are not implemented this way.
@@ -398,8 +398,9 @@ void Beam::paint(QPainter *p, const QStyleOptionGraphicsItem *, QWidget *)
     p->drawConvexPolygon(scaled_shear);
     // Draw extreme shear values
     p->setPen(QPen(QColor(128, 64, 0, 255),line_width/2)); /// Dark orange shear values
-    p->drawText(shear_rect, Qt::AlignLeft, left_shear);
-    p->drawText(shear_rect, Qt::AlignRight, right_shear);
+    p->drawText(scaled_shear.first(), left_shear);
+    p->drawText(scaled_shear.at(scaled_shear.size()-3) +
+                QPointF(-p->boundingRect(shear_rect,right_shear).width(),0.0), right_shear);
 }
 
 void Beam::compute_deformed() {
