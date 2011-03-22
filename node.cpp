@@ -164,9 +164,9 @@ QPointF Node::displacement() {
 void Node::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 {
     // Draw boundingRect with a thin green line
-    painter->setPen(QPen(Qt::green, 0.1, Qt::DotLine));
-    painter->setBrush(Qt::NoBrush);
-    painter->drawRect(boundingRect());
+//    painter->setPen(QPen(Qt::green, 0.1, Qt::DotLine));
+//    painter->setBrush(Qt::NoBrush);
+//    painter->drawRect(boundingRect());
 
     switch (my_constrain) {
     case uncostrained: // nothing

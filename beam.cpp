@@ -311,9 +311,9 @@ QRectF Beam::boundingRect() const
 void Beam::paint(QPainter *p, const QStyleOptionGraphicsItem *, QWidget *)
 {
     // Draw boundingRect with a thin green line
-    p->setPen(QPen(Qt::green, 3, Qt::DotLine));
-    p->setBrush(Qt::NoBrush);
-    p->drawRect(boundingRect());
+//    p->setPen(QPen(Qt::green, 3, Qt::DotLine));
+//    p->setBrush(Qt::NoBrush);
+//    p->drawRect(boundingRect());
 
     /// std::cout<<" painting beam"<<std::endl<<std::flush;
     qreal line_width = section.height();
@@ -331,14 +331,6 @@ void Beam::paint(QPainter *p, const QStyleOptionGraphicsItem *, QWidget *)
     // TODO: make internal actions plots subitems of Beam
     QString left_moment,max_moment,right_moment, left_shear,right_shear;
     const int label_chars = 5; // TODO Avoid using it
-
-//    std::cout<<"Moment: ";
-//    foreach (QPointF p, moment) std::cout<<QString("(%1,%2),").arg(p.x()).arg(p.y()).toStdString();
-//    std::cout<<std::endl;
-
-//    std::cout<<"Shear: ";
-//    foreach (QPointF p, shear) std::cout<<QString("(%1,%2),").arg(p.x()).arg(p.y()).toStdString();
-//    std::cout<<std::endl;
 
     left_moment = QString("%1").arg(moment.first().y(),label_chars) ;
     // NEXT IS WRONG!!!!
@@ -372,24 +364,8 @@ void Beam::paint(QPainter *p, const QStyleOptionGraphicsItem *, QWidget *)
     // Draw left, right and maximum in-span moment
     p->setPen(QPen(QColor(0, 128, 0, 255),line_width/2)); // Dark green moment labels
     p->drawText(scaled_moment.first(), left_moment);
-    p->drawText(
-            // While the left moment may be naively drawn from the first point the last may require something more elaborate.
-            // In fact we may want the label to end at the last representative point of scaled_moment.
-            // Since scaled_moment is a closed polygon representing a plot, last item is at origin (0,0)
-            // and the previous has the same abscissa of the extreme of the beam.
-            // The actual last significative point is the 3rd counting from the end.
-            // I pick it by index and since QVector starts counting from 0 the index is the size minus two, not three.
-
-            // TO simplify things a little we may draw this label at the coordinates of the last "real" plot point, translating it a little more than a font height (i.e. doubling it).
-            scaled_moment.at(scaled_moment.size()-3) +
+    p->drawText(scaled_moment.at(scaled_moment.size()-3) +
             QPointF(-p->boundingRect(moment_rect,right_moment).width(), 0.0), right_moment);
-    /* we may check they are equivalent: assert (
-            (*(--(--(scaled_moment.end())))) == scaled_moment.at(scaled_moment.size()-2)
-            the first version uses iterator but it is horrible to read and way harder to understand, the second may be inefficient for purely linked list storarage but we know that vector are not implemented this way.
-             in Eiffel it may look as scaled_moment.end_iter.previous.previous.item = scaled_moment.at(scaled_moment.count - 2)
-             it may be actually wiser to inherit the shape or caching the actual useful values somewhere.
-            );
-            */
     p->drawText(moment_rect, Qt::AlignBottom+Qt::AlignCenter, max_moment);
 
     // Drawing shear plot.

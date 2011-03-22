@@ -49,8 +49,9 @@ public:
 protected:
     void keyPressEvent(QKeyEvent *event);
     void wheelEvent(QWheelEvent *event);
-    void resizeEvent (QResizeEvent *event);
-    void mouseReleaseEvent(QMouseEvent *event);
+   // void resizeEvent (QResizeEvent *event);
+    //void mouseReleaseEvent(QMouseEvent *event);
+    void mousePressEvent(QMouseEvent *event);
     void mouseDoubleClickEvent ( QMouseEvent * event );
 
 
@@ -63,7 +64,7 @@ private:
     QPushButton *zoomin_button, *zoomout_button;
     QGraphicsAnchorLayout *zooms;
     QGraphicsProxyWidget *zoomin,*zoomout;
-    QPropertyAnimation animation;
+    //QPropertyAnimation animation;
 };
 
 #endif // CANVAS_H

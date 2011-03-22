@@ -40,13 +40,21 @@
 #include <assert.h>
 #include <stdio.h>
 #include <iostream>
+#include "flickcharm.h"
 
-Canvas::Canvas() :
-   animation(this, "transform") // the shown rectangle of this canvas will be animated
+Canvas::Canvas()
+    // No animation : animation(this, "sceneRect") // the shown rectangle of this canvas will be animated
 {
+    // FlickCharm provides kinetic scrolling
+    FlickCharm charm;
+    charm.activateOn (this);
+    // See http://www.slideshare.net/qtbynokia/special-effects-with-qt-graphics-view
+    // and http://labs.qt.nokia.com/2009/07/19/kinetic-scrolling-on-any-widgets/
+
     setScene(new QGraphicsScene(this));
     scene()->setItemIndexMethod(QGraphicsScene::NoIndex);
 
+    setDragMode(ScrollHandDrag); // Enabling scrolling
     setCacheMode(CacheBackground);
     setViewportUpdateMode(BoundingRectViewportUpdate);
     setRenderHint(QPainter::Antialiasing);
@@ -54,17 +62,23 @@ Canvas::Canvas() :
     setResizeAnchor(AnchorViewCenter);
 
     // We will animate the rectangle shown by thus canvas
-    animation.setDuration(3000);
-    animation.setEasingCurve(QEasingCurve::OutBack);
+    //    animation.setDuration(3000);
+    //    animation.setEasingCurve(QEasingCurve::OutBack);
     // when the main dialog is closed update the canvas
     connect(&dialog, SIGNAL(finished(int)), this, SLOT(dialog_closed(int)));
 
     // Add zoom buttons; the following is clumsy; "-" overrides "+" button.
-//    zooms = new QGraphicsAnchorLayout();
-//    zoomin_button = new QPushButton("+");
-//    zoomout_button = new QPushButton ("-");
-//    zoomin = scene->addWidget (zoomin_button);
-//    //zoomout = scene->addWidget (zoomout_button);
+    //zooms = new QGraphicsAnchorLayout();
+     QGraphicsWidget *zoomin_button = scene()->addWidget(new QPushButton("+"));
+     QGraphicsWidget *zoomout_button = scene()->addWidget(new QPushButton ("-"));
+
+     QGraphicsGridLayout *layout = new QGraphicsGridLayout;
+     layout->addItem(zoomin_button, 1, 0, Qt::AlignBottom);
+     layout->addItem(zoomout_button, 1, 1, Qt::AlignBottom);
+
+     QGraphicsWidget *form = new QGraphicsWidget;
+     form->setLayout(layout);
+     scene()->addItem(form);
 
     setMinimumSize(300, 300);
     setWindowTitle(tr("Mobile nodes"));
@@ -206,31 +220,33 @@ void Canvas::wheelEvent(QWheelEvent *event)
     scale(s,s);
 }
 
-void Canvas::resizeEvent (QResizeEvent *) {
-    if (t)
-        if (! (t->beams().empty()))
-            fitInView(t,Qt::KeepAspectRatio);
+//void Canvas::resizeEvent (QResizeEvent *) {
+//    if (t)
+//        if (! (t->beams().empty()))
+//            fitInView(t,Qt::KeepAspectRatio);
 
-}
+//}
 
-void Canvas::mouseReleaseEvent(QMouseEvent *event) {
+//void Canvas::mouseReleaseEvent(QMouseEvent *event) {
+void Canvas::    mousePressEvent(QMouseEvent *event) {
     QGraphicsItem *clicked = itemAt(event->pos());
     QGraphicsItem *focused ;
     if (clicked) focused = clicked;
     else /* no object at click point ; let's focus the entire truss */
         focused = t;
-    // Start animation from current rectangle show
-    animation.setStartValue(transform());
-    //animation.setStartValue(sceneRect());
+
+    // The animation from current rectangle to those of the clicked element is currently way too slow. Perhaps beam.paint is suboptimal.
+    // Commenting it out and sticking to
+    fitInView(focused, Qt::KeepAspectRatio);
+    //animation.setStartValue(sceneRect()); // Start animation from current rectangle show
     // The animation will end showing focused in a way similar
     // to a call to fitInView(focused, Qt::KeepAspectRatio);
-    //animation.setEndValue(focused->mapRectToScene(focused->boundingRect()));
-    animation.setEndValue(focused->sceneTransform());
-                          //mapRectToScene(focused->boundingRect()));
-    animation.start();
-
+    //    animation.setEndValue(focused->mapRectToScene(focused->boundingRect()));
+    //    animation.start();
 }
 
 void Canvas::mouseDoubleClickEvent ( QMouseEvent * event ) {
+    hide();
     dialog.show();
+    show();
 }

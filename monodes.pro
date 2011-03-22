@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-#QT       += core gui
+QT       += core gui webkit svg
 
 TARGET = monodes
 #TEMPLATE = app subdirs
@@ -26,7 +26,8 @@ SOURCES = main.cpp\
     sectiondialog.cpp \
     truss.cpp \
     load.cpp \
-    reactions.cpp
+    reactions.cpp \
+    flickcharm.cpp
 
 HEADERS  = \
     node.h \
@@ -44,7 +45,8 @@ HEADERS  = \
     truss.h \
     load.h \
     reactions.h \
-    commonmath.h
+    commonmath.h \
+    flickcharm.h
 
 ## Eigen2 matrix library takes the form of some headers
 INCLUDEPATH += Eigen
@@ -65,18 +67,21 @@ MOBILITY =
 
 #CONFIG += static
 
-#symbian {
-#    TARGET.UID3 = 0xe0bb5b77
-#    # TARGET.CAPABILITY +=
-#    TARGET.EPOCSTACKSIZE = 0x14000
-#    TARGET.EPOCHEAPSIZE = 0x020000 0x800000
-#}
-
 RESOURCES += \
     images.qrc \
     texts.qrc
 
 OTHER_FILES += \
+    icon.png \
     README \
     TODO \
     LICENSE
+
+symbian {
+  ICON = icon.svg
+
+#    TARGET.UID3 = 0xe0bb5b77
+#    # TARGET.CAPABILITY +=
+#    TARGET.EPOCSTACKSIZE = 0x14000
+#    TARGET.EPOCHEAPSIZE = 0x020000 0x800000
+}
