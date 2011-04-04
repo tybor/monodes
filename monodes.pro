@@ -72,15 +72,33 @@ RESOURCES += \
     texts.qrc
 
 OTHER_FILES += \
-    icon.png \
     README \
     TODO \
     LICENSE
 
 symbian {
-  ICON = icon.svg
+vendorinfo = \
+    "; Localised Vendor name" \
+    "%{\"Tybor, Paolo Redaelli\"}" \
+    " " \
+    "; Unique Vendor name" \
+    ":\"Tybor, Paolo Redaelli\"" \
+    " "
 
-#    TARGET.UID3 = 0xe0bb5b77
+ my_deployment.pkg_prerules = vendorinfo
+
+ supported_platforms = \
+     "; This program only supports S60 5.0 and later" \
+     "[0x1028315F],0,0,0,{\"S60 5th Edition Symbian1\"}" \
+     "[0x20022E6D],0,0,0,{\"Symbian3\"}" \
+     "[0x200267C2], 4, 7, 0, {\"Qt WebKit\"}" \
+     "[0x2001E61C], 4, 7, 0, {\"Qt\"}"
+
+ default_deployment.pkg_prerules -= pkg_platform_dependencies
+ my_deployment.pkg_prerules += supported_platforms
+ DEPLOYMENT += my_deployment
+
+    TARGET.UID3 = 0x2003086D
 #    # TARGET.CAPABILITY +=
 #    TARGET.EPOCSTACKSIZE = 0x14000
 #    TARGET.EPOCHEAPSIZE = 0x020000 0x800000
