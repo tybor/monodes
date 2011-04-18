@@ -94,11 +94,11 @@ enum Constrain contrain(int index){
 }
 
 enum Constrain TrussDialog::left_constrain() {
-    return contrain(left_bearing->currentIndex());
+    return hinge; //contrain(left_bearing->currentIndex());
 }
 
 enum Constrain TrussDialog::right_constrain() {
-    return contrain(right_bearing->currentIndex());
+    return hinge; //contrain(right_bearing->currentIndex());
 }
 
 void TrussDialog::update_spans(int spans) {

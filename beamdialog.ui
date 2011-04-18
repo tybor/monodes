@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>461</width>
-    <height>546</height>
+    <width>360</width>
+    <height>640</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -26,7 +26,7 @@
       <string>Insert</string>
      </property>
      <property name="icon">
-      <iconset resource="images.qrc">
+      <iconset>
        <normaloff>:/icone/insert-bearing.png</normaloff>:/icone/insert-bearing.png</iconset>
      </property>
      <property name="iconSize">
@@ -75,7 +75,7 @@
       <string>Delete</string>
      </property>
      <property name="icon">
-      <iconset resource="images.qrc">
+      <iconset>
        <normaloff>:/icone/delete-beam.png</normaloff>:/icone/delete-beam.png</iconset>
      </property>
      <property name="iconSize">
@@ -127,9 +127,7 @@
    </item>
   </layout>
  </widget>
- <resources>
-  <include location="images.qrc"/>
- </resources>
+ <resources/>
  <connections>
   <connection>
    <sender>buttonBox</sender>

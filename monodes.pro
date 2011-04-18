@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui webkit svg
+QT       += core gui
 
 TARGET = monodes
 #TEMPLATE = app subdirs
@@ -26,8 +26,7 @@ SOURCES = main.cpp\
     sectiondialog.cpp \
     truss.cpp \
     load.cpp \
-    reactions.cpp \
-    flickcharm.cpp
+    reactions.cpp
 
 HEADERS  = \
     node.h \
@@ -45,8 +44,7 @@ HEADERS  = \
     truss.h \
     load.h \
     reactions.h \
-    commonmath.h \
-    flickcharm.h
+    commonmath.h
 
 ## Eigen2 matrix library takes the form of some headers
 INCLUDEPATH += Eigen
@@ -59,22 +57,29 @@ FORMS = \
     licensedialog.ui \
     sectiondialog.ui
 
-CONFIG += mobility
-MOBILITY = 
 
 #CONFIG += link_pkgconfig
 #PKGCONFIG += eigen2
 
 #CONFIG += static
 
-RESOURCES += \
-    images.qrc \
-    texts.qrc
+RESOURCES +=
 
 OTHER_FILES += \
     README \
     TODO \
-    LICENSE
+    LICENSE \
+    android/src/eu/licentia/necessitas/ministro/IMinistro.aidl \
+    android/src/eu/licentia/necessitas/ministro/IMinistroCallback.aidl \
+    android/src/eu/licentia/necessitas/industrius/QtActivity.java \
+    android/src/eu/licentia/necessitas/industrius/QtSurface.java \
+    android/src/eu/licentia/necessitas/industrius/QtApplication.java \
+    android/res/drawable-mdpi/icon.png \
+    android/res/drawable-hdpi/icon.png \
+    android/res/values/libs.xml \
+    android/res/values/strings.xml \
+    android/res/drawable-ldpi/icon.png \
+    android/AndroidManifest.xml
 
 symbian {
 vendorinfo = \
@@ -91,15 +96,16 @@ vendorinfo = \
      "; This program only supports S60 5.0 and later" \
      "[0x1028315F],0,0,0,{\"S60 5th Edition Symbian1\"}" \
      "[0x20022E6D],0,0,0,{\"Symbian3\"}" \
-     "[0x200267C2], 4, 7, 0, {\"Qt WebKit\"}" \
-     "[0x2001E61C], 4, 7, 0, {\"Qt\"}"
+     "[0x200267C2], 4, 6, 3, {\"Qt WebKit\"}" \
+     "[0x2001E61C], 4, 6, 3, {\"Qt\"}"
 
  default_deployment.pkg_prerules -= pkg_platform_dependencies
  my_deployment.pkg_prerules += supported_platforms
  DEPLOYMENT += my_deployment
 
-    TARGET.UID3 = 0x2003086D
+#    TARGET.UID3 = 0x2003086D
 #    # TARGET.CAPABILITY +=
 #    TARGET.EPOCSTACKSIZE = 0x14000
 #    TARGET.EPOCHEAPSIZE = 0x020000 0x800000
+ ICON = icon.svg
 }
