@@ -9,6 +9,6 @@ qmake -spec symbian-abld
 ##make distclean 
 
 make release-gcce 
-make sis QT_SIS_CERTIFICATE=OVI_06-28-2010.crt QT_SIS_KEY=OVI_06-28-2010.key
-make installer_sis QT_SIS_CERTIFICATE=OVI_06-28-2010.crt QT_SIS_KEY=OVI_06-28-2010.key
+make sis QT_SIS_CERTIFICATE=OVI-paolo.crt QT_SIS_KEY=OVI-paolo.key
+make installer_sis QT_SIS_CERTIFICATE=OVI-paolo.crt QT_SIS_KEY=OVI-paolo.key
 

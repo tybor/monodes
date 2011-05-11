@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>296</width>
-    <height>281</height>
+    <width>300</width>
+    <height>300</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -25,13 +25,16 @@
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
+     <property name="spacing">
+      <number>0</number>
+     </property>
      <property name="sizeConstraint">
       <enum>QLayout::SetDefaultConstraint</enum>
      </property>
      <item>
       <widget class="QLabel" name="label_spans">
        <property name="sizePolicy">
-        <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+        <sizepolicy hsizetype="Minimum" vsizetype="Maximum">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
@@ -46,6 +49,18 @@
      </item>
      <item>
       <widget class="QSpinBox" name="spans_count">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+       <property name="readOnly">
+        <bool>true</bool>
+       </property>
        <property name="buttonSymbols">
         <enum>QAbstractSpinBox::PlusMinus</enum>
        </property>
@@ -102,8 +117,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>276</width>
-        <height>193</height>
+        <width>280</width>
+        <height>212</height>
        </rect>
       </property>
       <property name="minimumSize">
@@ -122,7 +137,7 @@
        <item row="0" column="1">
         <widget class="QLabel" name="label_span_length">
          <property name="sizePolicy">
-          <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
@@ -140,7 +155,7 @@ p, li { white-space: pre-wrap; }
        <item row="0" column="2">
         <widget class="QLabel" name="label_load">
          <property name="sizePolicy">
-          <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
@@ -151,7 +166,7 @@ p, li { white-space: pre-wrap; }
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Droid Sans'; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Load&lt;/p&gt;
-&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;[kN/m ≃ kg/cm]&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;[kN/m, kg/cm]&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
         </widget>
        </item>
@@ -170,6 +185,15 @@ p, li { white-space: pre-wrap; }
        </item>
        <item row="1" column="1">
         <widget class="QDoubleSpinBox" name="span1">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="buttonSymbols">
           <enum>QAbstractSpinBox::PlusMinus</enum>
          </property>
@@ -189,6 +213,15 @@ p, li { white-space: pre-wrap; }
        </item>
        <item row="1" column="2">
         <widget class="QDoubleSpinBox" name="load1">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="buttonSymbols">
           <enum>QAbstractSpinBox::PlusMinus</enum>
          </property>
@@ -215,6 +248,15 @@ p, li { white-space: pre-wrap; }
        </item>
        <item row="2" column="1">
         <widget class="QDoubleSpinBox" name="span2">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="buttonSymbols">
           <enum>QAbstractSpinBox::PlusMinus</enum>
          </property>
@@ -234,6 +276,15 @@ p, li { white-space: pre-wrap; }
        </item>
        <item row="2" column="2">
         <widget class="QDoubleSpinBox" name="load2">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="buttonSymbols">
           <enum>QAbstractSpinBox::PlusMinus</enum>
          </property>
@@ -260,6 +311,15 @@ p, li { white-space: pre-wrap; }
        </item>
        <item row="3" column="1">
         <widget class="QDoubleSpinBox" name="span3">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="buttonSymbols">
           <enum>QAbstractSpinBox::PlusMinus</enum>
          </property>
@@ -279,6 +339,15 @@ p, li { white-space: pre-wrap; }
        </item>
        <item row="3" column="2">
         <widget class="QDoubleSpinBox" name="load3">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="buttonSymbols">
           <enum>QAbstractSpinBox::PlusMinus</enum>
          </property>
@@ -305,6 +374,15 @@ p, li { white-space: pre-wrap; }
        </item>
        <item row="4" column="1">
         <widget class="QDoubleSpinBox" name="span4">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="buttonSymbols">
           <enum>QAbstractSpinBox::PlusMinus</enum>
          </property>
@@ -324,6 +402,15 @@ p, li { white-space: pre-wrap; }
        </item>
        <item row="4" column="2">
         <widget class="QDoubleSpinBox" name="load4">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="buttonSymbols">
           <enum>QAbstractSpinBox::PlusMinus</enum>
          </property>
@@ -352,6 +439,12 @@ p, li { white-space: pre-wrap; }
         <widget class="QDoubleSpinBox" name="span5">
          <property name="enabled">
           <bool>true</bool>
+         </property>
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
          </property>
          <property name="font">
           <font>
@@ -383,6 +476,15 @@ p, li { white-space: pre-wrap; }
        </item>
        <item row="5" column="2">
         <widget class="QDoubleSpinBox" name="load5">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="frame">
           <bool>true</bool>
          </property>

@@ -40,14 +40,13 @@
 #include <assert.h>
 #include <stdio.h>
 #include <iostream>
-#include "flickcharm.h"
 
 Canvas::Canvas()
     // No animation : animation(this, "sceneRect") // the shown rectangle of this canvas will be animated
 {
     // FlickCharm provides kinetic scrolling
-    FlickCharm charm;
-    charm.activateOn (this);
+    //FlickCharm charm;
+    //charm.activateOn (this);
     // See http://www.slideshare.net/qtbynokia/special-effects-with-qt-graphics-view
     // and http://labs.qt.nokia.com/2009/07/19/kinetic-scrolling-on-any-widgets/
 
